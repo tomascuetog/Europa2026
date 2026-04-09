@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#0d1b2a">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Europa 2026">
+<title>Organización · Europa 2026</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,300;1,400&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<link rel="stylesheet" href="style.css">
+
+</head>
+<body>
+<div class="modal-overlay" id="modal"><div class="modal-card">
+  <img class="modal-photo" id="mImg" src="" alt="">
+  <div class="modal-footer"><div class="modal-title" id="mTitle"></div><button class="modal-close" id="mClose">✕ Cerrar</button></div>
+</div></div><nav class="site-nav"><div class="nav-inner"><a class="nav-logo" href="index.html">Europa<span style="color:white">'</span>26</a><a href="index.html">🗺️ Inicio</a><span class="nav-sep">·</span><a href="ruta.html">Ruta & Clima</a><span class="nav-sep">·</span><a href="barcelona.html">Barcelona</a><span class="nav-sep">·</span><a href="grecia-islas.html">Grecia Islas</a><span class="nav-sep">·</span><a href="continental.html">Continental</a><span class="nav-sep">·</span><a href="budapest.html">Budapest</a><span class="nav-sep">·</span><a href="madrid.html">Madrid</a><span class="nav-sep">·</span><a href="organizar.html">Organización</a><span class="nav-sep">·</span></div></nav>
+<!-- ── COSTOS ── -->
+<section style="background:var(--navy);color:white;padding:5rem 2rem" id="costos">
+<div style="max-width:900px;margin:0 auto">
+  <p class="section-eyebrow">Finanzas</p>
+  <h2 style="font-family:'Cormorant Garamond',serif;font-size:clamp(2rem,4vw,3.5rem);font-weight:300;margin-bottom:.5rem">Resumen de Gastos</h2>
+  <p style="color:rgba(255,255,255,.45);font-size:.88rem;margin-bottom:2rem">Estimación por persona · Opciones preferidas (★) · Septiembre 2026</p>
+  <table class="cost-table">
+    <thead><tr><th>Tramo / Destino</th><th>Concepto</th><th>Opción elegida</th><th style="text-align:right">USD/persona</th></tr></thead>
+    <tbody>
+      <tr><td colspan="4" style="padding:.5rem 1rem;font-size:.63rem;letter-spacing:.2em;text-transform:uppercase;color:var(--gold);background:rgba(255,255,255,.03)">Transportes internos</td></tr>
+      <tr><td class="cost-dest">Madrid → Barcelona</td><td><div class="cost-cat">Tren</div></td><td><span class="cost-pref">★ Tren AVE</span></td><td style="text-align:right">53</td></tr>
+      <tr><td class="cost-dest">Barcelona → Atenas</td><td><div class="cost-cat">Vuelo</div></td><td><span class="cost-pref">★ Vuelo directo</span></td><td style="text-align:right">76</td></tr>
+      <tr><td class="cost-dest">Atenas → Santorini</td><td><div class="cost-cat">Ferry El Pireo</div></td><td><span class="cost-pref">★ Ferry ~8h</span></td><td style="text-align:right">45</td></tr>
+      <tr><td class="cost-dest">Santorini → Naxos</td><td><div class="cost-cat">Ferry</div></td><td><span class="cost-pref">★ Ferry 2h</span></td><td style="text-align:right">37</td></tr>
+      <tr><td class="cost-dest">Naxos → Creta</td><td><div class="cost-cat">Vuelo</div></td><td><span class="cost-pref">★ Vuelo</span></td><td style="text-align:right">56</td></tr>
+      <tr><td class="cost-dest">Creta → Atenas</td><td><div class="cost-cat">Vuelo</div></td><td><span class="cost-pref">★ Vuelo</span></td><td style="text-align:right">76</td></tr>
+      <tr><td class="cost-dest">Auto alquiler road trip</td><td><div class="cost-cat">4 días · Compacto</div></td><td>Economía / Compacto</td><td style="text-align:right">120</td></tr>
+      <tr><td class="cost-dest">Gasolina road trip</td><td><div class="cost-cat">~600 km</div></td><td>~50L gasoil</td><td style="text-align:right">40</td></tr>
+      <tr><td class="cost-dest">Salónica → Budapest</td><td><div class="cost-cat">Vuelo</div></td><td><span class="cost-pref">★ Vuelo directo</span></td><td style="text-align:right">68</td></tr>
+      <tr><td class="cost-dest">Budapest → Madrid</td><td><div class="cost-cat">Vuelo</div></td><td>Por confirmar</td><td style="text-align:right">100</td></tr>
+      <tr><td colspan="4" style="padding:.5rem 1rem;font-size:.63rem;letter-spacing:.2em;text-transform:uppercase;color:var(--gold);background:rgba(255,255,255,.03)">Hospedajes</td></tr>
+      <tr><td class="cost-dest">Barcelona</td><td><div class="cost-cat">3 noches</div></td><td><span class="cost-pref">★ BCN Sports Hostel · $34/n</span></td><td style="text-align:right">102</td></tr>
+      <tr><td class="cost-dest">Atenas (×2)</td><td><div class="cost-cat">2 noches total</div></td><td><span class="cost-pref">★ Safestay Monastiraki · $23/n</span></td><td style="text-align:right">46</td></tr>
+      <tr><td class="cost-dest">Santorini</td><td><div class="cost-cat">2 noches</div></td><td><span class="cost-pref">★ Santorini Camping · $26/n</span></td><td style="text-align:right">52</td></tr>
+      <tr><td class="cost-dest">Naxos</td><td><div class="cost-cat">2 noches</div></td><td><span class="cost-pref">★ Katerina Roza Studios · $24.6/n</span></td><td style="text-align:right">49</td></tr>
+      <tr><td class="cost-dest">Creta</td><td><div class="cost-cat">3 noches</div></td><td><span class="cost-pref">★ Cocoon City Hostel · $29/n</span></td><td style="text-align:right">87</td></tr>
+      <tr><td class="cost-dest">Nauplia + Meteora</td><td><div class="cost-cat">2 noches</div></td><td>Hostel / guesthouse · ~$25/n</td><td style="text-align:right">50</td></tr>
+      <tr><td class="cost-dest">Budapest</td><td><div class="cost-cat">3 noches</div></td><td><span class="cost-pref">★ The Hive · $19/n</span></td><td style="text-align:right">57</td></tr>
+      <tr><td class="cost-dest">Madrid</td><td><div class="cost-cat">4 noches</div></td><td>Sin costo</td><td style="text-align:right">0</td></tr>
+      <tr><td colspan="4" style="padding:.5rem 1rem;font-size:.63rem;letter-spacing:.2em;text-transform:uppercase;color:var(--gold);background:rgba(255,255,255,.03)">Gastos diarios</td></tr>
+      <tr><td class="cost-dest">Comidas</td><td><div class="cost-cat">24 días × $20</div></td><td>Restaurantes + supermercado</td><td style="text-align:right">480</td></tr>
+      <tr><td class="cost-dest">Transporte local</td><td><div class="cost-cat">Metro y buses</div></td><td>Sin taxis</td><td style="text-align:right">50</td></tr>
+      <tr><td class="cost-dest">Alcohol</td><td><div class="cost-cat">Durante el viaje</div></td><td>Bares, supermercado, etc.</td><td style="text-align:right">200</td></tr>
+      <tr><td class="cost-dest">Entradas y actividades</td><td><div class="cost-cat">Museos, tours, ferrys locales</div></td><td>Acrópolis, Cnosos, Meteora…</td><td style="text-align:right">200</td></tr>
+      <tr class="cost-subtotal"><td colspan="3" style="padding:1rem;color:rgba(255,255,255,.8)">SUBTOTAL — Sin vuelos internacionales</td><td style="text-align:right;padding:1rem;font-size:1.1rem;color:white">USD 2.044</td></tr>
+      <tr><td colspan="4" style="padding:.5rem 1rem;font-size:.63rem;letter-spacing:.2em;text-transform:uppercase;color:var(--gold);background:rgba(255,255,255,.03)">Vuelos internacionales</td></tr>
+      <tr><td class="cost-dest">Bs. As. ↔ Madrid</td><td><div class="cost-cat">Ida + vuelta · round trip</div></td><td>Aerolíneas / LATAM</td><td style="text-align:right">1.000</td></tr>
+      <tr style="border-top:1px solid rgba(201,151,58,.3)"><td colspan="3" style="padding:1.2rem 1rem;font-weight:700;font-size:.95rem;color:white"><strong>TOTAL ESTIMADO POR PERSONA</strong></td><td style="text-align:right;padding:1.2rem 1rem"><span class="cost-grand">~USD 3.044</span></td></tr>
+    </tbody>
+  </table>
+  <p class="cost-note">★ Precios basados en opciones preferidas · Hospedajes en habitación compartida · Vuelo int'l: $1.000 round trip · Comida $20/día · No incluye souvenirs ni imprevistos</p>
+</div>
+</section>
+
+<!-- ── TAREAS ── -->
+<section style="background:var(--cream-dark);padding:5rem 2rem" id="tareas">
+<div style="max-width:1000px;margin:0 auto">
+  <p class="section-eyebrow" style="color:var(--gold)">Organización</p>
+  <h2 style="font-family:'Cormorant Garamond',serif;font-size:clamp(2rem,4vw,3rem);font-weight:400;margin-bottom:.5rem">Lista de Tareas</h2>
+  <p style="color:var(--text-mid);font-size:.88rem;margin-bottom:.7rem">Todo lo que hay que reservar antes del viaje — se guarda automáticamente</p>
+  <p id="tasksSummary" style="font-size:.82rem;color:var(--text-mid);margin-bottom:2rem"></p>
+  <div class="tasks-grid" id="tasksGrid"></div>
+  <button class="tasks-reset" id="tasksReset">↺ Desmarcar todo</button>
+</div>
+</section>
+
+<!-- ── EQUIPAJE ── -->
+<section style="background:var(--cream);padding:5rem 2rem" id="packing">
+<div style="max-width:1000px;margin:0 auto">
+  <p class="section-eyebrow" style="color:var(--gold)">Preparación</p>
+  <h2 style="font-family:'Cormorant Garamond',serif;font-size:clamp(2rem,4vw,3rem);font-weight:300;margin-bottom:.5rem">Equipaje — Carry-on only</h2>
+  <p style="color:var(--text-mid);font-size:.88rem;margin-bottom:.5rem">Mochila 30-35L · Máximo 10kg · Lavamos ropa en hostels cada 3-4 días</p>
+  <p style="color:var(--text-mid);font-size:.82rem;margin-bottom:2rem">Marcá lo que ya tenés listo · Se guarda automáticamente</p>
+  <div class="packing-cats" id="packGrid"></div>
+</div>
+</section>
+
+<!-- ── TRACKER ── -->
+<section style="background:var(--navy);color:white;padding:5rem 2rem" id="tracker">
+<div style="max-width:1000px;margin:0 auto">
+  <p class="section-eyebrow">Estado</p>
+  <h2 style="font-family:'Cormorant Garamond',serif;font-size:clamp(2rem,4vw,3rem);font-weight:300;margin-bottom:.5rem">Tracker de Reservas</h2>
+  <p id="trackerProgress" style="font-size:.82rem;color:rgba(255,255,255,.4);margin-bottom:1.5rem"></p>
+  <div style="overflow-x:auto">
+    <table class="tracker-table">
+      <thead><tr><th>Item</th><th>Estado</th><th>Confirmación</th><th>Notas</th><th>Comprobante</th></tr></thead>
+      <tbody id="trackerBody"></tbody>
+    </table>
+  </div>
+</div>
+</section>
+<footer class="site-footer"><p>Europa 2026 · <span>Septiembre</span> · Madrid · Barcelona · Grecia · Budapest</p></footer>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="shared.js"></script>
+<script>
+// ── TASKS ────────────────────────────────────────────────────
+(function(){
+var TASKS=[
+  {group:"✈️ Vuelos internacionales",items:[{id:"v1",t:"Bs. As. → Madrid (ida)",tag:"urgente"},{id:"v2",t:"Madrid → Bs. As. (vuelta)",tag:"urgente"}]},
+  {group:"🚄 Transportes internos",items:[{id:"t1",t:"Tren AVE Madrid → Barcelona",tag:"urgente"},{id:"t2",t:"Vuelo Barcelona → Atenas",tag:"urgente"},{id:"t3",t:"Ferry Atenas (Pireo) → Santorini",tag:"urgente"},{id:"t4",t:"Ferry Santorini → Naxos",tag:"urgente"},{id:"t5",t:"Vuelo Naxos → Creta",tag:"urgente"},{id:"t6",t:"Vuelo Creta → Atenas",tag:"urgente"},{id:"t7",t:"Vuelo Salónica → Budapest",tag:"urgente"},{id:"t8",t:"Vuelo Budapest → Madrid",tag:"urgente"},{id:"t9",t:"Auto alquiler Grecia Continental (4 días)"}]},
+  {group:"🏨 Hospedajes",items:[{id:"h1",t:"Barcelona — BCN Sports Hostel"},{id:"h2",t:"Atenas I — Safestay Monastiraki"},{id:"h3",t:"Santorini — Santorini Camping"},{id:"h4",t:"Naxos — Katerina Roza Studios"},{id:"h5",t:"Creta — Cocoon City Hostel"},{id:"h6",t:"Atenas II — Safestay Monastiraki"},{id:"h7",t:"Nauplia (1 noche)"},{id:"h8",t:"Meteora (1 noche)"},{id:"h9",t:"Budapest — The Hive"}]},
+  {group:"🗺️ Barcelona",items:[{id:"b1",t:"Entrada Sagrada Família (con fecha)"},{id:"b2",t:"Entrada La Pedrera o Casa Batlló"},{id:"b3",t:"Entrada Park Güell (zona monumental)"}]},
+  {group:"🏛️ Grecia — Islas",items:[{id:"g1",t:"Reservar excursión Balos o Elafonisi"},{id:"g2",t:"Planear traslados en Santorini (ATV)"},{id:"g3",t:"Confirmar horarios ferrys entre islas"}]},
+  {group:"🚗 Road Trip Grecia",items:[{id:"r1",t:"Confirmar auto: retiro ATH, devolución SKG"},{id:"r2",t:"Entrada Acrópolis de Atenas (anticipado)"},{id:"r3",t:"Entrada Palacio de Cnosos"},{id:"r4",t:"Entrada sitio Meteora / monasterios"}]},
+  {group:"🏰 Budapest",items:[{id:"bu1",t:"Entrada Baños Széchenyi (slot horario)"},{id:"bu2",t:"Tour Parlamento (reservar online)"}]},
+  {group:"📋 Documentación y extras",items:[{id:"d1",t:"Contratar seguro de viaje internacional",tag:"urgente"},{id:"d2",t:"Verificar pasaportes vigentes (mín. 6 meses)"},{id:"d3",t:"Descargar Google Maps offline por zona"},{id:"d4",t:"Conseguir SIM Europa o eSIM"},{id:"d5",t:"Confirmar seguro auto incluye Grecia"}]},
+];
+var KEY='europa2026_tasks_v2';
+function load(){try{return JSON.parse(localStorage.getItem(KEY)||'{}')}catch(e){return{}}}
+function save(s){try{localStorage.setItem(KEY,JSON.stringify(s))}catch(e){}}
+function render(){
+  var state=load();
+  var grid=document.getElementById('tasksGrid');
+  grid.innerHTML='';
+  var total=0,done=0;
+  TASKS.forEach(function(group){
+    var dG=group.items.filter(function(it){return state[it.id]}).length;
+    total+=group.items.length; done+=dG;
+    var div=document.createElement('div'); div.className='task-group';
+    div.innerHTML='<div class="task-group-title">'+group.group+'<span class="task-progress">'+dG+'/'+group.items.length+'</span></div>';
+    group.items.forEach(function(it){
+      var d=!!state[it.id];
+      var tag=it.tag?'<span class="tag'+(it.tag==='urgente'?' urgent':'')+'">'+it.tag+'</span>':'';
+      var el=document.createElement('div'); el.className='task-item';
+      el.innerHTML='<div class="task-cb'+(d?' done':'')+'"></div><span class="task-label'+(d?' done':'')+'">'+it.t+tag+'</span>';
+      el.addEventListener('click',function(){var s=load();s[it.id]=!s[it.id];save(s);render();});
+      div.appendChild(el);
+    });
+    grid.appendChild(div);
+  });
+  document.getElementById('tasksSummary').innerHTML='<strong>'+done+' de '+total+'</strong> tareas completadas'+(done===total&&total>0?' 🎉 ¡Todo listo!':'');
+}
+document.getElementById('tasksReset').addEventListener('click',function(){if(confirm('¿Desmarcar todas?')){try{localStorage.removeItem(KEY)}catch(e){}render();}});
+render();
+})();
+
+// ── PACKING ──────────────────────────────────────────────────
+(function(){
+var PACKS=[
+  {cat:"👕 Ropa (7 días, lavado en hostels)",items:[{id:"p1",t:"5 remeras livianas de secado rápido",must:true},{id:"p2",t:"2 pantalones/shorts livianos",must:true},{id:"p3",t:"1 pantalón largo (templos, noches Budapest)",must:true},{id:"p4",t:"Campera impermeable y liviana",must:true},{id:"p5",t:"2 trajes de baño (secado rápido)",must:true},{id:"p6",t:"7 mudas de ropa interior de microfibra",must:true},{id:"p7",t:"5 pares de medias"}]},
+  {cat:"👟 Calzado — máximo 2 pares",items:[{id:"s1",t:"Zapatillas cómodas todo terreno",must:true},{id:"s2",t:"Ojotas/sandalia plana (playa + Santorini)",must:true}]},
+  {cat:"🧴 Higiene — líquidos ≤100ml en bolsa ZIP",items:[{id:"hy1",t:"Shampoo sólido",must:true},{id:"hy2",t:"Jabón sólido o pastilla"},{id:"hy3",t:"Desodorante sólido (no aerosol)"},{id:"hy4",t:"Pasta dental + cepillo viaje"},{id:"hy5",t:"Protector solar FPS 50+ (100ml)",must:true}]},
+  {cat:"🏖️ Playa & Sol",items:[{id:"b1",t:"Gafas de sol",must:true},{id:"b2",t:"Gorra o sombrero plegable",must:true},{id:"b3",t:"Toalla de microfibra ultra fina",must:true},{id:"b4",t:"Bolsa seca impermeable (ferrys)"}]},
+  {cat:"🔌 Tecnología",items:[{id:"t1",t:"Adaptador europeo tipo F (Schuko)",must:true},{id:"t2",t:"Cargador multipuerto USB-C",must:true},{id:"t3",t:"Power bank 10.000mAh (límite cabina)",must:true},{id:"t4",t:"Auriculares"},{id:"t5",t:"SIM europea o eSIM activada antes",must:true}]},
+  {cat:"💊 Farmacia básica",items:[{id:"h1",t:"Seguro de viaje activo en el celular",must:true},{id:"h2",t:"Ibuprofeno 400mg x10"},{id:"h3",t:"Antihistamínico"},{id:"h4",t:"Pastillas para mareo (ferrys)",must:true},{id:"h5",t:"Antidiarreico + suero oral"},{id:"h6",t:"Curitas surtidas"}]},
+  {cat:"📋 Documentos & dinero",items:[{id:"d1",t:"Pasaporte vigente (mín. 6 meses desde vuelta)",must:true},{id:"d2",t:"Foto del pasaporte en la nube + copia física",must:true},{id:"d3",t:"Tarjeta Wise/Revolut sin comisión",must:true},{id:"d4",t:"Efectivo: €150 para mercados"},{id:"d5",t:"Reservas descargadas offline",must:true},{id:"d6",t:"Candado con combinación (hostel)",must:true}]},
+  {cat:"🎒 La mochila",items:[{id:"m1",t:"Mochila 30-35L (cabe en cabina)",must:true},{id:"m2",t:"Organizadores tipo packing cubes"},{id:"m3",t:"Candado TSA exterior"},{id:"m4",t:"Botella de agua colapsable 500ml",must:true}]},
+];
+var KEY='europa2026_pack_v2';
+function load(){try{return JSON.parse(localStorage.getItem(KEY)||'{}')}catch(e){return{}}}
+function save(s){try{localStorage.setItem(KEY,JSON.stringify(s))}catch(e){}}
+function render(){
+  var state=load();
+  var grid=document.getElementById('packGrid');
+  grid.innerHTML='';
+  PACKS.forEach(function(cat){
+    var div=document.createElement('div'); div.className='packing-cat';
+    div.innerHTML='<div class="packing-cat-title">'+cat.cat+'</div>';
+    cat.items.forEach(function(item){
+      var done=!!state[item.id];
+      var el=document.createElement('div'); el.className='pack-item';
+      el.innerHTML='<div class="pcb'+(done?' done':'')+'"></div><span class="'+(done?'done':'')+'">'+item.t+(item.must?'<span class="must">imprescindible</span>':'')+'</span>';
+      el.addEventListener('click',function(){var s=load();s[item.id]=!s[item.id];save(s);render();});
+      div.appendChild(el);
+    });
+    grid.appendChild(div);
+  });
+}
+render();
+})();
+
+// ── TRACKER ──────────────────────────────────────────────────
+(function(){
+var ITEMS=[
+  {id:'tr1',label:'✈️ Vuelo Bs. As. → Madrid (ida)'},{id:'tr2',label:'✈️ Vuelo Madrid → Bs. As. (vuelta)'},
+  {id:'tr3',label:'🚄 Tren AVE Madrid → Barcelona'},{id:'tr4',label:'✈️ Vuelo Barcelona → Atenas'},
+  {id:'tr5',label:'⛴️ Ferry Pireo → Santorini'},{id:'tr6',label:'⛴️ Ferry Santorini → Naxos'},
+  {id:'tr7',label:'✈️ Vuelo Naxos → Creta'},{id:'tr8',label:'✈️ Vuelo Creta → Atenas'},
+  {id:'tr9',label:'✈️ Vuelo Salónica → Budapest'},{id:'tr10',label:'✈️ Vuelo Budapest → Madrid'},
+  {id:'tr11',label:'🚗 Auto alquiler Grecia (4 días)'},{id:'tr12',label:'🏨 Hospedaje Barcelona'},
+  {id:'tr13',label:'🏨 Hospedaje Atenas I'},{id:'tr14',label:'🏨 Hospedaje Santorini'},
+  {id:'tr15',label:'🏨 Hospedaje Naxos'},{id:'tr16',label:'🏨 Hospedaje Creta'},
+  {id:'tr17',label:'🏨 Hospedaje Atenas II'},{id:'tr18',label:'🏨 Hospedaje Nauplia'},
+  {id:'tr19',label:'🏨 Hospedaje Meteora'},{id:'tr20',label:'🏨 Hospedaje Budapest'},
+  {id:'tr21',label:'🏛️ Entrada Acrópolis Atenas'},{id:'tr22',label:'🏛️ Entrada Sagrada Família'},
+  {id:'tr23',label:'🏛️ Entrada Park Güell'},{id:'tr24',label:'🏛️ Entrada Palacio de Cnosos'},
+  {id:'tr25',label:'🏛️ Baños Széchenyi Budapest'},{id:'tr26',label:'📋 Seguro de viaje'},
+];
+var KEY='europa2026_tracker_v2';
+function load(){try{return JSON.parse(localStorage.getItem(KEY)||'{}')}catch(e){return{}}}
+function save(s){try{localStorage.setItem(KEY,JSON.stringify(s))}catch(e){}}
+function sc(v){return v==='pagado'?'pagado':v==='reservado'?'reservado':'pendiente';}
+function makeAttach(id,s){
+  if(s.file) return '<div style="display:flex;align-items:center;gap:.4rem"><span style="font-size:.7rem;color:#86efac;max-width:90px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="'+s.fileName+'">📎 '+s.fileName+'</span><button onclick="rmFile(event,''+id+'')" style="background:none;border:none;color:rgba(255,255,255,.3);cursor:pointer;font-size:.75rem;padding:0">✕</button></div>';
+  return '<label style="cursor:pointer;font-size:.7rem;color:rgba(255,255,255,.3);border:1px dashed rgba(255,255,255,.15);border-radius:6px;padding:.25rem .5rem;white-space:nowrap">📎 Subir<input type="file" accept="image/*,.pdf" style="display:none" onchange="attachF(event,''+id+'')" /></label>';
+}
+window.rmFile=function(e,id){e.stopPropagation();var s=load();if(s[id]){delete s[id].file;delete s[id].fileName;save(s);renderTracker();}};
+window.attachF=function(e,id){var file=e.target.files[0];if(!file)return;var r=new FileReader();r.onload=function(ev){var s=load();if(!s[id])s[id]={status:'pendiente',date:'',note:''};s[id].file=ev.target.result;s[id].fileName=file.name.length>18?file.name.substring(0,16)+'…':file.name;save(s);renderTracker();};r.readAsDataURL(file);};
+function renderTracker(){
+  var state=load();
+  var tbody=document.getElementById('trackerBody');
+  tbody.innerHTML='';
+  var paid=0,reserved=0;
+  ITEMS.forEach(function(item){
+    var s=state[item.id]||{status:'pendiente',date:'',note:''};
+    var tr=document.createElement('tr');
+    tr.innerHTML='<td style="font-weight:500;white-space:nowrap;font-size:.8rem">'+item.label+'</td>'+
+      '<td><select class="status-sel '+sc(s.status)+'" data-id="'+item.id+'" data-field="status">'+
+        '<option value="pendiente"'+(s.status==='pendiente'?' selected':'')+'>⏳ Pendiente</option>'+
+        '<option value="reservado"'+(s.status==='reservado'?' selected':'')+'>📌 Reservado</option>'+
+        '<option value="pagado"'+(s.status==='pagado'?' selected':'')+'>✅ Pagado</option>'+
+      '</select></td>'+
+      '<td><input class="date-inp" data-id="'+item.id+'" data-field="date" type="text" placeholder="Conf. / fecha" value="'+s.date+'"></td>'+
+      '<td><input class="tracker-note-inp" data-id="'+item.id+'" data-field="note" type="text" placeholder="Notas…" value="'+s.note+'"></td>'+
+      '<td>'+makeAttach(item.id,s)+'</td>';
+    tbody.appendChild(tr);
+    if(s.status==='pagado') paid++;
+    else if(s.status==='reservado') reserved++;
+  });
+  var pending=ITEMS.length-paid-reserved;
+  document.getElementById('trackerProgress').innerHTML='<span style="color:#86efac">✅ '+paid+' pagados</span> &nbsp;<span style="color:#fde047">📌 '+reserved+' reservados</span> &nbsp;<span style="color:#fca5a5">⏳ '+pending+' pendientes</span> &nbsp;<span style="color:rgba(255,255,255,.3)">de '+ITEMS.length+' total</span>';
+}
+document.addEventListener('change',function(e){
+  if(e.target.dataset.field==='status'){var s=load();var id=e.target.dataset.id;if(!s[id])s[id]={status:'pendiente',date:'',note:''};s[id].status=e.target.value;e.target.className='status-sel '+sc(e.target.value);save(s);renderTracker();}
+});
+document.addEventListener('blur',function(e){
+  if(e.target.dataset.field==='date'||e.target.dataset.field==='note'){var s=load();var id=e.target.dataset.id;if(!s[id])s[id]={status:'pendiente',date:'',note:''};s[id][e.target.dataset.field]=e.target.value;save(s);}
+},true);
+renderTracker();
+})();
+</script>
+</body></html>

@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#0d1b2a">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Europa 2026">
+<title>Ruta & Clima · Europa 2026</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,300;1,400&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<link rel="stylesheet" href="style.css">
+
+</head>
+<body>
+<div class="modal-overlay" id="modal"><div class="modal-card">
+  <img class="modal-photo" id="mImg" src="" alt="">
+  <div class="modal-footer"><div class="modal-title" id="mTitle"></div><button class="modal-close" id="mClose">✕ Cerrar</button></div>
+</div></div><nav class="site-nav"><div class="nav-inner"><a class="nav-logo" href="index.html">Europa<span style="color:white">'</span>26</a><a href="index.html">🗺️ Inicio</a><span class="nav-sep">·</span><a href="ruta.html">Ruta & Clima</a><span class="nav-sep">·</span><a href="barcelona.html">Barcelona</a><span class="nav-sep">·</span><a href="grecia-islas.html">Grecia Islas</a><span class="nav-sep">·</span><a href="continental.html">Continental</a><span class="nav-sep">·</span><a href="budapest.html">Budapest</a><span class="nav-sep">·</span><a href="madrid.html">Madrid</a><span class="nav-sep">·</span><a href="organizar.html">Organización</a><span class="nav-sep">·</span></div></nav>
+<section style="background:var(--navy);padding:5rem 2rem" id="mapa">
+<div style="max-width:1100px;margin:0 auto">
+  <p class="section-eyebrow">La Ruta</p>
+  <h2 style="font-family:'Cormorant Garamond',serif;font-size:clamp(2rem,4vw,3rem);font-weight:300;color:white;margin-bottom:1.5rem">Mapa del Viaje</h2>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+  <div id="tripMap" style="height:480px;border-radius:12px;overflow:hidden;border:1px solid rgba(255,255,255,.1)"></div>
+</div>
+</section>
+
+<section style="background:var(--cream-dark);padding:5rem 2rem" id="calendario">
+<div style="max-width:1000px;margin:0 auto">
+  <p class="section-eyebrow" style="color:var(--gold)">Septiembre 2026</p>
+  <h2 style="font-family:'Cormorant Garamond',serif;font-size:clamp(2rem,4vw,3rem);font-weight:400;margin-bottom:2.5rem">Calendario del Viaje</h2>
+  <div class="calendar-grid">
+    <div class="cal-header">Lun</div><div class="cal-header">Mar</div><div class="cal-header">Mié</div><div class="cal-header">Jue</div><div class="cal-header">Vie</div><div class="cal-header">Sáb</div><div class="cal-header">Dom</div>
+    <div class="cal-cell empty"><div class="cal-num">31 Ago</div></div><div class="cal-cell empty"><div class="cal-num">1</div></div><div class="cal-cell empty"><div class="cal-num">2</div></div>
+    <div class="cal-cell"><div class="cal-num">3</div><div class="cal-event ev-travel">✈ Bs. As. → Madrid</div></div>
+    <div class="cal-cell"><div class="cal-num">4</div><div class="cal-event ev-madrid">🚄 Madrid → BCN</div></div>
+    <div class="cal-cell"><div class="cal-num">5</div><div class="cal-event ev-bcn">📍 Barcelona</div></div>
+    <div class="cal-cell"><div class="cal-num">6</div><div class="cal-event ev-bcn">📍 Barcelona</div></div>
+    <div class="cal-cell"><div class="cal-num">7</div><div class="cal-event ev-athens">✈ BCN → Atenas</div></div>
+    <div class="cal-cell"><div class="cal-num">8</div><div class="cal-event ev-island">⛴ ATN → Santorini</div></div>
+    <div class="cal-cell"><div class="cal-num">9</div><div class="cal-event ev-island">📍 Santorini</div></div>
+    <div class="cal-cell"><div class="cal-num">10</div><div class="cal-event ev-island">⛴ STN → Naxos</div></div>
+    <div class="cal-cell"><div class="cal-num">11</div><div class="cal-event ev-island">📍 Naxos</div></div>
+    <div class="cal-cell"><div class="cal-num">12</div><div class="cal-event ev-creta">✈ NXS → Creta</div></div>
+    <div class="cal-cell"><div class="cal-num">13</div><div class="cal-event ev-creta">📍 Creta</div></div>
+    <div class="cal-cell"><div class="cal-num">14</div><div class="cal-event ev-creta">📍 Creta</div></div>
+    <div class="cal-cell"><div class="cal-num">15</div><div class="cal-event ev-athens">✈ Creta → Atenas</div></div>
+    <div class="cal-cell"><div class="cal-num">16</div><div class="cal-event ev-road">🚗 Nauplia · Corinto</div></div>
+    <div class="cal-cell"><div class="cal-num">17</div><div class="cal-event ev-road">🚗 Meteora · Delfos</div></div>
+    <div class="cal-cell"><div class="cal-num">18</div><div class="cal-event ev-road">🚗 Salónica · Pella</div></div>
+    <div class="cal-cell"><div class="cal-num">19</div><div class="cal-event ev-buda">✈ SLC → Budapest</div></div>
+    <div class="cal-cell"><div class="cal-num">20</div><div class="cal-event ev-buda">📍 Budapest</div></div>
+    <div class="cal-cell"><div class="cal-num">21</div><div class="cal-event ev-buda">📍 Budapest</div></div>
+    <div class="cal-cell"><div class="cal-num">22</div><div class="cal-event ev-madrid">✈ BDP → Madrid</div></div>
+    <div class="cal-cell"><div class="cal-num">23</div><div class="cal-event ev-madrid">📍 Madrid</div></div>
+    <div class="cal-cell"><div class="cal-num">24</div><div class="cal-event ev-madrid">📍 Madrid</div></div>
+    <div class="cal-cell"><div class="cal-num">25</div><div class="cal-event ev-madrid">📍 Madrid</div></div>
+    <div class="cal-cell"><div class="cal-num">26</div><div class="cal-event ev-travel">✈ Madrid → Bs. As.</div></div>
+    <div class="cal-cell"><div class="cal-num">27</div><div class="cal-event ev-travel">🏠 Buenos Aires</div></div>
+  </div>
+</div>
+</section>
+
+<section style="background:var(--cream);padding:5rem 2rem" id="clima">
+<div style="max-width:1100px;margin:0 auto">
+  <p class="section-eyebrow" style="color:var(--gold)">Septiembre</p>
+  <h2 style="font-family:'Cormorant Garamond',serif;font-size:clamp(2rem,4vw,3rem);font-weight:300;margin-bottom:2.5rem">Clima & Presupuesto por Ciudad</h2>
+  <div class="climate-grid">
+    <div class="climate-card"><div class="climate-card-header"><div><div class="climate-card-name">Barcelona</div><div class="climate-card-dates">4 sep — 7 sep</div></div><div style="font-size:1.8rem">🌤️</div></div><div class="climate-badges"><span class="climate-badge temp">🌡️ 24°C</span><span class="climate-badge rain">💧 6 días lluvia</span><span class="climate-badge sea">🌊 23°C mar</span></div><div class="climate-budget">Comida: ~$20 · Metro: $3–5<br>Entradas: $15–25 (Sagrada $33)<div class="total">Total: ~$38–50/día</div></div></div>
+    <div class="climate-card"><div class="climate-card-header"><div><div class="climate-card-name">Atenas</div><div class="climate-card-dates">7 sep — 8 sep</div></div><div style="font-size:1.8rem">☀️</div></div><div class="climate-badges"><span class="climate-badge temp">🌡️ 28°C</span><span class="climate-badge rain">💧 2 días lluvia</span><span class="climate-badge other">☀️ Muy seco</span></div><div class="climate-budget">Comida: ~$20 · Metro: $2–4<br>Acrópolis: $20 · Museo: $10<div class="total">Total: ~$35–45/día</div></div></div>
+    <div class="climate-card"><div class="climate-card-header"><div><div class="climate-card-name">Santorini</div><div class="climate-card-dates">8 sep — 10 sep</div></div><div style="font-size:1.8rem">☀️</div></div><div class="climate-badges"><span class="climate-badge temp">🌡️ 26°C</span><span class="climate-badge rain">💧 1 día lluvia</span><span class="climate-badge sea">🌊 24°C mar</span></div><div class="climate-budget">Comida: ~$25 · ATV: $20–25<br>⚠️ Isla más cara de las Cícladas<div class="total">Total: ~$50–70/día</div></div></div>
+    <div class="climate-card"><div class="climate-card-header"><div><div class="climate-card-name">Naxos</div><div class="climate-card-dates">10 sep — 12 sep</div></div><div style="font-size:1.8rem">☀️</div></div><div class="climate-badges"><span class="climate-badge temp">🌡️ 26°C</span><span class="climate-badge rain">💧 2 días lluvia</span><span class="climate-badge other">💰 La más barata</span></div><div class="climate-budget">Comida: ~$18 · Moto: $15–20<br>Entradas: gratuitas en su mayoría<div class="total">Total: ~$30–40/día</div></div></div>
+    <div class="climate-card"><div class="climate-card-header"><div><div class="climate-card-name">Creta</div><div class="climate-card-dates">12 sep — 15 sep</div></div><div style="font-size:1.8rem">☀️</div></div><div class="climate-badges"><span class="climate-badge temp">🌡️ 27°C</span><span class="climate-badge rain">💧 2 días lluvia</span><span class="climate-badge sea">🌊 25°C mar</span></div><div class="climate-budget">Comida: ~$20 · Bus interurbano: $4<br>Excursión Balos: $15–25<div class="total">Total: ~$35–45/día</div></div></div>
+    <div class="climate-card"><div class="climate-card-header"><div><div class="climate-card-name">Road Trip Grecia</div><div class="climate-card-dates">15 sep — 19 sep</div></div><div style="font-size:1.8rem">🚗</div></div><div class="climate-badges"><span class="climate-badge temp">🌡️ 26°C</span><span class="climate-badge rain">💧 3 días lluvia</span><span class="climate-badge other">🏛️ Ruinas épicas</span></div><div class="climate-budget">Comida: ~$20 · Gasolina: $10<br>Entradas sitios: $5–15 c/u<div class="total">Total: ~$50–70/día</div></div></div>
+    <div class="climate-card"><div class="climate-card-header"><div><div class="climate-card-name">Budapest</div><div class="climate-card-dates">19 sep — 22 sep</div></div><div style="font-size:1.8rem">⛅</div></div><div class="climate-badges"><span class="climate-badge temp">🌡️ 19°C</span><span class="climate-badge rain">💧 8 días lluvia</span><span class="climate-badge other">🎉 Mejor noche</span></div><div class="climate-budget">Comida: ~$18 · Metro 24h: $5<br>Széchenyi: $28–35 · Parlamento: $8<div class="total">Total: ~$30–40/día</div></div></div>
+    <div class="climate-card"><div class="climate-card-header"><div><div class="climate-card-name">Madrid</div><div class="climate-card-dates">22 sep — 26 sep</div></div><div style="font-size:1.8rem">🌤️</div></div><div class="climate-badges"><span class="climate-badge temp">🌡️ 22°C</span><span class="climate-badge rain">💧 5 días lluvia</span><span class="climate-badge other">🏠 Sin hospedaje</span></div><div class="climate-budget">Comida: ~$20 · Metro 10 viajes: $12<br>Prado: gratis 18–20hs · Retiro: gratis<div class="total">Total: ~$25–35/día</div></div></div>
+  </div>
+</div>
+</section>
+<footer class="site-footer"><p>Europa 2026 · <span>Septiembre</span> · Madrid · Barcelona · Grecia · Budapest</p></footer>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="shared.js"></script>
+<script>
+(function(){
+  if(typeof L==='undefined'){setTimeout(arguments.callee,200);return;}
+  var stops=[
+    {name:"Madrid",lat:40.4168,lng:-3.7038,num:1,col:"#c0392b",url:"madrid.html"},
+    {name:"Barcelona",lat:41.3851,lng:2.1734,num:2,col:"#e67e22",url:"barcelona.html"},
+    {name:"Atenas",lat:37.9838,lng:23.7275,num:3,col:"#3498db",url:"grecia-islas.html"},
+    {name:"Santorini",lat:36.3932,lng:25.4615,num:4,col:"#2980b9",url:"grecia-islas.html#santorini"},
+    {name:"Naxos",lat:37.1036,lng:25.3753,num:5,col:"#1abc9c",url:"grecia-islas.html#naxos"},
+    {name:"Creta",lat:35.5138,lng:24.018,num:6,col:"#27ae60",url:"grecia-islas.html#creta"},
+    {name:"Meteora",lat:39.7217,lng:21.6306,num:7,col:"#8e44ad",url:"continental.html"},
+    {name:"Salónica",lat:40.6401,lng:22.9444,num:8,col:"#8e44ad",url:"continental.html"},
+    {name:"Budapest",lat:47.4979,lng:19.0402,num:9,col:"#9b59b6",url:"budapest.html"},
+  ];
+  var map=L.map('tripMap',{zoomControl:true,scrollWheelZoom:false}).setView([40,15],4);
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',{attribution:'&copy; OpenStreetMap &copy; CARTO',maxZoom:19}).addTo(map);
+  var latlngs=stops.map(function(s){return[s.lat,s.lng];});
+  L.polyline(latlngs,{color:'rgba(201,151,58,0.7)',weight:2.5,dashArray:'6,4'}).addTo(map);
+  stops.forEach(function(s){
+    var icon=L.divIcon({className:'',html:'<div style="background:'+s.col+';color:white;font-family:Outfit,sans-serif;font-size:11px;font-weight:700;width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;border:2px solid rgba(255,255,255,.7);box-shadow:0 2px 8px rgba(0,0,0,.5);cursor:pointer">'+s.num+'</div>',iconSize:[28,28],iconAnchor:[14,14]});
+    L.marker([s.lat,s.lng],{icon:icon}).addTo(map).bindPopup('<b>'+s.name+'</b><br><a href="'+s.url+'">Ver destino →</a>');
+  });
+})();
+</script>
