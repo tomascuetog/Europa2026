@@ -19,9 +19,9 @@ function showDay(mapId,idx){
   });
 }
 
-// MINI MAPS (called after Leaflet loads)
+// MINI MAPS (called after Leaflet loads AND after window.MAPS is set)
 function initMiniMaps(){
-  if(typeof L==='undefined'){setTimeout(initMiniMaps,200);return;}
+  if(typeof L==='undefined'||!window.MAPS){setTimeout(initMiniMaps,200);return;}
   var light='https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png';
   var attr='&copy; OpenStreetMap &copy; CARTO';
   function mkMap(id,lat,lng,zoom,spots){

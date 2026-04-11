@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#0d1b2a">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Europa 2026">
+<title>Atenas · Europa 2026</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,300;1,400&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="modal-overlay" id="modal"><div class="modal-card">
+  <img class="modal-photo" id="mImg" src="" alt="">
+  <div class="modal-footer"><div class="modal-title" id="mTitle"></div><button class="modal-close" id="mClose">✕ Cerrar</button></div>
+</div></div>
+<nav class="site-nav"><div class="nav-inner"><a class="nav-logo" href="index.html">Europa<span style="color:white">'</span>26</a><a href="index.html">🗺️ Inicio</a><span class="nav-sep">·</span><a href="ruta.html">Ruta & Clima</a><span class="nav-sep">·</span><a href="barcelona.html">Barcelona</a><span class="nav-sep">·</span><a href="atenas.html">Atenas</a><span class="nav-sep">·</span><a href="grecia-islas.html">Grecia Islas</a><span class="nav-sep">·</span><a href="continental.html">Grecia Continental</a><span class="nav-sep">·</span><a href="budapest.html">Budapest</a><span class="nav-sep">·</span><a href="madrid.html">Madrid</a><span class="nav-sep">·</span><a href="organizar.html">Organización</a><span class="nav-sep">·</span></div></nav>
+
+<section class="page-hero">
+  <div class="page-hero-bg" style="background-image:url('https://upload.wikimedia.org/wikipedia/commons/thumb/d/da/The_Parthenon_in_Athens.jpg/1280px-The_Parthenon_in_Athens.jpg');background-size:cover;background-position:center 60%"></div>
+  <div class="page-hero-overlay"></div>
+  <div class="page-hero-content">
+    <p class="page-hero-eyebrow">Destino 03 · Lun 7 — Mar 8 Sep</p>
+    <h1 class="page-hero-title">Atenas</h1>
+    <span class="page-hero-nights">1 Noche · Puerta a Grecia</span>
+  </div>
+</section>
+
+<nav class="journey-strip">
+  <a href="barcelona.html" class="tl-item"><span class="tl-dot"></span><span class="tl-label"><strong>Barcelona</strong><em>vie 4 — lun 7 · 3N</em></span></a>
+  <a href="atenas.html" class="tl-item tl-current"><span class="tl-dot"></span><span class="tl-label"><strong>Atenas</strong><em>lun 7 — mar 8 · 1N</em></span></a>
+  <a href="grecia-islas.html#santorini" class="tl-item"><span class="tl-dot"></span><span class="tl-label"><strong>Santorini</strong><em>mar 8 — jue 10 · 2N</em></span></a>
+  <a href="grecia-islas.html#naxos" class="tl-item"><span class="tl-dot"></span><span class="tl-label"><strong>Naxos</strong><em>jue 10 — sab 12 · 2N</em></span></a>
+  <a href="grecia-islas.html#creta" class="tl-item"><span class="tl-dot"></span><span class="tl-label"><strong>Creta</strong><em>sab 12 — mar 15 · 3N</em></span></a>
+  <a href="continental.html" class="tl-item"><span class="tl-dot"></span><span class="tl-label"><strong>Grecia Continental</strong><em>mar 15 — sab 19 · 4D</em></span></a>
+  <a href="budapest.html" class="tl-item"><span class="tl-dot"></span><span class="tl-label"><strong>Budapest</strong><em>sab 19 — mar 22 · 3N</em></span></a>
+  <a href="madrid.html" class="tl-item"><span class="tl-dot"></span><span class="tl-label"><strong>Madrid</strong><em>mar 22 — sab 26 · 4N</em></span></a>
+</nav>
+
+<div class="dest-body">
+  <div class="currency-bar">
+    <div class="currency-badge">💱 Euro (€)</div>
+    <div class="currency-rate">📈 1 USD ≈ €0.92</div>
+    <span class="currency-tip">Cajeros NBG o Alpha Bank — evitar Euronet (comisión alta)</span>
+  </div>
+
+  <div style="margin-bottom:2.5rem"><p class="block-title">Frases útiles</p>
+  <div class="phrase-grid">
+    <div class="phrase-row"><div class="local">Γεια σας / Γεια</div><div class="pron-es"><span class="pron">Yia sas / Yia</span><span class="es">Hola (formal / informal)</span></div></div>
+    <div class="phrase-row"><div class="local">Ευχαριστώ</div><div class="pron-es"><span class="pron">Efjaristó</span><span class="es">Gracias</span></div></div>
+    <div class="phrase-row"><div class="local">Παρακαλώ</div><div class="pron-es"><span class="pron">Parakaló</span><span class="es">Por favor / De nada</span></div></div>
+    <div class="phrase-row"><div class="local">Πόσο κάνει;</div><div class="pron-es"><span class="pron">Póso káni?</span><span class="es">¿Cuánto cuesta?</span></div></div>
+    <div class="phrase-row"><div class="local">Μία μπύρα παρακαλώ</div><div class="pron-es"><span class="pron">Mía bíra parakaló</span><span class="es">Una cerveza, por favor</span></div></div>
+    <div class="phrase-row"><div class="local">Στην υγειά σας!</div><div class="pron-es"><span class="pron">Stin igía sas!</span><span class="es">¡Salud!</span></div></div>
+    <div class="phrase-row"><div class="local">Τον λογαριασμό</div><div class="pron-es"><span class="pron">Ton logariasmó</span><span class="es">La cuenta, por favor</span></div></div>
+    <div class="phrase-row"><div class="local">Ναι / Όχι</div><div class="pron-es"><span class="pron">Né / Óji</span><span class="es">Sí / No</span></div></div>
+  </div></div>
+
+  <p class="dest-description">La ciudad más antigua de Europa, cuna de la democracia y la filosofía occidental. Con solo 1 noche, el plan es inmersión total: subir a la Acrópolis al atardecer, perderse en el laberinto de Plaka y brindar con ouzo en Monastiraki. Una noche que vale el viaje entero.</p>
+  <div class="dest-highlights">
+    <span class="highlight-pill">Cuna de la Democracia</span>
+    <span class="highlight-pill">Acrópolis</span>
+    <span class="highlight-pill">Plaka & Monastiraki</span>
+    <span class="highlight-pill">Gastronomía</span>
+  </div>
+
+  <div class="two-col">
+    <div>
+      <p class="block-title">Qué hacer — tocá para ver fotos</p>
+      <div class="activities-grid">
+        <span class="activity-tag highlight">Acrópolis & Partenón</span>
+        <span class="activity-tag highlight">Museo de la Acrópolis</span>
+        <span class="activity-tag">Barrio Plaka</span>
+        <span class="activity-tag">Anafiotika</span>
+        <span class="activity-tag">Ágora Ateniense</span>
+        <span class="activity-tag">Mercado Monastiraki</span>
+        <span class="activity-tag">Monte Licabeto</span>
+        <span class="activity-tag">Plaza Syntagma</span>
+        <span class="activity-tag">Templo de Zeus Olímpico</span>
+        <span class="activity-tag">Barrio Psyri</span>
+        <span class="activity-tag">Vida Nocturna</span>
+      </div>
+    </div>
+    <div>
+      <div class="info-card"><span class="info-card-title">🚇 Cómo moverse</span>
+        <ul>
+          <li>Metro: 3 líneas · €1.20 por viaje · pase 24h €4.50</li>
+          <li>Aeropuerto: Metro línea 3 (azul) · 40min · €9</li>
+          <li>Acrópolis: acceso a pie desde Monastiraki (20min)</li>
+          <li>Taxi: Uber y Bolt disponibles · económicos</li>
+          <li>App: Citymapper o Google Maps funcionan perfecto</li>
+        </ul>
+      </div>
+      <div class="info-card" style="margin-top:1rem"><span class="info-card-title">🌡️ Clima en Septiembre</span>
+        <ul>
+          <li>Temperatura: 24–32°C · muy soleado y seco</li>
+          <li>Lluvia: prácticamente nula en septiembre</li>
+          <li>Sol: sale 6:45 am · se pone 7:30 pm</li>
+          <li>Indispensable: protector solar FPS 50+, agua</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="two-col" style="margin-top:2rem">
+    <div class="info-card"><span class="info-card-title">🕐 Horarios & Reservas</span>
+      <ul>
+        <li><strong>Acrópolis</strong> · 8:00–20:00 · €20 · <a href="https://etickets.tap.gr" target="_blank">Reservar anticipado →</a></li>
+        <li><strong>Museo de la Acrópolis</strong> · 9:00–17:00 · €10</li>
+        <li><strong>Ágora Ateniense</strong> · 8:00–20:00 · €10 (incluida en combo)</li>
+        <li><strong>Templo de Zeus Olímpico</strong> · 8:00–20:00 · €6</li>
+        <li><strong>Monte Licabeto</strong> · teleférico €7.50 · o caminata 20min</li>
+      </ul>
+    </div>
+    <div class="info-card"><span class="info-card-title">🍽️ Dónde comer</span>
+      <ul>
+        <li><strong>Monastiraki</strong> · souvlaki de €2–3 el pincho</li>
+        <li><strong>Plaka</strong> · tavernas con terraza · gyros y mezze</li>
+        <li><strong>Psyri</strong> · barrio gastronómico · moderno y local</li>
+        <li><strong>Mercado Central</strong> · frutas, especias, aceitunas</li>
+        <li>Propina: no obligatoria, redondear está bien</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="info-card" style="margin-top:2rem"><span class="info-card-title">🏨 Dónde dormir</span>
+    <ul>
+      <li><strong>Safestay Monastiraki</strong> · dormitorio 8 camas · vista a la Acrópolis · €28–35 pp</li>
+      <li>Check-in: 15:00 · Check-out: 11:00</li>
+      <li>A 5 min a pie del metro Monastiraki</li>
+      <li>Desayuno no incluido · cafés cerca del hostel desde €3</li>
+    </ul>
+  </div>
+
+  <div class="info-card" style="margin-top:1.5rem"><span class="info-card-title">✈️ Llegada & Salida</span>
+    <ul>
+      <li><strong>Llegada</strong> · vuelo desde Barcelona · lunes 7 Sep · ~14:00</li>
+      <li><strong>Salida</strong> · ferry al Pireo → Santorini · martes 8 Sep · 7:30am</li>
+      <li>Puerto del Pireo: metro línea 1 (verde) desde Monastiraki · 25min</li>
+      <li>Llegar al puerto con 1h de anticipación</li>
+    </ul>
+  </div>
+
+  <div style="margin-bottom:2.5rem;margin-top:2.5rem">
+    <p class="block-title">Mapa del destino</p>
+    <div id="map-ath2" class="dest-map"></div>
+  </div>
+</div>
+
+<footer class="site-footer"><p>Europa 2026 · <span>Septiembre</span> · Madrid · Barcelona · Grecia · Budapest</p></footer>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="shared.js"></script>
+<script>window.MAPS=[{"id":"map-ath2","lat":37.9755,"lng":23.736,"zoom":14,"spots":[
+  {"num":1,"name":"Acrópolis & Partenón","lat":37.9715,"lng":23.7267,"hostel":false},
+  {"num":2,"name":"Museo de la Acrópolis","lat":37.9692,"lng":23.7287,"hostel":false},
+  {"num":3,"name":"Ágora Ateniense","lat":37.9754,"lng":23.7213,"hostel":false},
+  {"num":4,"name":"Barrio Plaka","lat":37.9742,"lng":23.7285,"hostel":false},
+  {"num":5,"name":"Mercado Monastiraki","lat":37.9763,"lng":23.7227,"hostel":false},
+  {"num":6,"name":"Monte Licabeto","lat":37.9804,"lng":23.7450,"hostel":false},
+  {"num":7,"name":"Templo de Zeus","lat":37.9693,"lng":23.7323,"hostel":false},
+  {"num":8,"name":"Barrio Psyri","lat":37.9781,"lng":23.7208,"hostel":false},
+  {"num":9,"name":"Plaza Syntagma","lat":37.9755,"lng":23.7355,"hostel":false},
+  {"num":"H","name":"Safestay Monastiraki","lat":37.9763,"lng":23.7252,"hostel":true}
+]}];</script>
+</body></html>
