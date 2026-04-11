@@ -104,140 +104,366 @@
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="shared.js"></script>
 <script>
-// ── TASKS ────────────────────────────────────────────────────
-(function(){
-var TASKS=[
-  {group:"✈️ Vuelos internacionales",items:[{id:"v1",t:"Bs. As. → Madrid (ida)",tag:"urgente"},{id:"v2",t:"Madrid → Bs. As. (vuelta)",tag:"urgente"}]},
-  {group:"🚄 Transportes internos",items:[{id:"t1",t:"Tren AVE Madrid → Barcelona",tag:"urgente"},{id:"t2",t:"Vuelo Barcelona → Atenas",tag:"urgente"},{id:"t3",t:"Ferry Atenas (Pireo) → Santorini",tag:"urgente"},{id:"t4",t:"Ferry Santorini → Naxos",tag:"urgente"},{id:"t5",t:"Vuelo Naxos → Creta",tag:"urgente"},{id:"t6",t:"Vuelo Creta → Atenas",tag:"urgente"},{id:"t7",t:"Vuelo Salónica → Budapest",tag:"urgente"},{id:"t8",t:"Vuelo Budapest → Madrid",tag:"urgente"},{id:"t9",t:"Auto alquiler Grecia Continental (4 días)"}]},
-  {group:"🏨 Hospedajes",items:[{id:"h1",t:"Barcelona — BCN Sports Hostel"},{id:"h2",t:"Atenas I — Safestay Monastiraki"},{id:"h3",t:"Santorini — Santorini Camping"},{id:"h4",t:"Naxos — Katerina Roza Studios"},{id:"h5",t:"Creta — Cocoon City Hostel"},{id:"h6",t:"Atenas II — Safestay Monastiraki"},{id:"h7",t:"Nauplia (1 noche)"},{id:"h8",t:"Meteora (1 noche)"},{id:"h9",t:"Budapest — The Hive"}]},
-  {group:"🗺️ Barcelona",items:[{id:"b1",t:"Entrada Sagrada Família (con fecha)"},{id:"b2",t:"Entrada La Pedrera o Casa Batlló"},{id:"b3",t:"Entrada Park Güell (zona monumental)"}]},
-  {group:"🏛️ Grecia — Islas",items:[{id:"g1",t:"Reservar excursión Balos o Elafonisi"},{id:"g2",t:"Planear traslados en Santorini (ATV)"},{id:"g3",t:"Confirmar horarios ferrys entre islas"}]},
-  {group:"🚗 Road Trip Grecia",items:[{id:"r1",t:"Confirmar auto: retiro ATH, devolución SKG"},{id:"r2",t:"Entrada Acrópolis de Atenas (anticipado)"},{id:"r3",t:"Entrada Palacio de Cnosos"},{id:"r4",t:"Entrada sitio Meteora / monasterios"}]},
-  {group:"🏰 Budapest",items:[{id:"bu1",t:"Entrada Baños Széchenyi (slot horario)"},{id:"bu2",t:"Tour Parlamento (reservar online)"}]},
-  {group:"📋 Documentación y extras",items:[{id:"d1",t:"Contratar seguro de viaje internacional",tag:"urgente"},{id:"d2",t:"Verificar pasaportes vigentes (mín. 6 meses)"},{id:"d3",t:"Descargar Google Maps offline por zona"},{id:"d4",t:"Conseguir SIM Europa o eSIM"},{id:"d5",t:"Confirmar seguro auto incluye Grecia"}]},
-];
-var KEY='europa2026_tasks_v2';
-function load(){try{return JSON.parse(localStorage.getItem(KEY)||'{}')}catch(e){return{}}}
-function save(s){try{localStorage.setItem(KEY,JSON.stringify(s))}catch(e){}}
-function render(){
-  var state=load();
-  var grid=document.getElementById('tasksGrid');
-  grid.innerHTML='';
-  var total=0,done=0;
-  TASKS.forEach(function(group){
-    var dG=group.items.filter(function(it){return state[it.id]}).length;
-    total+=group.items.length; done+=dG;
-    var div=document.createElement('div'); div.className='task-group';
-    div.innerHTML='<div class="task-group-title">'+group.group+'<span class="task-progress">'+dG+'/'+group.items.length+'</span></div>';
-    group.items.forEach(function(it){
-      var d=!!state[it.id];
-      var tag=it.tag?'<span class="tag'+(it.tag==='urgente'?' urgent':'')+'">'+it.tag+'</span>':'';
-      var el=document.createElement('div'); el.className='task-item';
-      el.innerHTML='<div class="task-cb'+(d?' done':'')+'"></div><span class="task-label'+(d?' done':'')+'">'+it.t+tag+'</span>';
-      el.addEventListener('click',function(){var s=load();s[it.id]=!s[it.id];save(s);render();});
-      div.appendChild(el);
+(function() {
+  // ── TASKS ──────────────────────────────────────────────────
+  var TASKS = [
+    {group:"Vuelos internacionales", items:[
+      {id:"v1", t:"Bs. As. → Madrid (ida)", tag:"urgente"},
+      {id:"v2", t:"Madrid → Bs. As. (vuelta)", tag:"urgente"}
+    ]},
+    {group:"Transportes internos", items:[
+      {id:"t1", t:"Tren AVE Madrid → Barcelona", tag:"urgente"},
+      {id:"t2", t:"Vuelo Barcelona → Atenas", tag:"urgente"},
+      {id:"t3", t:"Ferry Atenas (Pireo) → Santorini", tag:"urgente"},
+      {id:"t4", t:"Ferry Santorini → Naxos", tag:"urgente"},
+      {id:"t5", t:"Vuelo Naxos → Creta", tag:"urgente"},
+      {id:"t6", t:"Vuelo Creta → Atenas", tag:"urgente"},
+      {id:"t7", t:"Vuelo Salónica → Budapest", tag:"urgente"},
+      {id:"t8", t:"Vuelo Budapest → Madrid", tag:"urgente"},
+      {id:"t9", t:"Auto alquiler Grecia Continental (4 días)"}
+    ]},
+    {group:"Hospedajes", items:[
+      {id:"h1", t:"Barcelona — BCN Sports Hostel"},
+      {id:"h2", t:"Atenas I — Safestay Monastiraki"},
+      {id:"h3", t:"Santorini — Santorini Camping"},
+      {id:"h4", t:"Naxos — Katerina Roza Studios"},
+      {id:"h5", t:"Creta — Cocoon City Hostel"},
+      {id:"h6", t:"Atenas II — Safestay Monastiraki"},
+      {id:"h7", t:"Nauplia (1 noche)"},
+      {id:"h8", t:"Meteora (1 noche)"},
+      {id:"h9", t:"Budapest — The Hive"}
+    ]},
+    {group:"Barcelona", items:[
+      {id:"b1", t:"Entrada Sagrada Família (con fecha)"},
+      {id:"b2", t:"Entrada La Pedrera o Casa Batlló"},
+      {id:"b3", t:"Entrada Park Güell (zona monumental)"}
+    ]},
+    {group:"Grecia — Islas", items:[
+      {id:"g1", t:"Reservar excursión Balos o Elafonisi"},
+      {id:"g2", t:"Planear traslados en Santorini (ATV)"},
+      {id:"g3", t:"Confirmar horarios ferrys entre islas"}
+    ]},
+    {group:"Road Trip Grecia", items:[
+      {id:"r1", t:"Confirmar auto: retiro ATH, devolución SKG"},
+      {id:"r2", t:"Entrada Acrópolis de Atenas (anticipado)"},
+      {id:"r3", t:"Entrada Palacio de Cnosos"},
+      {id:"r4", t:"Entrada sitio Meteora / monasterios"}
+    ]},
+    {group:"Budapest", items:[
+      {id:"bu1", t:"Entrada Baños Széchenyi (slot horario)"},
+      {id:"bu2", t:"Tour Parlamento (reservar online)"}
+    ]},
+    {group:"Documentación y extras", items:[
+      {id:"d1", t:"Contratar seguro de viaje internacional", tag:"urgente"},
+      {id:"d2", t:"Verificar pasaportes vigentes (mín. 6 meses)"},
+      {id:"d3", t:"Descargar Google Maps offline por zona"},
+      {id:"d4", t:"Conseguir SIM Europa o eSIM"},
+      {id:"d5", t:"Confirmar seguro auto incluye Grecia"}
+    ]}
+  ];
+  var TASKS_KEY = 'europa2026_tasks_v2';
+  function tasksLoad() { try { return JSON.parse(localStorage.getItem(TASKS_KEY) || '{}'); } catch(e) { return {}; } }
+  function tasksSave(s) { try { localStorage.setItem(TASKS_KEY, JSON.stringify(s)); } catch(e) {} }
+  function renderTasks() {
+    var state = tasksLoad();
+    var grid = document.getElementById('tasksGrid');
+    if (!grid) return;
+    grid.innerHTML = '';
+    var total = 0, done = 0;
+    TASKS.forEach(function(group) {
+      var dG = group.items.filter(function(it) { return state[it.id]; }).length;
+      total += group.items.length;
+      done += dG;
+      var div = document.createElement('div');
+      div.className = 'task-group';
+      var title = document.createElement('div');
+      title.className = 'task-group-title';
+      title.innerHTML = group.group + '<span class="task-progress">' + dG + '/' + group.items.length + '</span>';
+      div.appendChild(title);
+      group.items.forEach(function(it) {
+        var d = !!state[it.id];
+        var el = document.createElement('div');
+        el.className = 'task-item';
+        var cb = document.createElement('div');
+        cb.className = 'task-cb' + (d ? ' done' : '');
+        var lbl = document.createElement('span');
+        lbl.className = 'task-label' + (d ? ' done' : '');
+        lbl.textContent = it.t;
+        if (it.tag) {
+          var tagEl = document.createElement('span');
+          tagEl.className = 'tag' + (it.tag === 'urgente' ? ' urgent' : '');
+          tagEl.textContent = it.tag;
+          lbl.appendChild(tagEl);
+        }
+        el.appendChild(cb);
+        el.appendChild(lbl);
+        el.addEventListener('click', function() {
+          var s = tasksLoad(); s[it.id] = !s[it.id]; tasksSave(s); renderTasks();
+        });
+        div.appendChild(el);
+      });
+      grid.appendChild(div);
     });
-    grid.appendChild(div);
+    var summary = document.getElementById('tasksSummary');
+    if (summary) summary.innerHTML = '<strong>' + done + ' de ' + total + '</strong> tareas completadas' + (done === total && total > 0 ? ' ¡Todo listo!' : '');
+  }
+  var resetBtn = document.getElementById('tasksReset');
+  if (resetBtn) resetBtn.addEventListener('click', function() {
+    if (confirm('¿Desmarcar todas?')) { try { localStorage.removeItem(TASKS_KEY); } catch(e) {} renderTasks(); }
   });
-  document.getElementById('tasksSummary').innerHTML='<strong>'+done+' de '+total+'</strong> tareas completadas'+(done===total&&total>0?' 🎉 ¡Todo listo!':'');
-}
-document.getElementById('tasksReset').addEventListener('click',function(){if(confirm('¿Desmarcar todas?')){try{localStorage.removeItem(KEY)}catch(e){}render();}});
-render();
-})();
+  renderTasks();
 
-// ── PACKING ──────────────────────────────────────────────────
-(function(){
-var PACKS=[
-  {cat:"👕 Ropa (7 días, lavado en hostels)",items:[{id:"p1",t:"5 remeras livianas de secado rápido",must:true},{id:"p2",t:"2 pantalones/shorts livianos",must:true},{id:"p3",t:"1 pantalón largo (templos, noches Budapest)",must:true},{id:"p4",t:"Campera impermeable y liviana",must:true},{id:"p5",t:"2 trajes de baño (secado rápido)",must:true},{id:"p6",t:"7 mudas de ropa interior de microfibra",must:true},{id:"p7",t:"5 pares de medias"}]},
-  {cat:"👟 Calzado — máximo 2 pares",items:[{id:"s1",t:"Zapatillas cómodas todo terreno",must:true},{id:"s2",t:"Ojotas/sandalia plana (playa + Santorini)",must:true}]},
-  {cat:"🧴 Higiene — líquidos ≤100ml en bolsa ZIP",items:[{id:"hy1",t:"Shampoo sólido",must:true},{id:"hy2",t:"Jabón sólido o pastilla"},{id:"hy3",t:"Desodorante sólido (no aerosol)"},{id:"hy4",t:"Pasta dental + cepillo viaje"},{id:"hy5",t:"Protector solar FPS 50+ (100ml)",must:true}]},
-  {cat:"🏖️ Playa & Sol",items:[{id:"b1",t:"Gafas de sol",must:true},{id:"b2",t:"Gorra o sombrero plegable",must:true},{id:"b3",t:"Toalla de microfibra ultra fina",must:true},{id:"b4",t:"Bolsa seca impermeable (ferrys)"}]},
-  {cat:"🔌 Tecnología",items:[{id:"t1",t:"Adaptador europeo tipo F (Schuko)",must:true},{id:"t2",t:"Cargador multipuerto USB-C",must:true},{id:"t3",t:"Power bank 10.000mAh (límite cabina)",must:true},{id:"t4",t:"Auriculares"},{id:"t5",t:"SIM europea o eSIM activada antes",must:true}]},
-  {cat:"💊 Farmacia básica",items:[{id:"h1",t:"Seguro de viaje activo en el celular",must:true},{id:"h2",t:"Ibuprofeno 400mg x10"},{id:"h3",t:"Antihistamínico"},{id:"h4",t:"Pastillas para mareo (ferrys)",must:true},{id:"h5",t:"Antidiarreico + suero oral"},{id:"h6",t:"Curitas surtidas"}]},
-  {cat:"📋 Documentos & dinero",items:[{id:"d1",t:"Pasaporte vigente (mín. 6 meses desde vuelta)",must:true},{id:"d2",t:"Foto del pasaporte en la nube + copia física",must:true},{id:"d3",t:"Tarjeta Wise/Revolut sin comisión",must:true},{id:"d4",t:"Efectivo: €150 para mercados"},{id:"d5",t:"Reservas descargadas offline",must:true},{id:"d6",t:"Candado con combinación (hostel)",must:true}]},
-  {cat:"🎒 La mochila",items:[{id:"m1",t:"Mochila 30-35L (cabe en cabina)",must:true},{id:"m2",t:"Organizadores tipo packing cubes"},{id:"m3",t:"Candado TSA exterior"},{id:"m4",t:"Botella de agua colapsable 500ml",must:true}]},
-];
-var KEY='europa2026_pack_v2';
-function load(){try{return JSON.parse(localStorage.getItem(KEY)||'{}')}catch(e){return{}}}
-function save(s){try{localStorage.setItem(KEY,JSON.stringify(s))}catch(e){}}
-function render(){
-  var state=load();
-  var grid=document.getElementById('packGrid');
-  grid.innerHTML='';
-  PACKS.forEach(function(cat){
-    var div=document.createElement('div'); div.className='packing-cat';
-    div.innerHTML='<div class="packing-cat-title">'+cat.cat+'</div>';
-    cat.items.forEach(function(item){
-      var done=!!state[item.id];
-      var el=document.createElement('div'); el.className='pack-item';
-      el.innerHTML='<div class="pcb'+(done?' done':'')+'"></div><span class="'+(done?'done':'')+'">'+item.t+(item.must?'<span class="must">imprescindible</span>':'')+'</span>';
-      el.addEventListener('click',function(){var s=load();s[item.id]=!s[item.id];save(s);render();});
-      div.appendChild(el);
+  // ── PACKING ────────────────────────────────────────────────
+  var PACKS = [
+    {cat:"Ropa (7 días, lavado en hostels)", items:[
+      {id:"pk_p1", t:"5 remeras livianas de secado rápido", must:true},
+      {id:"pk_p2", t:"2 pantalones/shorts livianos", must:true},
+      {id:"pk_p3", t:"1 pantalón largo (templos, noches Budapest)", must:true},
+      {id:"pk_p4", t:"Campera impermeable y liviana", must:true},
+      {id:"pk_p5", t:"2 trajes de baño (secado rápido)", must:true},
+      {id:"pk_p6", t:"7 mudas de ropa interior de microfibra", must:true},
+      {id:"pk_p7", t:"5 pares de medias"}
+    ]},
+    {cat:"Calzado — máximo 2 pares", items:[
+      {id:"pk_s1", t:"Zapatillas cómodas todo terreno", must:true},
+      {id:"pk_s2", t:"Ojotas/sandalia plana (playa + Santorini)", must:true}
+    ]},
+    {cat:"Higiene — líquidos 100ml en bolsa ZIP", items:[
+      {id:"pk_hy1", t:"Shampoo sólido", must:true},
+      {id:"pk_hy2", t:"Jabón sólido o pastilla"},
+      {id:"pk_hy3", t:"Desodorante sólido (no aerosol)"},
+      {id:"pk_hy4", t:"Pasta dental + cepillo viaje"},
+      {id:"pk_hy5", t:"Protector solar FPS 50+ (100ml)", must:true}
+    ]},
+    {cat:"Playa y Sol", items:[
+      {id:"pk_b1", t:"Gafas de sol", must:true},
+      {id:"pk_b2", t:"Gorra o sombrero plegable", must:true},
+      {id:"pk_b3", t:"Toalla de microfibra ultra fina", must:true},
+      {id:"pk_b4", t:"Bolsa seca impermeable (ferrys)"}
+    ]},
+    {cat:"Tecnología", items:[
+      {id:"pk_t1", t:"Adaptador europeo tipo F (Schuko)", must:true},
+      {id:"pk_t2", t:"Cargador multipuerto USB-C", must:true},
+      {id:"pk_t3", t:"Power bank 10.000mAh (límite cabina)", must:true},
+      {id:"pk_t4", t:"Auriculares"},
+      {id:"pk_t5", t:"SIM europea o eSIM activada antes", must:true}
+    ]},
+    {cat:"Farmacia básica", items:[
+      {id:"pk_h1", t:"Seguro de viaje activo en el celular", must:true},
+      {id:"pk_h2", t:"Ibuprofeno 400mg x10"},
+      {id:"pk_h3", t:"Antihistamínico"},
+      {id:"pk_h4", t:"Pastillas para mareo (ferrys)", must:true},
+      {id:"pk_h5", t:"Antidiarreico + suero oral"},
+      {id:"pk_h6", t:"Curitas surtidas"}
+    ]},
+    {cat:"Documentos y dinero", items:[
+      {id:"pk_d1", t:"Pasaporte vigente (mín. 6 meses desde vuelta)", must:true},
+      {id:"pk_d2", t:"Foto del pasaporte en la nube + copia física", must:true},
+      {id:"pk_d3", t:"Tarjeta Wise/Revolut sin comisión", must:true},
+      {id:"pk_d4", t:"Efectivo: 150 EUR para mercados"},
+      {id:"pk_d5", t:"Reservas descargadas offline", must:true},
+      {id:"pk_d6", t:"Candado con combinación (hostel)", must:true}
+    ]},
+    {cat:"La mochila", items:[
+      {id:"pk_m1", t:"Mochila 30-35L (cabe en cabina)", must:true},
+      {id:"pk_m2", t:"Organizadores tipo packing cubes"},
+      {id:"pk_m3", t:"Candado TSA exterior"},
+      {id:"pk_m4", t:"Botella de agua colapsable 500ml", must:true}
+    ]}
+  ];
+  var PACK_KEY = 'europa2026_pack_v3';
+  function packLoad() { try { return JSON.parse(localStorage.getItem(PACK_KEY) || '{}'); } catch(e) { return {}; } }
+  function packSave(s) { try { localStorage.setItem(PACK_KEY, JSON.stringify(s)); } catch(e) {} }
+  function renderPack() {
+    var state = packLoad();
+    var grid = document.getElementById('packGrid');
+    if (!grid) return;
+    grid.innerHTML = '';
+    PACKS.forEach(function(cat) {
+      var div = document.createElement('div');
+      div.className = 'packing-cat';
+      var title = document.createElement('div');
+      title.className = 'packing-cat-title';
+      title.textContent = cat.cat;
+      div.appendChild(title);
+      cat.items.forEach(function(item) {
+        var done = !!state[item.id];
+        var el = document.createElement('div');
+        el.className = 'pack-item';
+        var cb = document.createElement('div');
+        cb.className = 'pcb' + (done ? ' done' : '');
+        var lbl = document.createElement('span');
+        if (done) lbl.className = 'done';
+        lbl.textContent = item.t;
+        if (item.must) {
+          var must = document.createElement('span');
+          must.className = 'must';
+          must.textContent = 'imprescindible';
+          lbl.appendChild(must);
+        }
+        el.appendChild(cb);
+        el.appendChild(lbl);
+        el.addEventListener('click', function() {
+          var s = packLoad(); s[item.id] = !s[item.id]; packSave(s); renderPack();
+        });
+        div.appendChild(el);
+      });
+      grid.appendChild(div);
     });
-    grid.appendChild(div);
-  });
-}
-render();
-})();
+  }
+  renderPack();
 
-// ── TRACKER ──────────────────────────────────────────────────
-(function(){
-var ITEMS=[
-  {id:'tr1',label:'✈️ Vuelo Bs. As. → Madrid (ida)'},{id:'tr2',label:'✈️ Vuelo Madrid → Bs. As. (vuelta)'},
-  {id:'tr3',label:'🚄 Tren AVE Madrid → Barcelona'},{id:'tr4',label:'✈️ Vuelo Barcelona → Atenas'},
-  {id:'tr5',label:'⛴️ Ferry Pireo → Santorini'},{id:'tr6',label:'⛴️ Ferry Santorini → Naxos'},
-  {id:'tr7',label:'✈️ Vuelo Naxos → Creta'},{id:'tr8',label:'✈️ Vuelo Creta → Atenas'},
-  {id:'tr9',label:'✈️ Vuelo Salónica → Budapest'},{id:'tr10',label:'✈️ Vuelo Budapest → Madrid'},
-  {id:'tr11',label:'🚗 Auto alquiler Grecia (4 días)'},{id:'tr12',label:'🏨 Hospedaje Barcelona'},
-  {id:'tr13',label:'🏨 Hospedaje Atenas I'},{id:'tr14',label:'🏨 Hospedaje Santorini'},
-  {id:'tr15',label:'🏨 Hospedaje Naxos'},{id:'tr16',label:'🏨 Hospedaje Creta'},
-  {id:'tr17',label:'🏨 Hospedaje Atenas II'},{id:'tr18',label:'🏨 Hospedaje Nauplia'},
-  {id:'tr19',label:'🏨 Hospedaje Meteora'},{id:'tr20',label:'🏨 Hospedaje Budapest'},
-  {id:'tr21',label:'🏛️ Entrada Acrópolis Atenas'},{id:'tr22',label:'🏛️ Entrada Sagrada Família'},
-  {id:'tr23',label:'🏛️ Entrada Park Güell'},{id:'tr24',label:'🏛️ Entrada Palacio de Cnosos'},
-  {id:'tr25',label:'🏛️ Baños Széchenyi Budapest'},{id:'tr26',label:'📋 Seguro de viaje'},
-];
-var KEY='europa2026_tracker_v2';
-function load(){try{return JSON.parse(localStorage.getItem(KEY)||'{}')}catch(e){return{}}}
-function save(s){try{localStorage.setItem(KEY,JSON.stringify(s))}catch(e){}}
-function sc(v){return v==='pagado'?'pagado':v==='reservado'?'reservado':'pendiente';}
-function makeAttach(id,s){
-  if(s.file) return '<div style="display:flex;align-items:center;gap:.4rem"><span style="font-size:.7rem;color:#86efac;max-width:90px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="'+s.fileName+'">📎 '+s.fileName+'</span><button onclick="rmFile(event,''+id+'')" style="background:none;border:none;color:rgba(255,255,255,.3);cursor:pointer;font-size:.75rem;padding:0">✕</button></div>';
-  return '<label style="cursor:pointer;font-size:.7rem;color:rgba(255,255,255,.3);border:1px dashed rgba(255,255,255,.15);border-radius:6px;padding:.25rem .5rem;white-space:nowrap">📎 Subir<input type="file" accept="image/*,.pdf" style="display:none" onchange="attachF(event,''+id+'')" /></label>';
-}
-window.rmFile=function(e,id){e.stopPropagation();var s=load();if(s[id]){delete s[id].file;delete s[id].fileName;save(s);renderTracker();}};
-window.attachF=function(e,id){var file=e.target.files[0];if(!file)return;var r=new FileReader();r.onload=function(ev){var s=load();if(!s[id])s[id]={status:'pendiente',date:'',note:''};s[id].file=ev.target.result;s[id].fileName=file.name.length>18?file.name.substring(0,16)+'…':file.name;save(s);renderTracker();};r.readAsDataURL(file);};
-function renderTracker(){
-  var state=load();
-  var tbody=document.getElementById('trackerBody');
-  tbody.innerHTML='';
-  var paid=0,reserved=0;
-  ITEMS.forEach(function(item){
-    var s=state[item.id]||{status:'pendiente',date:'',note:''};
-    var tr=document.createElement('tr');
-    tr.innerHTML='<td style="font-weight:500;white-space:nowrap;font-size:.8rem">'+item.label+'</td>'+
-      '<td><select class="status-sel '+sc(s.status)+'" data-id="'+item.id+'" data-field="status">'+
-        '<option value="pendiente"'+(s.status==='pendiente'?' selected':'')+'>⏳ Pendiente</option>'+
-        '<option value="reservado"'+(s.status==='reservado'?' selected':'')+'>📌 Reservado</option>'+
-        '<option value="pagado"'+(s.status==='pagado'?' selected':'')+'>✅ Pagado</option>'+
-      '</select></td>'+
-      '<td><input class="date-inp" data-id="'+item.id+'" data-field="date" type="text" placeholder="Conf. / fecha" value="'+s.date+'"></td>'+
-      '<td><input class="tracker-note-inp" data-id="'+item.id+'" data-field="note" type="text" placeholder="Notas…" value="'+s.note+'"></td>'+
-      '<td>'+makeAttach(item.id,s)+'</td>';
-    tbody.appendChild(tr);
-    if(s.status==='pagado') paid++;
-    else if(s.status==='reservado') reserved++;
+  // ── TRACKER ────────────────────────────────────────────────
+  var ITEMS = [
+    {id:'tr1',  label:'Vuelo Bs. As. → Madrid (ida)'},
+    {id:'tr2',  label:'Vuelo Madrid → Bs. As. (vuelta)'},
+    {id:'tr3',  label:'Tren AVE Madrid → Barcelona'},
+    {id:'tr4',  label:'Vuelo Barcelona → Atenas'},
+    {id:'tr5',  label:'Ferry Pireo → Santorini'},
+    {id:'tr6',  label:'Ferry Santorini → Naxos'},
+    {id:'tr7',  label:'Vuelo Naxos → Creta'},
+    {id:'tr8',  label:'Vuelo Creta → Atenas'},
+    {id:'tr9',  label:'Vuelo Salónica → Budapest'},
+    {id:'tr10', label:'Vuelo Budapest → Madrid'},
+    {id:'tr11', label:'Auto alquiler Grecia (4 días)'},
+    {id:'tr12', label:'Hospedaje Barcelona'},
+    {id:'tr13', label:'Hospedaje Atenas I'},
+    {id:'tr14', label:'Hospedaje Santorini'},
+    {id:'tr15', label:'Hospedaje Naxos'},
+    {id:'tr16', label:'Hospedaje Creta'},
+    {id:'tr17', label:'Hospedaje Atenas II'},
+    {id:'tr18', label:'Hospedaje Nauplia'},
+    {id:'tr19', label:'Hospedaje Meteora'},
+    {id:'tr20', label:'Hospedaje Budapest'},
+    {id:'tr21', label:'Entrada Acrópolis Atenas'},
+    {id:'tr22', label:'Entrada Sagrada Família'},
+    {id:'tr23', label:'Entrada Park Güell'},
+    {id:'tr24', label:'Entrada Palacio de Cnosos'},
+    {id:'tr25', label:'Baños Széchenyi Budapest'},
+    {id:'tr26', label:'Seguro de viaje'}
+  ];
+  var TRACKER_KEY = 'europa2026_tracker_v2';
+  function trkLoad() { try { return JSON.parse(localStorage.getItem(TRACKER_KEY) || '{}'); } catch(e) { return {}; } }
+  function trkSave(s) { try { localStorage.setItem(TRACKER_KEY, JSON.stringify(s)); } catch(e) {} }
+  function statusClass(v) { return v === 'pagado' ? 'pagado' : v === 'reservado' ? 'reservado' : 'pendiente'; }
+  function renderTracker() {
+    var state = trkLoad();
+    var tbody = document.getElementById('trackerBody');
+    if (!tbody) return;
+    tbody.innerHTML = '';
+    var paid = 0, reserved = 0;
+    ITEMS.forEach(function(item) {
+      var s = state[item.id] || {status:'pendiente', date:'', note:''};
+      var tr = document.createElement('tr');
+
+      var tdLabel = document.createElement('td');
+      tdLabel.style.cssText = 'font-weight:500;white-space:nowrap;font-size:.8rem';
+      tdLabel.textContent = item.label;
+
+      var tdStatus = document.createElement('td');
+      var sel = document.createElement('select');
+      sel.className = 'status-sel ' + statusClass(s.status);
+      sel.dataset.id = item.id;
+      sel.dataset.field = 'status';
+      ['pendiente','reservado','pagado'].forEach(function(v) {
+        var opt = document.createElement('option');
+        opt.value = v;
+        opt.textContent = v === 'pendiente' ? 'Pendiente' : v === 'reservado' ? 'Reservado' : 'Pagado';
+        if (s.status === v) opt.selected = true;
+        sel.appendChild(opt);
+      });
+      tdStatus.appendChild(sel);
+
+      var tdDate = document.createElement('td');
+      var dateInp = document.createElement('input');
+      dateInp.className = 'date-inp';
+      dateInp.type = 'text';
+      dateInp.placeholder = 'Conf. / fecha';
+      dateInp.value = s.date || '';
+      dateInp.dataset.id = item.id;
+      dateInp.dataset.field = 'date';
+      tdDate.appendChild(dateInp);
+
+      var tdNote = document.createElement('td');
+      var noteInp = document.createElement('input');
+      noteInp.className = 'tracker-note-inp';
+      noteInp.type = 'text';
+      noteInp.placeholder = 'Notas…';
+      noteInp.value = s.note || '';
+      noteInp.dataset.id = item.id;
+      noteInp.dataset.field = 'note';
+      tdNote.appendChild(noteInp);
+
+      var tdFile = document.createElement('td');
+      if (s.file) {
+        tdFile.innerHTML = '<span style="font-size:.7rem;color:#86efac">' + (s.fileName || 'archivo') + '</span>';
+      } else {
+        var fileLabel = document.createElement('label');
+        fileLabel.style.cssText = 'cursor:pointer;font-size:.7rem;color:rgba(255,255,255,.3);border:1px dashed rgba(255,255,255,.15);border-radius:6px;padding:.25rem .5rem;white-space:nowrap';
+        fileLabel.textContent = 'Subir';
+        var fileInp = document.createElement('input');
+        fileInp.type = 'file';
+        fileInp.accept = 'image/*,.pdf';
+        fileInp.style.display = 'none';
+        (function(itemId) {
+          fileInp.addEventListener('change', function() {
+            var file = this.files[0];
+            if (!file) return;
+            var r = new FileReader();
+            r.onload = function(ev) {
+              var st = trkLoad();
+              if (!st[itemId]) st[itemId] = {status:'pendiente', date:'', note:''};
+              st[itemId].file = ev.target.result;
+              st[itemId].fileName = file.name.length > 18 ? file.name.substring(0,16) + '...' : file.name;
+              trkSave(st);
+              renderTracker();
+            };
+            r.readAsDataURL(file);
+          });
+        })(item.id);
+        fileLabel.appendChild(fileInp);
+        tdFile.appendChild(fileLabel);
+      }
+
+      tr.appendChild(tdLabel);
+      tr.appendChild(tdStatus);
+      tr.appendChild(tdDate);
+      tr.appendChild(tdNote);
+      tr.appendChild(tdFile);
+      tbody.appendChild(tr);
+
+      if (s.status === 'pagado') paid++;
+      else if (s.status === 'reservado') reserved++;
+    });
+    var pending = ITEMS.length - paid - reserved;
+    var prog = document.getElementById('trackerProgress');
+    if (prog) prog.innerHTML =
+      '<span style="color:#86efac">Pagados: ' + paid + '</span> &nbsp;' +
+      '<span style="color:#fde047">Reservados: ' + reserved + '</span> &nbsp;' +
+      '<span style="color:#fca5a5">Pendientes: ' + pending + '</span> &nbsp;' +
+      '<span style="color:rgba(255,255,255,.3)">de ' + ITEMS.length + ' total</span>';
+  }
+  document.addEventListener('change', function(e) {
+    if (e.target.dataset.field === 'status') {
+      var s = trkLoad();
+      var id = e.target.dataset.id;
+      if (!s[id]) s[id] = {status:'pendiente', date:'', note:''};
+      s[id].status = e.target.value;
+      e.target.className = 'status-sel ' + statusClass(e.target.value);
+      trkSave(s);
+      renderTracker();
+    }
   });
-  var pending=ITEMS.length-paid-reserved;
-  document.getElementById('trackerProgress').innerHTML='<span style="color:#86efac">✅ '+paid+' pagados</span> &nbsp;<span style="color:#fde047">📌 '+reserved+' reservados</span> &nbsp;<span style="color:#fca5a5">⏳ '+pending+' pendientes</span> &nbsp;<span style="color:rgba(255,255,255,.3)">de '+ITEMS.length+' total</span>';
-}
-document.addEventListener('change',function(e){
-  if(e.target.dataset.field==='status'){var s=load();var id=e.target.dataset.id;if(!s[id])s[id]={status:'pendiente',date:'',note:''};s[id].status=e.target.value;e.target.className='status-sel '+sc(e.target.value);save(s);renderTracker();}
-});
-document.addEventListener('blur',function(e){
-  if(e.target.dataset.field==='date'||e.target.dataset.field==='note'){var s=load();var id=e.target.dataset.id;if(!s[id])s[id]={status:'pendiente',date:'',note:''};s[id][e.target.dataset.field]=e.target.value;save(s);}
-},true);
-renderTracker();
+  document.addEventListener('blur', function(e) {
+    if (e.target.dataset.field === 'date' || e.target.dataset.field === 'note') {
+      var s = trkLoad();
+      var id = e.target.dataset.id;
+      if (!s[id]) s[id] = {status:'pendiente', date:'', note:''};
+      s[id][e.target.dataset.field] = e.target.value;
+      trkSave(s);
+    }
+  }, true);
+  renderTracker();
 })();
 </script>
 </body></html>

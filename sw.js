@@ -1,4 +1,4 @@
-const CACHE='europa2026-v3';
+const CACHE='europa2026-v4';
 const PAGES=['index.html','ruta.html','barcelona.html','atenas.html','grecia-islas.html','continental.html','budapest.html','madrid.html','organizar.html','style.css','shared.js'];
 self.addEventListener('install',e=>{e.waitUntil(caches.open(CACHE).then(c=>c.addAll(PAGES)).then(()=>self.skipWaiting()));});
 self.addEventListener('activate',e=>{e.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(k=>k!==CACHE).map(k=>caches.delete(k)))).then(()=>self.clients.claim()));});
