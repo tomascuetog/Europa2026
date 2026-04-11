@@ -95,25 +95,26 @@
   <div style="margin-bottom:2.5rem"><p class="block-title">Mapa de ruta continental</p><div id="map-road" class="dest-map"></div></div>
 <footer class="site-footer"><p>Europa 2026 · <span>Septiembre</span> · Madrid · Barcelona · Grecia · Budapest</p></footer>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-<script src="shared.js"></script><script>window.MAPS=[{"id":"map-road","lat":39,"lng":22.5,"zoom":6,"spots":[{"num":1,"name":"Atenas — salida","lat":37.9838,"lng":23.7275,"hostel":false},{"num":2,"name":"Canal de Corinto","lat":37.9379,"lng":22.9985,"hostel":false},{"num":3,"name":"Antigua Corinto","lat":37.9063,"lng":22.8798,"hostel":false},{"num":4,"name":"Micenas (Agamenón)","lat":37.7311,"lng":22.7561,"hostel":false},{"num":5,"name":"Teatro de Epidauro","lat":37.5959,"lng":23.0778,"hostel":false},{"num":6,"name":"Nauplia","lat":37.5675,"lng":22.8019,"hostel":false},{"num":7,"name":"Oráculo de Delfos","lat":38.4824,"lng":22.5011,"hostel":false},{"num":8,"name":"Termópilas","lat":38.7995,"lng":22.5351,"hostel":false},{"num":9,"name":"Meteora — Monasterios","lat":39.7217,"lng":21.6306,"hostel":false},{"num":10,"name":"Vergina — Tumba Filipo II","lat":40.4817,"lng":22.3189,"hostel":false},{"num":11,"name":"Pella — Museo Arqueológico","lat":40.7592,"lng":22.5253,"hostel":false},{"num":12,"name":"Salónica — llegada","lat":40.6401,"lng":22.9444,"hostel":false}]}];</script>
-
-<script>
-// Draw route line for road trip
-(function(){
-  function drawRoute(){
-    if(typeof L==='undefined'||!window.MAPS){setTimeout(drawRoute,200);return;}
-    setTimeout(function(){
-      var mapEl=document.getElementById('map-road');
-      if(!mapEl||!mapEl._leaflet_id){setTimeout(drawRoute,300);return;}
-      var leafletMap=null;
-      // access the leaflet map instance from the container
-      try{ leafletMap=L.map._maps ? L.map._maps[mapEl._leaflet_id] : null; }catch(e){}
-      if(!leafletMap){ setTimeout(drawRoute,300); return; }
-      var coords=window.MAPS[0].spots.filter(function(s){return typeof s.num==='number';}).map(function(s){return[s.lat,s.lng];});
-      L.polyline(coords,{color:'#c9973a',weight:3,opacity:.75,dashArray:'8,6'}).addTo(leafletMap);
-    },600);
-  }
-  drawRoute();
-})();
-</script>
+<script src="shared.js"></script><script>window.MAPS=[{"id":"map-road","lat":39,"lng":22.5,"zoom":6,
+"days":["Mar 15 Sep","Mié 16 Sep","Jue 17 Sep","Vie 18 Sep"],
+"routes":[
+  [[37.9838,23.7275],[37.9379,22.9985],[37.9063,22.8798],[37.7311,22.7561],[37.5959,23.0778],[37.5675,22.8019]],
+  [[37.5675,22.8019],[38.4824,22.5011]],
+  [[38.4824,22.5011],[38.7995,22.5351],[39.7217,21.6306]],
+  [[39.7217,21.6306],[40.4817,22.3189],[40.7592,22.5253],[40.6401,22.9444]]
+],
+"spots":[
+  {"num":1,"name":"Atenas — salida","lat":37.9838,"lng":23.7275,"hostel":false,"day":1,"order":1},
+  {"num":2,"name":"Canal de Corinto","lat":37.9379,"lng":22.9985,"hostel":false,"day":1,"order":2},
+  {"num":3,"name":"Antigua Corinto","lat":37.9063,"lng":22.8798,"hostel":false,"day":1,"order":3},
+  {"num":4,"name":"Micenas","lat":37.7311,"lng":22.7561,"hostel":false,"day":1,"order":4},
+  {"num":5,"name":"Teatro de Epidauro","lat":37.5959,"lng":23.0778,"hostel":false,"day":1,"order":5},
+  {"num":6,"name":"Nauplia ★","lat":37.5675,"lng":22.8019,"hostel":false,"day":1,"order":6},
+  {"num":7,"name":"Oráculo de Delfos ★","lat":38.4824,"lng":22.5011,"hostel":false,"day":2,"order":1},
+  {"num":8,"name":"Termópilas","lat":38.7995,"lng":22.5351,"hostel":false,"day":3,"order":1},
+  {"num":9,"name":"Meteora — Monasterios ★","lat":39.7217,"lng":21.6306,"hostel":false,"day":3,"order":2},
+  {"num":10,"name":"Vergina","lat":40.4817,"lng":22.3189,"hostel":false,"day":4,"order":1},
+  {"num":11,"name":"Pella","lat":40.7592,"lng":22.5253,"hostel":false,"day":4,"order":2},
+  {"num":12,"name":"Salónica — llegada","lat":40.6401,"lng":22.9444,"hostel":false,"day":4,"order":3}
+]}];
 </body></html>
