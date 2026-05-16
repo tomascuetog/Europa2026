@@ -104,8 +104,13 @@
 <footer class="site-footer"><p>Europa 2026 · <span>Septiembre</span> · Madrid · Barcelona · Grecia · Budapest</p></footer>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="shared.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
 (function() {
+  var SB_URL = 'https://adzmnnmubbharcprjkhs.supabase.co';
+  var SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFkem1ubm11YmJoYXJjcHJqa2hzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg5MzI3MjcsImV4cCI6MjA5NDUwODcyN30.K_TdCUgIo23aqc0wCQBJI7BMWDTT6PND89n7x_MU6-A';
+  var sb = supabase.createClient(SB_URL, SB_KEY);
+
   // ── TASKS ──────────────────────────────────────────────────
   var TASKS = [
     {group:"Vuelos internacionales", items:[
@@ -162,17 +167,15 @@
       {id:"d5", t:"Confirmar seguro auto incluye Grecia"}
     ]}
   ];
-  var TASKS_KEY = 'europa2026_tasks_v2';
-  function tasksLoad() { try { return JSON.parse(localStorage.getItem(TASKS_KEY) || '{}'); } catch(e) { return {}; } }
-  function tasksSave(s) { try { localStorage.setItem(TASKS_KEY, JSON.stringify(s)); } catch(e) {} }
+  var tasksState = {};
+
   function renderTasks() {
-    var state = tasksLoad();
     var grid = document.getElementById('tasksGrid');
     if (!grid) return;
     grid.innerHTML = '';
     var total = 0, done = 0;
     TASKS.forEach(function(group) {
-      var dG = group.items.filter(function(it) { return state[it.id]; }).length;
+      var dG = group.items.filter(function(it) { return tasksState[it.id]; }).length;
       total += group.items.length;
       done += dG;
       var div = document.createElement('div');
@@ -182,7 +185,7 @@
       title.innerHTML = group.group + '<span class="task-progress">' + dG + '/' + group.items.length + '</span>';
       div.appendChild(title);
       group.items.forEach(function(it) {
-        var d = !!state[it.id];
+        var d = !!tasksState[it.id];
         var el = document.createElement('div');
         el.className = 'task-item';
         var cb = document.createElement('div');
@@ -199,7 +202,9 @@
         el.appendChild(cb);
         el.appendChild(lbl);
         el.addEventListener('click', function() {
-          var s = tasksLoad(); s[it.id] = !s[it.id]; tasksSave(s); renderTasks();
+          tasksState[it.id] = !tasksState[it.id];
+          renderTasks();
+          sb.from('tasks').upsert({id: it.id, done: !!tasksState[it.id], updated_at: new Date().toISOString()});
         });
         div.appendChild(el);
       });
@@ -208,11 +213,17 @@
     var summary = document.getElementById('tasksSummary');
     if (summary) summary.innerHTML = '<strong>' + done + ' de ' + total + '</strong> tareas completadas' + (done === total && total > 0 ? ' ¡Todo listo!' : '');
   }
+
   var resetBtn = document.getElementById('tasksReset');
   if (resetBtn) resetBtn.addEventListener('click', function() {
-    if (confirm('¿Desmarcar todas?')) { try { localStorage.removeItem(TASKS_KEY); } catch(e) {} renderTasks(); }
+    if (confirm('¿Desmarcar todas?')) {
+      var rows = [];
+      TASKS.forEach(function(g) { g.items.forEach(function(it) { rows.push({id: it.id, done: false, updated_at: new Date().toISOString()}); }); });
+      tasksState = {};
+      renderTasks();
+      sb.from('tasks').upsert(rows);
+    }
   });
-  renderTasks();
 
   // ── PACKING ────────────────────────────────────────────────
   var PACKS = [
@@ -272,11 +283,9 @@
       {id:"pk_m4", t:"Botella de agua colapsable 500ml", must:true}
     ]}
   ];
-  var PACK_KEY = 'europa2026_pack_v3';
-  function packLoad() { try { return JSON.parse(localStorage.getItem(PACK_KEY) || '{}'); } catch(e) { return {}; } }
-  function packSave(s) { try { localStorage.setItem(PACK_KEY, JSON.stringify(s)); } catch(e) {} }
+  var packState = {};
+
   function renderPack() {
-    var state = packLoad();
     var grid = document.getElementById('packGrid');
     if (!grid) return;
     grid.innerHTML = '';
@@ -288,7 +297,7 @@
       title.textContent = cat.cat;
       div.appendChild(title);
       cat.items.forEach(function(item) {
-        var done = !!state[item.id];
+        var done = !!packState[item.id];
         var el = document.createElement('div');
         el.className = 'pack-item';
         var cb = document.createElement('div');
@@ -305,14 +314,15 @@
         el.appendChild(cb);
         el.appendChild(lbl);
         el.addEventListener('click', function() {
-          var s = packLoad(); s[item.id] = !s[item.id]; packSave(s); renderPack();
+          packState[item.id] = !packState[item.id];
+          renderPack();
+          sb.from('packing').upsert({id: item.id, done: !!packState[item.id], updated_at: new Date().toISOString()});
         });
         div.appendChild(el);
       });
       grid.appendChild(div);
     });
   }
-  renderPack();
 
   // ── TRACKER ────────────────────────────────────────────────
   var ITEMS = [
@@ -343,18 +353,47 @@
     {id:'tr25', label:'Baños Széchenyi Budapest'},
     {id:'tr26', label:'Seguro de viaje'}
   ];
-  var TRACKER_KEY = 'europa2026_tracker_v2';
-  function trkLoad() { try { return JSON.parse(localStorage.getItem(TRACKER_KEY) || '{}'); } catch(e) { return {}; } }
-  function trkSave(s) { try { localStorage.setItem(TRACKER_KEY, JSON.stringify(s)); } catch(e) {} }
+  var trackerState = {};
+
+  function trkUpsert(id) {
+    var s = trackerState[id] || {status:'pendiente', date:'', note:'', file_url:'', file_name:''};
+    return sb.from('tracker').upsert({
+      id: id,
+      status: s.status || 'pendiente',
+      date: s.date || '',
+      note: s.note || '',
+      file_url: s.file_url || '',
+      file_name: s.file_name || '',
+      updated_at: new Date().toISOString()
+    });
+  }
+
   function statusClass(v) { return v === 'pagado' ? 'pagado' : v === 'reservado' ? 'reservado' : 'pendiente'; }
-  function renderTracker() {
-    var state = trkLoad();
-    var tbody = document.getElementById('trackerBody');
-    if (!tbody) return;
-    tbody.innerHTML = '';
+
+  function renderTrackerProgress() {
     var paid = 0, reserved = 0;
     ITEMS.forEach(function(item) {
-      var s = state[item.id] || {status:'pendiente', date:'', note:''};
+      var s = trackerState[item.id];
+      if (s && s.status === 'pagado') paid++;
+      else if (s && s.status === 'reservado') reserved++;
+    });
+    var pending = ITEMS.length - paid - reserved;
+    var prog = document.getElementById('trackerProgress');
+    if (prog) prog.innerHTML =
+      '<span style="color:#86efac">Pagados: ' + paid + '</span> &nbsp;' +
+      '<span style="color:#fde047">Reservados: ' + reserved + '</span> &nbsp;' +
+      '<span style="color:#fca5a5">Pendientes: ' + pending + '</span> &nbsp;' +
+      '<span style="color:rgba(255,255,255,.3)">de ' + ITEMS.length + ' total</span>';
+  }
+
+  function renderTracker() {
+    var tbody = document.getElementById('trackerBody');
+    if (!tbody) return;
+    var focused = document.activeElement;
+    if (focused && (focused.dataset.field === 'date' || focused.dataset.field === 'note')) return;
+    tbody.innerHTML = '';
+    ITEMS.forEach(function(item) {
+      var s = trackerState[item.id] || {status:'pendiente', date:'', note:'', file_url:'', file_name:''};
       var tr = document.createElement('tr');
 
       var tdLabel = document.createElement('td');
@@ -396,8 +435,9 @@
       tdNote.appendChild(noteInp);
 
       var tdFile = document.createElement('td');
-      if (s.file) {
-        tdFile.innerHTML = '<span style="font-size:.7rem;color:#86efac">' + (s.fileName || 'archivo') + '</span>';
+      if (s.file_url) {
+        var fn = s.file_name || 'archivo';
+        tdFile.innerHTML = '<a href="' + s.file_url + '" target="_blank" rel="noopener" style="font-size:.7rem;color:#86efac;text-decoration:underline">' + fn + '</a>';
       } else {
         var fileLabel = document.createElement('label');
         fileLabel.style.cssText = 'cursor:pointer;font-size:.7rem;color:rgba(255,255,255,.3);border:1px dashed rgba(255,255,255,.15);border-radius:6px;padding:.25rem .5rem;white-space:nowrap';
@@ -406,22 +446,25 @@
         fileInp.type = 'file';
         fileInp.accept = 'image/*,.pdf';
         fileInp.style.display = 'none';
-        (function(itemId) {
+        (function(itemId, lbl) {
           fileInp.addEventListener('change', function() {
             var file = this.files[0];
             if (!file) return;
-            var r = new FileReader();
-            r.onload = function(ev) {
-              var st = trkLoad();
-              if (!st[itemId]) st[itemId] = {status:'pendiente', date:'', note:''};
-              st[itemId].file = ev.target.result;
-              st[itemId].fileName = file.name.length > 18 ? file.name.substring(0,16) + '...' : file.name;
-              trkSave(st);
-              renderTracker();
-            };
-            r.readAsDataURL(file);
+            lbl.textContent = 'Subiendo…';
+            var ext = file.name.split('.').pop();
+            var path = itemId + '_' + Date.now() + '.' + ext;
+            sb.storage.from('comprobantes').upload(path, file, {upsert: true}).then(function(res) {
+              if (res.error) { lbl.textContent = 'Error'; console.error(res.error); return; }
+              var pub = sb.storage.from('comprobantes').getPublicUrl(path);
+              var url = pub.data.publicUrl;
+              var fname = file.name.length > 20 ? file.name.substring(0, 18) + '...' : file.name;
+              if (!trackerState[itemId]) trackerState[itemId] = {status:'pendiente', date:'', note:'', file_url:'', file_name:''};
+              trackerState[itemId].file_url = url;
+              trackerState[itemId].file_name = fname;
+              trkUpsert(itemId).then(function() { renderTracker(); });
+            });
           });
-        })(item.id);
+        })(item.id, fileLabel);
         fileLabel.appendChild(fileInp);
         tdFile.appendChild(fileLabel);
       }
@@ -432,39 +475,75 @@
       tr.appendChild(tdNote);
       tr.appendChild(tdFile);
       tbody.appendChild(tr);
-
-      if (s.status === 'pagado') paid++;
-      else if (s.status === 'reservado') reserved++;
     });
-    var pending = ITEMS.length - paid - reserved;
-    var prog = document.getElementById('trackerProgress');
-    if (prog) prog.innerHTML =
-      '<span style="color:#86efac">Pagados: ' + paid + '</span> &nbsp;' +
-      '<span style="color:#fde047">Reservados: ' + reserved + '</span> &nbsp;' +
-      '<span style="color:#fca5a5">Pendientes: ' + pending + '</span> &nbsp;' +
-      '<span style="color:rgba(255,255,255,.3)">de ' + ITEMS.length + ' total</span>';
+    renderTrackerProgress();
   }
+
   document.addEventListener('change', function(e) {
     if (e.target.dataset.field === 'status') {
-      var s = trkLoad();
       var id = e.target.dataset.id;
-      if (!s[id]) s[id] = {status:'pendiente', date:'', note:''};
-      s[id].status = e.target.value;
+      if (!trackerState[id]) trackerState[id] = {status:'pendiente', date:'', note:'', file_url:'', file_name:''};
+      trackerState[id].status = e.target.value;
       e.target.className = 'status-sel ' + statusClass(e.target.value);
-      trkSave(s);
-      renderTracker();
+      renderTrackerProgress();
+      trkUpsert(id);
     }
   });
+
   document.addEventListener('blur', function(e) {
     if (e.target.dataset.field === 'date' || e.target.dataset.field === 'note') {
-      var s = trkLoad();
       var id = e.target.dataset.id;
-      if (!s[id]) s[id] = {status:'pendiente', date:'', note:''};
-      s[id][e.target.dataset.field] = e.target.value;
-      trkSave(s);
+      var field = e.target.dataset.field;
+      if (!trackerState[id]) trackerState[id] = {status:'pendiente', date:'', note:'', file_url:'', file_name:''};
+      trackerState[id][field] = e.target.value;
+      trkUpsert(id);
     }
   }, true);
-  renderTracker();
+
+  // ── REAL-TIME SYNC ─────────────────────────────────────────
+  sb.channel('europa_sync')
+    .on('postgres_changes', {event: '*', schema: 'public', table: 'tasks'}, function(payload) {
+      if (payload.new) { tasksState[payload.new.id] = payload.new.done; renderTasks(); }
+    })
+    .on('postgres_changes', {event: '*', schema: 'public', table: 'packing'}, function(payload) {
+      if (payload.new) { packState[payload.new.id] = payload.new.done; renderPack(); }
+    })
+    .on('postgres_changes', {event: '*', schema: 'public', table: 'tracker'}, function(payload) {
+      if (payload.new) {
+        var r = payload.new;
+        trackerState[r.id] = {status: r.status, date: r.date, note: r.note, file_url: r.file_url || '', file_name: r.file_name || ''};
+        renderTracker();
+      }
+    })
+    .subscribe();
+
+  // ── INIT ──────────────────────────────────────────────────
+  var initGrid = document.getElementById('tasksGrid');
+  if (initGrid) initGrid.innerHTML = '<p style="grid-column:1/-1;color:var(--text-mid);font-size:.85rem;padding:1rem 0">Cargando datos compartidos…</p>';
+  var initPackGrid = document.getElementById('packGrid');
+  if (initPackGrid) initPackGrid.innerHTML = '<p style="color:var(--text-mid);font-size:.85rem;padding:1rem 0">Cargando datos compartidos…</p>';
+
+  Promise.all([
+    sb.from('tasks').select('*').then(function(res) {
+      (res.data || []).forEach(function(r) { tasksState[r.id] = r.done; });
+    }),
+    sb.from('packing').select('*').then(function(res) {
+      (res.data || []).forEach(function(r) { packState[r.id] = r.done; });
+    }),
+    sb.from('tracker').select('*').then(function(res) {
+      (res.data || []).forEach(function(r) {
+        trackerState[r.id] = {status: r.status, date: r.date, note: r.note, file_url: r.file_url || '', file_name: r.file_name || ''};
+      });
+    })
+  ]).then(function() {
+    renderTasks();
+    renderPack();
+    renderTracker();
+  }).catch(function(err) {
+    console.error('Error cargando datos:', err);
+    var g = document.getElementById('tasksGrid');
+    if (g) g.innerHTML = '<p style="grid-column:1/-1;color:#fca5a5;font-size:.85rem;padding:1rem 0">Error al conectar con la base de datos. Revisá la conexión.</p>';
+  });
 })();
 </script>
 </body></html>
