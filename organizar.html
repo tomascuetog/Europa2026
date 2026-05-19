@@ -52,6 +52,13 @@
 .bi-file-lbl{cursor:pointer;font-family:Outfit,sans-serif;font-size:.68rem;color:var(--text-mid);border:1px dashed rgba(13,27,42,.2);border-radius:8px;padding:.22rem .55rem;white-space:nowrap;transition:all .15s;-webkit-tap-highlight-color:transparent;}
 .bi-file-lbl:hover{border-color:var(--gold);color:var(--gold);}
 .bi-file-link{font-family:Outfit,sans-serif;font-size:.7rem;color:#15803d;text-decoration:underline;word-break:break-all;}
+.bi-tag{font-family:Outfit,sans-serif;font-size:.58rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;border-radius:20px;padding:.18rem .55rem;flex-shrink:0;}
+.bi-tag.transporte{background:rgba(59,130,246,.12);color:#1d4ed8;}
+.bi-tag.hospedaje{background:rgba(168,85,247,.12);color:#7e22ce;}
+.bi-tag.actividad{background:rgba(249,115,22,.12);color:#c2410c;}
+.bi-tag.otro{background:rgba(107,114,128,.12);color:#374151;}
+.bi-price-est .bi-price-sym{font-size:.68rem;color:rgba(13,27,42,.35);}
+.bi-price-est .bi-price-inp{color:rgba(13,27,42,.45);border-color:rgba(13,27,42,.1);}
 @media(max-width:480px){
   .bi-label{font-size:.77rem;}
   .res-val{font-size:1.65rem;}
@@ -138,41 +145,55 @@
 
   // ── BUDGET GROUPS ──────────────────────────────────────────
   var BUDGET_GROUPS = [
-    {group:'Transportes', items:[
-      {id:'tr1',  label:'Vuelo Bs. As. → Madrid (ida)',      est:500},
-      {id:'tr2',  label:'Vuelo Madrid → Bs. As. (vuelta)',   est:500},
-      {id:'tr3',  label:'Tren AVE Madrid → Barcelona',       est:53},
-      {id:'tr4',  label:'Vuelo Barcelona → Atenas',          est:76},
-      {id:'tr5',  label:'Ferry Pireo → Santorini',           est:45},
-      {id:'tr6',  label:'Ferry Santorini → Naxos',           est:37},
-      {id:'tr7',  label:'Vuelo Naxos → Creta',               est:56},
-      {id:'tr8',  label:'Vuelo Creta → Atenas',              est:76},
-      {id:'tr9',  label:'Vuelo Salónica → Budapest',         est:68},
-      {id:'tr10', label:'Vuelo Budapest → Madrid',           est:100},
-      {id:'tr11', label:'Auto alquiler Grecia (4 días)',      est:120},
-      {id:'tr11b',label:'Gasolina road trip (~600 km)',       est:40}
+    {group:'Internacionales', items:[
+      {id:'tr1',  label:'Vuelo Bs. As. → Madrid (ida)',       est:500, tag:'transporte'},
+      {id:'tr2',  label:'Vuelo Madrid → Bs. As. (vuelta)',    est:500, tag:'transporte'},
+      {id:'tr26', label:'Seguro de viaje internacional',      est:80,  tag:'otro'}
     ]},
-    {group:'Hospedajes', items:[
-      {id:'tr12', label:'Barcelona — BCN Sports Hostel (3n)', est:102},
-      {id:'tr13', label:'Atenas I — Safestay Monastiraki (1n)',est:23},
-      {id:'tr14', label:'Santorini Camping (2n)',              est:52},
-      {id:'tr15', label:'Naxos — Katerina Roza Studios (2n)', est:49},
-      {id:'tr16', label:'Creta — Cocoon City Hostel (3n)',    est:87},
-      {id:'tr17', label:'Atenas II — Safestay Monastiraki (1n)',est:23},
-      {id:'tr18', label:'Nauplia — hostel (1n)',               est:25},
-      {id:'tr19', label:'Meteora — hostel (1n)',               est:25},
-      {id:'tr20', label:'Budapest — The Hive (3n)',            est:57}
+    {group:'Madrid → Barcelona', items:[
+      {id:'tr3',  label:'Tren AVE Madrid → Barcelona',        est:53,  tag:'transporte'}
     ]},
-    {group:'Actividades & Entradas', items:[
-      {id:'tr22', label:'Sagrada Família',                    est:30},
-      {id:'tr23', label:'Park Güell (zona monumental)',       est:13},
-      {id:'tr21', label:'Acrópolis de Atenas',               est:20},
-      {id:'tr24', label:'Palacio de Cnosos',                  est:16},
-      {id:'tr25', label:'Baños Széchenyi Budapest',          est:20},
-      {id:'tr25b',label:'Tour Parlamento Budapest',          est:20}
+    {group:'Barcelona · 4–7 Sep', items:[
+      {id:'tr12', label:'BCN Sports Hostel (3 noches)',       est:102, tag:'hospedaje'},
+      {id:'tr22', label:'Sagrada Família',                    est:30,  tag:'actividad'},
+      {id:'tr23', label:'Park Güell (zona monumental)',       est:13,  tag:'actividad'}
     ]},
-    {group:'Otros', items:[
-      {id:'tr26', label:'Seguro de viaje internacional',     est:80}
+    {group:'Barcelona → Atenas', items:[
+      {id:'tr4',  label:'Vuelo Barcelona → Atenas',           est:76,  tag:'transporte'}
+    ]},
+    {group:'Atenas I · 7–8 Sep', items:[
+      {id:'tr13', label:'Safestay Monastiraki (1 noche)',     est:23,  tag:'hospedaje'},
+      {id:'tr21', label:'Acrópolis de Atenas',                est:20,  tag:'actividad'}
+    ]},
+    {group:'Santorini · 8–10 Sep', items:[
+      {id:'tr5',  label:'Ferry Pireo → Santorini',            est:45,  tag:'transporte'},
+      {id:'tr14', label:'Santorini Camping (2 noches)',       est:52,  tag:'hospedaje'}
+    ]},
+    {group:'Naxos · 10–12 Sep', items:[
+      {id:'tr6',  label:'Ferry Santorini → Naxos',            est:37,  tag:'transporte'},
+      {id:'tr15', label:'Katerina Roza Studios (2 noches)',   est:49,  tag:'hospedaje'}
+    ]},
+    {group:'Creta · 12–15 Sep', items:[
+      {id:'tr7',  label:'Vuelo Naxos → Creta',                est:56,  tag:'transporte'},
+      {id:'tr16', label:'Cocoon City Hostel (3 noches)',      est:87,  tag:'hospedaje'},
+      {id:'tr24', label:'Palacio de Cnosos',                  est:16,  tag:'actividad'}
+    ]},
+    {group:'Road Trip · 15–19 Sep', items:[
+      {id:'tr8',  label:'Vuelo Creta → Atenas',               est:76,  tag:'transporte'},
+      {id:'tr17', label:'Safestay Monastiraki II (1 noche)',  est:23,  tag:'hospedaje'},
+      {id:'tr11', label:'Auto alquiler (4 días)',              est:120, tag:'transporte'},
+      {id:'tr11b',label:'Gasolina road trip (~600 km)',        est:40,  tag:'transporte'},
+      {id:'tr18', label:'Nauplia — hostel (1 noche)',          est:25,  tag:'hospedaje'},
+      {id:'tr19', label:'Meteora — hostel (1 noche)',          est:25,  tag:'hospedaje'}
+    ]},
+    {group:'Budapest · 19–22 Sep', items:[
+      {id:'tr9',  label:'Vuelo Salónica → Budapest',          est:68,  tag:'transporte'},
+      {id:'tr20', label:'The Hive (3 noches)',                est:57,  tag:'hospedaje'},
+      {id:'tr25', label:'Baños Széchenyi',                    est:20,  tag:'actividad'},
+      {id:'tr25b',label:'Tour Parlamento Budapest',           est:20,  tag:'actividad'}
+    ]},
+    {group:'Budapest → Madrid', items:[
+      {id:'tr10', label:'Vuelo Budapest → Madrid',            est:100, tag:'transporte'}
     ]}
   ];
 
@@ -198,7 +219,8 @@
           yaPagado   += adelanto;
           aPagarAlla += Math.max(0, precio - adelanto);
         } else {
-          porReservar += item.est;
+          var estPrice = (s && s.precio > 0) ? s.precio : item.est;
+          porReservar += estPrice;
         }
       });
     });
@@ -229,7 +251,7 @@
     var s       = trackerState[item.id] || {status:'proyectado',precio:0,adelanto:0,note:'',file_url:'',file_name:''};
     var isRes   = normalizeStatus(s.status) === 'reservado';
     var hasSplit = isRes && (s.adelanto > 0);
-    var precio  = isRes ? (s.precio || item.est) : item.est;
+    var precio  = s.precio > 0 ? s.precio : item.est;
     var adelanto = s.adelanto || 0;
     var destino  = Math.max(0, precio - adelanto);
 
@@ -254,35 +276,37 @@
       renderResumen();
     });
 
+    mainRow.appendChild(pill);
+
+    if (item.tag) {
+      var tagNames = {transporte:'Transporte', hospedaje:'Hospedaje', actividad:'Actividad', otro:'Otro'};
+      var tagEl = document.createElement('span');
+      tagEl.className = 'bi-tag ' + item.tag;
+      tagEl.textContent = tagNames[item.tag] || item.tag;
+      mainRow.appendChild(tagEl);
+    }
+
     var lbl = document.createElement('span');
     lbl.className = 'bi-label';
     lbl.textContent = item.label;
-
-    mainRow.appendChild(pill);
     mainRow.appendChild(lbl);
 
-    if (isRes) {
-      var pw = document.createElement('div');
-      pw.className = 'bi-price-wrap';
-      var sym = document.createElement('span');
-      sym.className = 'bi-price-sym';
-      sym.textContent = '$';
-      var pi = document.createElement('input');
-      pi.className = 'bi-price-inp';
-      pi.type = 'number';
-      pi.min = '0';
-      pi.value = precio;
-      pi.dataset.id = item.id;
-      pi.dataset.field = 'precio';
-      pw.appendChild(sym);
-      pw.appendChild(pi);
-      mainRow.appendChild(pw);
-    } else {
-      var estEl = document.createElement('span');
-      estEl.className = 'bi-est';
-      estEl.textContent = 'Est $' + item.est;
-      mainRow.appendChild(estEl);
-    }
+    var pw = document.createElement('div');
+    pw.className = 'bi-price-wrap' + (isRes ? '' : ' bi-price-est');
+    var sym = document.createElement('span');
+    sym.className = 'bi-price-sym';
+    sym.textContent = isRes ? '$' : 'est $';
+    var pi = document.createElement('input');
+    pi.className = 'bi-price-inp';
+    pi.type = 'number';
+    pi.min = '0';
+    pi.value = precio;
+    pi.dataset.id = item.id;
+    pi.dataset.field = 'precio';
+    pw.appendChild(sym);
+    pw.appendChild(pi);
+    mainRow.appendChild(pw);
+
     card.appendChild(mainRow);
 
     // ─ detail (only when reservado) ─

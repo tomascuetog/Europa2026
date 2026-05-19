@@ -163,8 +163,8 @@ document.querySelectorAll('[id]').forEach(s=>obs.observe(s));
   var items=[
     {href:'home.html',icon:'🏠',label:'Inicio',active:path===''||path==='index.html'||path==='home.html'},
     {href:'itinerario.html',icon:'🗺️',label:'Ruta',active:path==='itinerario.html'||CITY_PAGES.indexOf(path)!==-1},
-    {href:'organizar.html#presupuesto',icon:'📋',label:'Reservas',active:false},
-    {href:'organizar.html#tareas',icon:'✅',label:'Tareas',active:TASK_PAGES.indexOf(path)!==-1}
+    {href:'organizar.html#presupuesto',icon:'💰',label:'Gastos',active:false},
+    {href:'organizar.html#tareas',icon:'🎒',label:'Equipaje',active:TASK_PAGES.indexOf(path)!==-1}
   ];
   nav.innerHTML=items.map(function(it){
     return '<a href="'+it.href+'"'+(it.active?' class="active"':'')+'><span class="bnav-icon">'+it.icon+'</span><span class="bnav-label">'+it.label+'</span></a>';

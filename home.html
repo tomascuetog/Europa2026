@@ -22,7 +22,9 @@
   .home-header-sub{font-family:Outfit,sans-serif;font-size:.72rem;letter-spacing:.2em;text-transform:uppercase;color:rgba(255,255,255,.45);}
   .home-body{background:var(--cream);border-radius:24px 24px 0 0;flex:1;padding:1.5rem 1.25rem calc(5rem + env(safe-area-inset-bottom,0));}
   .home-section-label{font-family:Outfit,sans-serif;font-size:.65rem;letter-spacing:.18em;text-transform:uppercase;color:var(--text-mid);margin-bottom:.9rem;padding-left:.25rem;}
+  /* Mobile: itinerario spans full width, other two side by side */
   .home-grid{display:grid;grid-template-columns:1fr 1fr;gap:.85rem;margin-bottom:1.75rem;}
+  .home-card-wide{grid-column:span 2;}
   .home-card{background:#fff;border-radius:18px;padding:1.4rem 1.25rem 1.3rem;text-decoration:none;color:var(--navy);display:flex;flex-direction:column;gap:.45rem;box-shadow:0 2px 14px rgba(13,27,42,.07);border:1px solid rgba(13,27,42,.06);transition:transform .15s,box-shadow .15s;-webkit-tap-highlight-color:transparent;}
   .home-card:active{transform:scale(.97);}
   .home-card-icon{font-size:1.9rem;line-height:1;}
@@ -31,10 +33,12 @@
   .home-card.accent{background:var(--navy);color:#fff;}
   .home-card.accent .home-card-sub{color:rgba(255,255,255,.5);}
   .home-card.accent .home-card-title{color:#fff;}
+  /* Tablet+: 3 columns equal */
   @media(min-width:600px){
     .home-body{padding:2rem 2rem calc(5rem + env(safe-area-inset-bottom,0));}
-    .home-grid{grid-template-columns:repeat(4,1fr);gap:1rem;max-width:860px;margin-left:auto;margin-right:auto;}
-    .home-section-label{max-width:860px;margin-left:auto;margin-right:auto;}
+    .home-grid{grid-template-columns:repeat(3,1fr);gap:1rem;max-width:780px;margin-left:auto;margin-right:auto;}
+    .home-section-label{max-width:780px;margin-left:auto;margin-right:auto;}
+    .home-card-wide{grid-column:span 1;}
   }
   @media(min-width:900px){
     .home-header{padding:3.5rem 2rem 2.5rem;}
@@ -55,35 +59,34 @@
   <div class="home-body">
     <div class="home-section-label">¿Qué querés ver?</div>
     <div class="home-grid">
-      <a class="home-card accent" href="itinerario.html">
+
+      <a class="home-card accent home-card-wide" href="itinerario.html">
         <div class="home-card-icon">🗺️</div>
         <div class="home-card-title">Itinerario</div>
-        <div class="home-card-sub">6 ciudades · 24 días</div>
+        <div class="home-card-sub">6 ciudades · 24 días · Sep 2026</div>
       </a>
+
       <a class="home-card" href="organizar.html#presupuesto">
-        <div class="home-card-icon">📋</div>
-        <div class="home-card-title">Reservas</div>
-        <div class="home-card-sub" id="stat-reservas">Cargando…</div>
-      </a>
-      <a class="home-card" href="organizar.html#resumen">
         <div class="home-card-icon">💰</div>
-        <div class="home-card-title">Costos</div>
-        <div class="home-card-sub">~USD 3.044 p/p</div>
+        <div class="home-card-title">Gastos y Reservas</div>
+        <div class="home-card-sub" id="stat-gastos">Cargando…</div>
       </a>
+
       <a class="home-card" href="organizar.html#tareas">
-        <div class="home-card-icon">✅</div>
-        <div class="home-card-title">Tareas</div>
-        <div class="home-card-sub" id="stat-tareas">Cargando…</div>
+        <div class="home-card-icon">🎒</div>
+        <div class="home-card-title">Equipaje y Docs</div>
+        <div class="home-card-sub" id="stat-equipaje">Cargando…</div>
       </a>
+
     </div>
   </div>
 </div>
 
-<nav class="bottom-nav" id="bottomNav">
+<nav class="bottom-nav">
   <a href="home.html" class="active"><span class="bnav-icon">🏠</span><span class="bnav-label">Inicio</span></a>
   <a href="itinerario.html"><span class="bnav-icon">🗺️</span><span class="bnav-label">Ruta</span></a>
-  <a href="organizar.html#tracker"><span class="bnav-icon">📋</span><span class="bnav-label">Reservas</span></a>
-  <a href="organizar.html#tareas"><span class="bnav-icon">✅</span><span class="bnav-label">Tareas</span></a>
+  <a href="organizar.html#presupuesto"><span class="bnav-icon">💰</span><span class="bnav-label">Gastos</span></a>
+  <a href="organizar.html#tareas"><span class="bnav-icon">🎒</span><span class="bnav-label">Equipaje</span></a>
 </nav>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -91,29 +94,35 @@
 (function(){
   var SB_URL='https://adzmnnmubbharcprjkhs.supabase.co';
   var SB_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFkem1ubm11YmJoYXJjcHJqa2hzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg5MzI3MjcsImV4cCI6MjA5NDUwODcyN30.K_TdCUgIo23aqc0wCQBJI7BMWDTT6PND89n7x_MU6-A';
-  var sb=supabase.createClient(SB_URL,SB_KEY);
-  var TOTAL_TASKS=37;
-  var TOTAL_TRACKER=26;
+  var sb = supabase.createClient(SB_URL, SB_KEY);
+  var TOTAL_BUDGET = 27;
+  var TOTAL_TASKS  = 8;
+
   Promise.all([
+    sb.from('tracker').select('id,status'),
     sb.from('tasks').select('id,done'),
-    sb.from('tracker').select('id,status')
-  ]).then(function(results){
-    var tasks=results[0].data||[];
-    var tracker=results[1].data||[];
-    var done=tasks.filter(function(r){return r.done;}).length;
-    var paid=tracker.filter(function(r){return r.status==='pagado';}).length;
-    var reserved=tracker.filter(function(r){return r.status==='reservado';}).length;
-    var statT=document.getElementById('stat-tareas');
-    var statR=document.getElementById('stat-reservas');
-    if(statT) statT.textContent=done+' de '+TOTAL_TASKS+' listas';
-    if(statR) statR.textContent=paid+' pagadas · '+reserved+' reservadas';
-  }).catch(function(){
-    var statT=document.getElementById('stat-tareas');
-    var statR=document.getElementById('stat-reservas');
-    if(statT) statT.textContent='—';
-    if(statR) statR.textContent='—';
+    sb.from('packing').select('id,done')
+  ]).then(function(res) {
+    var tracker = res[0].data || [];
+    var tasks   = res[1].data || [];
+    var packing = res[2].data || [];
+
+    var reservados = tracker.filter(function(r){ return r.status === 'reservado'; }).length;
+    var tasksDone  = tasks.filter(function(r){ return r.done; }).length;
+    var packDone   = packing.filter(function(r){ return r.done; }).length;
+
+    var gEl = document.getElementById('stat-gastos');
+    var eEl = document.getElementById('stat-equipaje');
+    if (gEl) gEl.textContent = reservados + ' de ' + TOTAL_BUDGET + ' reservados';
+    if (eEl) eEl.textContent = tasksDone + ' tareas · ' + packDone + ' items equipaje';
+  }).catch(function() {
+    var gEl = document.getElementById('stat-gastos');
+    var eEl = document.getElementById('stat-equipaje');
+    if (gEl) gEl.textContent = '—';
+    if (eEl) eEl.textContent = '—';
   });
-  if('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(function(){});
+
+  if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(function(){});
 })();
 </script>
 </body>
