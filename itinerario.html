@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#0d1b2a">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Europa 2026">
+<title>Itinerario · Europa 2026</title>
+<link rel="manifest" href="manifest.json">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,300;1,400&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<style>
+  body{background:var(--cream);padding-bottom:calc(4.5rem + env(safe-area-inset-bottom,0));}
+  .itin-header{background:var(--navy);padding:calc(env(safe-area-inset-top,0) + 1.25rem) 1.5rem 1.75rem;}
+  .itin-back{display:inline-flex;align-items:center;gap:.35rem;font-family:Outfit,sans-serif;font-size:.75rem;font-weight:500;letter-spacing:.08em;color:rgba(255,255,255,.5);text-decoration:none;margin-bottom:1rem;-webkit-tap-highlight-color:transparent;}
+  .itin-back:hover{color:var(--gold);}
+  .itin-title{font-family:'Cormorant Garamond',serif;font-size:clamp(2rem,6vw,3rem);font-weight:300;color:#fff;line-height:1;}
+  .itin-sub{font-family:Outfit,sans-serif;font-size:.75rem;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,.4);margin-top:.4rem;}
+  .itin-body{max-width:680px;margin:0 auto;padding:1.5rem 1.25rem;}
+  .itin-section-label{font-family:Outfit,sans-serif;font-size:.63rem;letter-spacing:.18em;text-transform:uppercase;color:var(--text-mid);margin-bottom:.9rem;padding-left:.2rem;}
+  .city-list{display:flex;flex-direction:column;gap:.7rem;margin-bottom:2rem;}
+  .city-item{display:flex;align-items:center;background:#fff;border-radius:16px;padding:1.1rem 1.1rem 1.1rem 1.1rem;text-decoration:none;color:var(--navy);box-shadow:0 2px 10px rgba(13,27,42,.07);border:1px solid rgba(13,27,42,.05);transition:transform .15s;-webkit-tap-highlight-color:transparent;}
+  .city-item:active{transform:scale(.98);}
+  .city-num{width:34px;height:34px;background:var(--navy);color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:Outfit,sans-serif;font-size:.78rem;font-weight:700;flex-shrink:0;margin-right:1rem;}
+  .city-info{flex:1;min-width:0;}
+  .city-name{font-family:'Cormorant Garamond',serif;font-size:1.2rem;font-weight:600;line-height:1.1;}
+  .city-dates{font-family:Outfit,sans-serif;font-size:.7rem;color:var(--text-mid);margin-top:.15rem;}
+  .city-right{text-align:right;flex-shrink:0;margin-left:.75rem;}
+  .city-temp{font-family:Outfit,sans-serif;font-size:.8rem;font-weight:600;color:var(--gold);}
+  .city-rain{font-family:Outfit,sans-serif;font-size:.65rem;color:var(--text-mid);margin-top:.1rem;}
+  .city-arrow{color:rgba(13,27,42,.2);font-size:.85rem;margin-left:.6rem;flex-shrink:0;}
+
+  /* Linea de ruta vertical */
+  .city-list{position:relative;}
+  .route-line{position:absolute;left:calc(1.25rem + 17px);top:34px;bottom:34px;width:2px;background:linear-gradient(to bottom,rgba(13,27,42,.12),rgba(13,27,42,.06));z-index:0;pointer-events:none;}
+  .city-item{position:relative;z-index:1;}
+
+  /* Info total */
+  .itin-total{background:var(--navy);border-radius:16px;padding:1.25rem 1.5rem;display:flex;justify-content:space-around;gap:1rem;margin-bottom:2rem;}
+  .itin-stat{text-align:center;}
+  .itin-stat-val{font-family:'Cormorant Garamond',serif;font-size:1.8rem;font-weight:300;color:#fff;line-height:1;}
+  .itin-stat-label{font-family:Outfit,sans-serif;font-size:.65rem;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.4);margin-top:.2rem;}
+
+  @media(min-width:600px){
+    .itin-body{padding:2rem 1.75rem;}
+  }
+</style>
+</head>
+<body>
+
+<div class="itin-header">
+  <a class="itin-back" href="home.html">← Inicio</a>
+  <div class="itin-title">Itinerario</div>
+  <div class="itin-sub">Sep 2026 · Buenos Aires → Europa → Buenos Aires</div>
+</div>
+
+<div class="itin-body">
+
+  <div class="itin-total">
+    <div class="itin-stat"><div class="itin-stat-val">24</div><div class="itin-stat-label">Días</div></div>
+    <div class="itin-stat"><div class="itin-stat-val">6</div><div class="itin-stat-label">Destinos</div></div>
+    <div class="itin-stat"><div class="itin-stat-val">18</div><div class="itin-stat-label">Noches</div></div>
+    <div class="itin-stat"><div class="itin-stat-val">~3k</div><div class="itin-stat-label">USD p/p</div></div>
+  </div>
+
+  <div class="itin-section-label">Ciudades y fechas</div>
+
+  <div class="city-list">
+    <div class="route-line"></div>
+
+    <a class="city-item" href="madrid.html">
+      <div class="city-num">1</div>
+      <div class="city-info">
+        <div class="city-name">Madrid</div>
+        <div class="city-dates">1–4 Sep · 3 noches · Punto de entrada y cierre</div>
+      </div>
+      <div class="city-right">
+        <div class="city-temp">22°C</div>
+        <div class="city-rain">5d lluvia</div>
+      </div>
+      <div class="city-arrow">›</div>
+    </a>
+
+    <a class="city-item" href="barcelona.html">
+      <div class="city-num">2</div>
+      <div class="city-info">
+        <div class="city-name">Barcelona</div>
+        <div class="city-dates">4–7 Sep · 3 noches · Gaudí, playa, tapas</div>
+      </div>
+      <div class="city-right">
+        <div class="city-temp">24°C</div>
+        <div class="city-rain">Mar 23°C</div>
+      </div>
+      <div class="city-arrow">›</div>
+    </a>
+
+    <a class="city-item" href="atenas.html">
+      <div class="city-num">3</div>
+      <div class="city-info">
+        <div class="city-name">Atenas</div>
+        <div class="city-dates">7–8 Sep · 1 noche · Acrópolis, Monastiraki</div>
+      </div>
+      <div class="city-right">
+        <div class="city-temp">28°C</div>
+        <div class="city-rain">2d lluvia</div>
+      </div>
+      <div class="city-arrow">›</div>
+    </a>
+
+    <a class="city-item" href="grecia-islas.html">
+      <div class="city-num">4</div>
+      <div class="city-info">
+        <div class="city-name">Grecia — Islas</div>
+        <div class="city-dates">8–15 Sep · 7 noches · Santorini · Naxos · Creta</div>
+      </div>
+      <div class="city-right">
+        <div class="city-temp">26°C</div>
+        <div class="city-rain">Mar 24°C</div>
+      </div>
+      <div class="city-arrow">›</div>
+    </a>
+
+    <a class="city-item" href="continental.html">
+      <div class="city-num">5</div>
+      <div class="city-info">
+        <div class="city-name">Grecia Continental</div>
+        <div class="city-dates">15–19 Sep · 3 noches · Road trip en auto</div>
+      </div>
+      <div class="city-right">
+        <div class="city-temp">26°C</div>
+        <div class="city-rain">3d lluvia</div>
+      </div>
+      <div class="city-arrow">›</div>
+    </a>
+
+    <a class="city-item" href="budapest.html">
+      <div class="city-num">6</div>
+      <div class="city-info">
+        <div class="city-name">Budapest</div>
+        <div class="city-dates">19–22 Sep · 3 noches · Baños, Parlamento, ruin bars</div>
+      </div>
+      <div class="city-right">
+        <div class="city-temp">19°C</div>
+        <div class="city-rain">8d lluvia</div>
+      </div>
+      <div class="city-arrow">›</div>
+    </a>
+
+  </div>
+
+  <div class="itin-section-label">Vuelos internacionales</div>
+  <div style="background:#fff;border-radius:16px;padding:1.25rem 1.5rem;box-shadow:0 2px 10px rgba(13,27,42,.07);border:1px solid rgba(13,27,42,.05);">
+    <div style="display:flex;flex-direction:column;gap:.9rem;">
+      <div style="display:flex;justify-content:space-between;align-items:center;font-family:Outfit,sans-serif;font-size:.82rem;">
+        <span>✈️ &nbsp;Bs. As. → Madrid</span>
+        <span style="color:var(--text-mid)">1 Sep</span>
+      </div>
+      <div style="height:1px;background:rgba(13,27,42,.07)"></div>
+      <div style="display:flex;justify-content:space-between;align-items:center;font-family:Outfit,sans-serif;font-size:.82rem;">
+        <span>✈️ &nbsp;Madrid → Bs. As.</span>
+        <span style="color:var(--text-mid)">25 Sep</span>
+      </div>
+    </div>
+    <div style="margin-top:1rem;padding-top:.9rem;border-top:1px solid rgba(13,27,42,.07);font-family:Outfit,sans-serif;font-size:.72rem;color:var(--text-mid);">Aerolíneas / LATAM · ~USD 1.000 round trip</div>
+  </div>
+
+</div>
+
+<nav class="bottom-nav">
+  <a href="home.html"><span class="bnav-icon">🏠</span><span class="bnav-label">Inicio</span></a>
+  <a href="itinerario.html" class="active"><span class="bnav-icon">🗺️</span><span class="bnav-label">Ruta</span></a>
+  <a href="organizar.html#tracker"><span class="bnav-icon">📋</span><span class="bnav-label">Reservas</span></a>
+  <a href="organizar.html#tareas"><span class="bnav-icon">✅</span><span class="bnav-label">Tareas</span></a>
+</nav>
+
+<script>
+if('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(function(){});
+</script>
+</body>
+</html>

@@ -153,5 +153,24 @@ const obs=new IntersectionObserver(entries=>entries.forEach(e=>{
 }),{rootMargin:'-120px 0px -55% 0px',threshold:0});
 document.querySelectorAll('[id]').forEach(s=>obs.observe(s));
 
+// BOTTOM NAV — se inyecta automáticamente en todas las páginas
+(function(){
+  var path=window.location.pathname.split('/').pop()||'home.html';
+  var CITY_PAGES=['madrid.html','barcelona.html','atenas.html','grecia-islas.html','continental.html','budapest.html','ruta.html'];
+  var TASK_PAGES=['organizar.html'];
+  var nav=document.createElement('nav');
+  nav.className='bottom-nav';
+  var items=[
+    {href:'home.html',icon:'🏠',label:'Inicio',active:path===''||path==='index.html'||path==='home.html'},
+    {href:'itinerario.html',icon:'🗺️',label:'Ruta',active:path==='itinerario.html'||CITY_PAGES.indexOf(path)!==-1},
+    {href:'organizar.html#tracker',icon:'📋',label:'Reservas',active:false},
+    {href:'organizar.html#tareas',icon:'✅',label:'Tareas',active:TASK_PAGES.indexOf(path)!==-1}
+  ];
+  nav.innerHTML=items.map(function(it){
+    return '<a href="'+it.href+'"'+(it.active?' class="active"':'')+'><span class="bnav-icon">'+it.icon+'</span><span class="bnav-label">'+it.label+'</span></a>';
+  }).join('');
+  document.body.appendChild(nav);
+})();
+
 // Service Worker
 if('serviceWorker' in navigator){navigator.serviceWorker.register('sw.js').catch(function(){});}

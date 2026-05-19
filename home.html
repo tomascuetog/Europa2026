@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#0d1b2a">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Europa 2026">
+<title>Europa 2026</title>
+<link rel="manifest" href="manifest.json">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,300;1,400&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<style>
+  body{background:var(--navy);min-height:100vh;padding-bottom:0;}
+  .home-outer{display:flex;flex-direction:column;min-height:100vh;}
+  .home-top{background:var(--navy);padding:env(safe-area-inset-top,0) 0 0;flex-shrink:0;}
+  .home-header{padding:2.5rem 1.75rem 2rem;text-align:center;}
+  .home-header-logo{font-family:'Cormorant Garamond',serif;font-size:clamp(2.6rem,9vw,4.2rem);font-weight:300;color:#fff;letter-spacing:.04em;line-height:1;margin-bottom:.5rem;}
+  .home-header-logo span{color:var(--gold);}
+  .home-header-sub{font-family:Outfit,sans-serif;font-size:.72rem;letter-spacing:.2em;text-transform:uppercase;color:rgba(255,255,255,.45);}
+  .home-body{background:var(--cream);border-radius:24px 24px 0 0;flex:1;padding:1.5rem 1.25rem calc(5rem + env(safe-area-inset-bottom,0));}
+  .home-section-label{font-family:Outfit,sans-serif;font-size:.65rem;letter-spacing:.18em;text-transform:uppercase;color:var(--text-mid);margin-bottom:.9rem;padding-left:.25rem;}
+  .home-grid{display:grid;grid-template-columns:1fr 1fr;gap:.85rem;margin-bottom:1.75rem;}
+  .home-card{background:#fff;border-radius:18px;padding:1.4rem 1.25rem 1.3rem;text-decoration:none;color:var(--navy);display:flex;flex-direction:column;gap:.45rem;box-shadow:0 2px 14px rgba(13,27,42,.07);border:1px solid rgba(13,27,42,.06);transition:transform .15s,box-shadow .15s;-webkit-tap-highlight-color:transparent;}
+  .home-card:active{transform:scale(.97);}
+  .home-card-icon{font-size:1.9rem;line-height:1;}
+  .home-card-title{font-family:'Cormorant Garamond',serif;font-size:1.25rem;font-weight:600;line-height:1.1;}
+  .home-card-sub{font-family:Outfit,sans-serif;font-size:.72rem;color:var(--text-mid);line-height:1.4;min-height:1em;}
+  .home-card.accent{background:var(--navy);color:#fff;}
+  .home-card.accent .home-card-sub{color:rgba(255,255,255,.5);}
+  .home-card.accent .home-card-title{color:#fff;}
+  @media(min-width:600px){
+    .home-body{padding:2rem 2rem calc(5rem + env(safe-area-inset-bottom,0));}
+    .home-grid{grid-template-columns:repeat(4,1fr);gap:1rem;max-width:860px;margin-left:auto;margin-right:auto;}
+    .home-section-label{max-width:860px;margin-left:auto;margin-right:auto;}
+  }
+  @media(min-width:900px){
+    .home-header{padding:3.5rem 2rem 2.5rem;}
+    .home-card{padding:2rem 1.75rem;}
+    .home-card-icon{font-size:2.2rem;}
+    .home-card-title{font-size:1.4rem;}
+  }
+</style>
+</head>
+<body>
+<div class="home-outer">
+  <div class="home-top">
+    <div class="home-header">
+      <div class="home-header-logo">Europa<span>'</span>26</div>
+      <div class="home-header-sub">Septiembre · 24 días · 6 destinos</div>
+    </div>
+  </div>
+  <div class="home-body">
+    <div class="home-section-label">¿Qué querés ver?</div>
+    <div class="home-grid">
+      <a class="home-card accent" href="itinerario.html">
+        <div class="home-card-icon">🗺️</div>
+        <div class="home-card-title">Itinerario</div>
+        <div class="home-card-sub">6 ciudades · 24 días</div>
+      </a>
+      <a class="home-card" href="organizar.html#tracker">
+        <div class="home-card-icon">📋</div>
+        <div class="home-card-title">Reservas</div>
+        <div class="home-card-sub" id="stat-reservas">Cargando…</div>
+      </a>
+      <a class="home-card" href="organizar.html#costos">
+        <div class="home-card-icon">💰</div>
+        <div class="home-card-title">Costos</div>
+        <div class="home-card-sub">~USD 3.044 p/p</div>
+      </a>
+      <a class="home-card" href="organizar.html#tareas">
+        <div class="home-card-icon">✅</div>
+        <div class="home-card-title">Tareas</div>
+        <div class="home-card-sub" id="stat-tareas">Cargando…</div>
+      </a>
+    </div>
+  </div>
+</div>
+
+<nav class="bottom-nav" id="bottomNav">
+  <a href="home.html" class="active"><span class="bnav-icon">🏠</span><span class="bnav-label">Inicio</span></a>
+  <a href="itinerario.html"><span class="bnav-icon">🗺️</span><span class="bnav-label">Ruta</span></a>
+  <a href="organizar.html#tracker"><span class="bnav-icon">📋</span><span class="bnav-label">Reservas</span></a>
+  <a href="organizar.html#tareas"><span class="bnav-icon">✅</span><span class="bnav-label">Tareas</span></a>
+</nav>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+(function(){
+  var SB_URL='https://adzmnnmubbharcprjkhs.supabase.co';
+  var SB_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFkem1ubm11YmJoYXJjcHJqa2hzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg5MzI3MjcsImV4cCI6MjA5NDUwODcyN30.K_TdCUgIo23aqc0wCQBJI7BMWDTT6PND89n7x_MU6-A';
+  var sb=supabase.createClient(SB_URL,SB_KEY);
+  var TOTAL_TASKS=37;
+  var TOTAL_TRACKER=26;
+  Promise.all([
+    sb.from('tasks').select('id,done'),
+    sb.from('tracker').select('id,status')
+  ]).then(function(results){
+    var tasks=results[0].data||[];
+    var tracker=results[1].data||[];
+    var done=tasks.filter(function(r){return r.done;}).length;
+    var paid=tracker.filter(function(r){return r.status==='pagado';}).length;
+    var reserved=tracker.filter(function(r){return r.status==='reservado';}).length;
+    var statT=document.getElementById('stat-tareas');
+    var statR=document.getElementById('stat-reservas');
+    if(statT) statT.textContent=done+' de '+TOTAL_TASKS+' listas';
+    if(statR) statR.textContent=paid+' pagadas · '+reserved+' reservadas';
+  }).catch(function(){
+    var statT=document.getElementById('stat-tareas');
+    var statR=document.getElementById('stat-reservas');
+    if(statT) statT.textContent='—';
+    if(statR) statR.textContent='—';
+  });
+  if('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(function(){});
+})();
+</script>
+</body>
+</html>
