@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#0d1b2a">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Europa 2026">
+<title>Gastos & Reservas · Europa 2026</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,300;1,400&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<style>
+/* ── RESUMEN ─────────────────────────────── */
+.res-grid{display:grid;grid-template-columns:1fr 1fr;gap:.85rem;margin-top:1.75rem;}
+.res-card{background:rgba(255,255,255,.07);border-radius:16px;padding:1.25rem 1.25rem 1.1rem;border:1px solid rgba(255,255,255,.1);}
+.res-card.accent{border-color:rgba(201,151,58,.35);background:rgba(201,151,58,.08);}
+.res-val{font-family:'Cormorant Garamond',serif;font-size:2rem;font-weight:300;color:#fff;line-height:1;}
+.res-val.gold{color:var(--gold);}
+.res-lbl{font-family:Outfit,sans-serif;font-size:.62rem;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.4);margin-top:.35rem;}
+.res-sub{font-family:Outfit,sans-serif;font-size:.65rem;color:rgba(255,255,255,.25);margin-top:.15rem;}
+
+/* ── BUDGET ITEMS ────────────────────────── */
+.bg-group-title{font-family:Outfit,sans-serif;font-size:.62rem;letter-spacing:.2em;text-transform:uppercase;color:var(--gold);padding:.4rem 0;margin:1.75rem 0 .6rem;border-bottom:1px solid rgba(201,151,58,.2);}
+.bg-group-title:first-child{margin-top:0;}
+.budget-item{background:#fff;border-radius:14px;padding:.95rem 1.1rem;margin-bottom:.55rem;border:1px solid rgba(13,27,42,.07);transition:border-color .2s,box-shadow .2s;}
+.budget-item.reservado{border-color:rgba(74,222,128,.25);box-shadow:0 2px 12px rgba(74,222,128,.06);}
+.bi-main{display:flex;align-items:center;gap:.65rem;}
+.bi-pill{font-family:Outfit,sans-serif;font-size:.63rem;font-weight:700;letter-spacing:.07em;text-transform:uppercase;border:none;border-radius:20px;padding:.3rem .75rem;cursor:pointer;white-space:nowrap;flex-shrink:0;transition:all .15s;-webkit-tap-highlight-color:transparent;}
+.bi-pill.proyectado{background:rgba(13,27,42,.08);color:#6b7280;}
+.bi-pill.proyectado:hover{background:rgba(13,27,42,.14);}
+.bi-pill.reservado{background:rgba(74,222,128,.15);color:#15803d;}
+.bi-pill.reservado:hover{background:rgba(74,222,128,.25);}
+.bi-tag{font-family:Outfit,sans-serif;font-size:.58rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;border-radius:20px;padding:.18rem .55rem;flex-shrink:0;}
+.bi-tag.transporte{background:rgba(59,130,246,.12);color:#1d4ed8;}
+.bi-tag.hospedaje{background:rgba(168,85,247,.12);color:#7e22ce;}
+.bi-tag.actividad{background:rgba(249,115,22,.12);color:#c2410c;}
+.bi-tag.otro{background:rgba(107,114,128,.12);color:#374151;}
+.bi-label{flex:1;font-family:Outfit,sans-serif;font-size:.82rem;font-weight:500;color:var(--navy);line-height:1.3;min-width:0;}
+.bi-price-wrap{display:flex;align-items:center;gap:.2rem;flex-shrink:0;}
+.bi-price-sym{font-family:Outfit,sans-serif;font-size:.78rem;color:var(--text-mid);}
+.bi-price-inp{width:72px;border:1px solid rgba(13,27,42,.15);border-radius:8px;padding:.28rem .5rem;font-family:Outfit,sans-serif;font-size:.82rem;text-align:right;color:var(--navy);background:transparent;}
+.bi-price-inp:focus{outline:none;border-color:var(--gold);background:#fffbf0;}
+.bi-price-est .bi-price-sym{font-size:.68rem;color:rgba(13,27,42,.35);}
+.bi-price-est .bi-price-inp{color:rgba(13,27,42,.45);border-color:rgba(13,27,42,.1);}
+.bi-detail{display:flex;flex-wrap:wrap;align-items:center;gap:.5rem;margin-top:.7rem;padding-top:.6rem;border-top:1px solid rgba(13,27,42,.06);}
+.bi-split-wrap{width:100%;background:var(--cream);border-radius:10px;padding:.75rem 1rem;display:flex;flex-direction:column;gap:.5rem;}
+.bi-split-row{display:flex;align-items:center;gap:.5rem;font-family:Outfit,sans-serif;font-size:.78rem;}
+.bi-split-lbl{color:var(--text-mid);min-width:130px;}
+.bi-adv-inp{width:72px;border:1px solid rgba(13,27,42,.15);border-radius:8px;padding:.25rem .5rem;font-family:Outfit,sans-serif;font-size:.78rem;text-align:right;background:white;}
+.bi-adv-inp:focus{outline:none;border-color:var(--gold);}
+.bi-dest-val{font-weight:600;color:var(--navy);}
+.bi-note-inp{flex:1;min-width:100px;border:1px solid rgba(13,27,42,.12);border-radius:8px;padding:.26rem .6rem;font-family:Outfit,sans-serif;font-size:.73rem;color:var(--text);background:transparent;}
+.bi-note-inp:focus{outline:none;border-color:var(--gold);}
+.bi-file-lbl{cursor:pointer;font-family:Outfit,sans-serif;font-size:.68rem;color:var(--text-mid);border:1px dashed rgba(13,27,42,.2);border-radius:8px;padding:.22rem .55rem;white-space:nowrap;transition:all .15s;-webkit-tap-highlight-color:transparent;}
+.bi-file-lbl:hover{border-color:var(--gold);color:var(--gold);}
+.bi-file-link{font-family:Outfit,sans-serif;font-size:.7rem;color:#15803d;text-decoration:underline;word-break:break-all;}
+@media(max-width:480px){
+  .bi-label{font-size:.77rem;}
+  .res-val{font-size:1.65rem;}
+  .bi-split-lbl{min-width:100px;}
+}
+</style>
+</head>
+<body>
+<div class="modal-overlay" id="modal"><div class="modal-card">
+  <img class="modal-photo" id="mImg" src="" alt="">
+  <div class="modal-footer"><div class="modal-title" id="mTitle"></div><button class="modal-close" id="mClose">✕ Cerrar</button></div>
+</div></div>
+<nav class="site-nav"><div class="nav-inner"><a class="nav-logo" href="home.html">Europa<span style="color:white">'</span>26</a><a href="home.html">🏠 Inicio</a><span class="nav-sep">·</span><a href="itinerario.html">Itinerario</a><span class="nav-sep">·</span><a href="barcelona.html">Barcelona</a><span class="nav-sep">·</span><a href="atenas.html">Atenas</a><span class="nav-sep">·</span><a href="grecia-islas.html">Grecia Islas</a><span class="nav-sep">·</span><a href="continental.html">Grecia Continental</a><span class="nav-sep">·</span><a href="budapest.html">Budapest</a><span class="nav-sep">·</span><a href="madrid.html">Madrid</a></div></nav>
+
+<!-- ── RESUMEN FINANCIERO ── -->
+<section style="background:var(--navy);color:white;padding:4rem 2rem 3rem" id="resumen">
+<div style="max-width:700px;margin:0 auto">
+  <p class="section-eyebrow">Finanzas</p>
+  <h2 style="font-family:'Cormorant Garamond',serif;font-size:clamp(2rem,4vw,3rem);font-weight:300;margin-bottom:.3rem">Presupuesto</h2>
+  <p style="color:rgba(255,255,255,.35);font-size:.78rem;margin-bottom:0">Actualizado en tiempo real · p/persona · Septiembre 2026</p>
+  <div class="res-grid">
+    <div class="res-card accent">
+      <div class="res-val gold" id="res-pagado">$0</div>
+      <div class="res-lbl">Ya pagado</div>
+      <div class="res-sub">adelantos confirmados</div>
+    </div>
+    <div class="res-card">
+      <div class="res-val" id="res-alla">$0</div>
+      <div class="res-lbl">A pagar allá</div>
+      <div class="res-sub">en destino</div>
+    </div>
+    <div class="res-card">
+      <div class="res-val" id="res-proyectado">$0</div>
+      <div class="res-lbl">Por reservar</div>
+      <div class="res-sub">estimado restante</div>
+    </div>
+    <div class="res-card">
+      <div class="res-val gold" id="res-total">~$0</div>
+      <div class="res-lbl">Total estimado</div>
+      <div class="res-sub">p/p · round trip incl.</div>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- ── PRESUPUESTO / RESERVAS ── -->
+<section style="background:var(--cream-dark);padding:4rem 2rem;padding-bottom:calc(6rem + env(safe-area-inset-bottom,0))" id="presupuesto">
+<div style="max-width:700px;margin:0 auto">
+  <p class="section-eyebrow" style="color:var(--gold)">Reservas & Costos</p>
+  <h2 style="font-family:'Cormorant Garamond',serif;font-size:clamp(1.8rem,4vw,3rem);font-weight:400;margin-bottom:.4rem">Ítems del viaje</h2>
+  <p style="color:var(--text-mid);font-size:.8rem;margin-bottom:2rem">Tocá <strong>Proyectado</strong> para marcarlo como Reservado · Editá el precio real · Ingresá el adelanto si ya pagaste una parte</p>
+  <div id="budgetContainer"></div>
+</div>
+</section>
+
+<footer class="site-footer"><p>Europa 2026 · <span>Septiembre</span> · Madrid · Barcelona · Grecia · Budapest</p></footer>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="shared.js"></script>
+<script>
+(function() {
+  var SB_URL = 'https://adzmnnmubbharcprjkhs.supabase.co';
+  var SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFkem1ubm11YmJoYXJjcHJqa2hzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg5MzI3MjcsImV4cCI6MjA5NDUwODcyN30.K_TdCUgIo23aqc0wCQBJI7BMWDTT6PND89n7x_MU6-A';
+  var sb = supabase.createClient(SB_URL, SB_KEY);
+  var trackerState = {};
+
+  var BUDGET_GROUPS = [
+    {group:'Internacionales', items:[
+      {id:'tr1',  label:'Vuelo Bs. As. → Madrid (ida)',       est:500, tag:'transporte'},
+      {id:'tr2',  label:'Vuelo Madrid → Bs. As. (vuelta)',    est:500, tag:'transporte'},
+      {id:'tr26', label:'Seguro de viaje internacional',      est:80,  tag:'otro'}
+    ]},
+    {group:'Madrid → Barcelona', items:[
+      {id:'tr3',  label:'Tren AVE Madrid → Barcelona',        est:53,  tag:'transporte'}
+    ]},
+    {group:'Barcelona · 4–7 Sep', items:[
+      {id:'tr12', label:'BCN Sports Hostel (3 noches)',       est:102, tag:'hospedaje'},
+      {id:'tr22', label:'Sagrada Família',                    est:30,  tag:'actividad'},
+      {id:'tr23', label:'Park Güell (zona monumental)',       est:13,  tag:'actividad'}
+    ]},
+    {group:'Barcelona → Atenas', items:[
+      {id:'tr4',  label:'Vuelo Barcelona → Atenas',           est:76,  tag:'transporte'}
+    ]},
+    {group:'Atenas I · 7–8 Sep', items:[
+      {id:'tr13', label:'Safestay Monastiraki (1 noche)',     est:23,  tag:'hospedaje'},
+      {id:'tr21', label:'Acrópolis de Atenas',                est:20,  tag:'actividad'}
+    ]},
+    {group:'Santorini · 8–10 Sep', items:[
+      {id:'tr5',  label:'Ferry Pireo → Santorini',            est:45,  tag:'transporte'},
+      {id:'tr14', label:'Santorini Camping (2 noches)',       est:52,  tag:'hospedaje'}
+    ]},
+    {group:'Naxos · 10–12 Sep', items:[
+      {id:'tr6',  label:'Ferry Santorini → Naxos',            est:37,  tag:'transporte'},
+      {id:'tr15', label:'Katerina Roza Studios (2 noches)',   est:49,  tag:'hospedaje'}
+    ]},
+    {group:'Creta · 12–15 Sep', items:[
+      {id:'tr7',  label:'Vuelo Naxos → Creta',                est:56,  tag:'transporte'},
+      {id:'tr16', label:'Cocoon City Hostel (3 noches)',      est:87,  tag:'hospedaje'},
+      {id:'tr24', label:'Palacio de Cnosos',                  est:16,  tag:'actividad'}
+    ]},
+    {group:'Road Trip · 15–19 Sep', items:[
+      {id:'tr8',  label:'Vuelo Creta → Atenas',               est:76,  tag:'transporte'},
+      {id:'tr17', label:'Safestay Monastiraki II (1 noche)',  est:23,  tag:'hospedaje'},
+      {id:'tr11', label:'Auto alquiler (4 días)',              est:120, tag:'transporte'},
+      {id:'tr11b',label:'Gasolina road trip (~600 km)',        est:40,  tag:'transporte'},
+      {id:'tr18', label:'Nauplia — hostel (1 noche)',          est:25,  tag:'hospedaje'},
+      {id:'tr19', label:'Meteora — hostel (1 noche)',          est:25,  tag:'hospedaje'}
+    ]},
+    {group:'Budapest · 19–22 Sep', items:[
+      {id:'tr9',  label:'Vuelo Salónica → Budapest',          est:68,  tag:'transporte'},
+      {id:'tr20', label:'The Hive (3 noches)',                est:57,  tag:'hospedaje'},
+      {id:'tr25', label:'Baños Széchenyi',                    est:20,  tag:'actividad'},
+      {id:'tr25b',label:'Tour Parlamento Budapest',           est:20,  tag:'actividad'}
+    ]},
+    {group:'Budapest → Madrid', items:[
+      {id:'tr10', label:'Vuelo Budapest → Madrid',            est:100, tag:'transporte'}
+    ]}
+  ];
+
+  function normalizeStatus(s) {
+    if (s === 'pagado' || s === 'reservado') return 'reservado';
+    return 'proyectado';
+  }
+  function fmt(n) {
+    return '$' + Math.round(n || 0).toLocaleString('es-AR');
+  }
+
+  // ── RESUMEN ────────────────────────────────────────────────
+  function renderResumen() {
+    var yaPagado = 0, aPagarAlla = 0, porReservar = 0, totalEst = 0;
+    BUDGET_GROUPS.forEach(function(g) {
+      g.items.forEach(function(item) {
+        totalEst += item.est;
+        var s = trackerState[item.id];
+        if (s && normalizeStatus(s.status) === 'reservado') {
+          var precio   = s.precio  || item.est;
+          var adelanto = s.adelanto || 0;
+          yaPagado   += adelanto;
+          aPagarAlla += Math.max(0, precio - adelanto);
+        } else {
+          var estPrice = (s && s.precio > 0) ? s.precio : item.est;
+          porReservar += estPrice;
+        }
+      });
+    });
+    function set(id, v) { var e = document.getElementById(id); if (e) e.textContent = v; }
+    set('res-pagado',     fmt(yaPagado));
+    set('res-alla',       fmt(aPagarAlla));
+    set('res-proyectado', fmt(porReservar));
+    set('res-total',      '~' + fmt(totalEst));
+  }
+
+  // ── BUDGET RENDER ──────────────────────────────────────────
+  function renderBudget() {
+    var container = document.getElementById('budgetContainer');
+    if (!container) return;
+    container.innerHTML = '';
+    BUDGET_GROUPS.forEach(function(group) {
+      var gt = document.createElement('div');
+      gt.className = 'bg-group-title';
+      gt.textContent = group.group;
+      container.appendChild(gt);
+      group.items.forEach(function(item) {
+        container.appendChild(buildItem(item));
+      });
+    });
+  }
+
+  function buildItem(item) {
+    var s        = trackerState[item.id] || {status:'proyectado',precio:0,adelanto:0,note:'',file_url:'',file_name:''};
+    var isRes    = normalizeStatus(s.status) === 'reservado';
+    var precio   = s.precio > 0 ? s.precio : item.est;
+    var adelanto = s.adelanto || 0;
+    var destino  = Math.max(0, precio - adelanto);
+
+    var card = document.createElement('div');
+    card.className = 'budget-item' + (isRes ? ' reservado' : '');
+
+    // ─ main row ─
+    var mainRow = document.createElement('div');
+    mainRow.className = 'bi-main';
+
+    var pill = document.createElement('button');
+    pill.className = 'bi-pill ' + (isRes ? 'reservado' : 'proyectado');
+    pill.textContent = isRes ? '✓ Reservado' : 'Proyectado';
+    pill.addEventListener('click', function() {
+      if (!trackerState[item.id]) trackerState[item.id] = {status:'proyectado',precio:0,adelanto:0,note:'',file_url:'',file_name:''};
+      var ns = isRes ? 'proyectado' : 'reservado';
+      trackerState[item.id].status = ns;
+      if (ns === 'proyectado') trackerState[item.id].adelanto = 0;
+      if (ns === 'reservado' && !trackerState[item.id].precio) trackerState[item.id].precio = item.est;
+      trkUpsert(item.id);
+      renderBudget();
+      renderResumen();
+    });
+    mainRow.appendChild(pill);
+
+    if (item.tag) {
+      var tagNames = {transporte:'Transporte', hospedaje:'Hospedaje', actividad:'Actividad', otro:'Otro'};
+      var tagEl = document.createElement('span');
+      tagEl.className = 'bi-tag ' + item.tag;
+      tagEl.textContent = tagNames[item.tag] || item.tag;
+      mainRow.appendChild(tagEl);
+    }
+
+    var lbl = document.createElement('span');
+    lbl.className = 'bi-label';
+    lbl.textContent = item.label;
+    mainRow.appendChild(lbl);
+
+    var pw = document.createElement('div');
+    pw.className = 'bi-price-wrap' + (isRes ? '' : ' bi-price-est');
+    var sym = document.createElement('span');
+    sym.className = 'bi-price-sym';
+    sym.textContent = isRes ? '$' : 'est $';
+    var pi = document.createElement('input');
+    pi.className = 'bi-price-inp';
+    pi.type = 'number'; pi.min = '0'; pi.value = precio;
+    pi.dataset.id = item.id; pi.dataset.field = 'precio';
+    pw.appendChild(sym); pw.appendChild(pi);
+    mainRow.appendChild(pw);
+
+    card.appendChild(mainRow);
+
+    // ─ detail (only when reservado) ─
+    if (isRes) {
+      var detail = document.createElement('div');
+      detail.className = 'bi-detail';
+
+      // Split siempre visible al reservar
+      var splitWrap = document.createElement('div');
+      splitWrap.className = 'bi-split-wrap';
+
+      var r1 = document.createElement('div');
+      r1.className = 'bi-split-row';
+      var l1 = document.createElement('span'); l1.className = 'bi-split-lbl'; l1.textContent = 'Adelanto pagado';
+      var s1 = document.createElement('span'); s1.className = 'bi-price-sym'; s1.textContent = '$';
+      var ai = document.createElement('input');
+      ai.className = 'bi-adv-inp'; ai.type = 'number'; ai.min = '0'; ai.value = adelanto;
+      ai.dataset.id = item.id; ai.dataset.field = 'adelanto';
+      r1.appendChild(l1); r1.appendChild(s1); r1.appendChild(ai);
+
+      var r2 = document.createElement('div');
+      r2.className = 'bi-split-row';
+      var l2 = document.createElement('span'); l2.className = 'bi-split-lbl'; l2.textContent = 'A pagar en destino';
+      var s2 = document.createElement('span'); s2.className = 'bi-price-sym'; s2.textContent = '$';
+      var dv = document.createElement('span'); dv.className = 'bi-dest-val'; dv.id = 'dest-' + item.id; dv.textContent = destino;
+      r2.appendChild(l2); r2.appendChild(s2); r2.appendChild(dv);
+
+      splitWrap.appendChild(r1); splitWrap.appendChild(r2);
+      detail.appendChild(splitWrap);
+
+      var noteInp = document.createElement('input');
+      noteInp.className = 'bi-note-inp';
+      noteInp.placeholder = 'Notas…';
+      noteInp.value = s.note || '';
+      noteInp.dataset.id = item.id; noteInp.dataset.field = 'note';
+      detail.appendChild(noteInp);
+
+      if (s.file_url) {
+        var flink = document.createElement('a');
+        flink.className = 'bi-file-link';
+        flink.href = s.file_url; flink.target = '_blank'; flink.rel = 'noopener';
+        flink.textContent = '📎 ' + (s.file_name || 'comprobante');
+        detail.appendChild(flink);
+      } else {
+        var flbl = document.createElement('label');
+        flbl.className = 'bi-file-lbl';
+        flbl.textContent = '📎 Adjuntar';
+        var finp = document.createElement('input');
+        finp.type = 'file'; finp.accept = 'image/*,.pdf'; finp.style.display = 'none';
+        (function(itemId, lbl) {
+          finp.addEventListener('change', function() {
+            var file = this.files[0];
+            if (!file) return;
+            lbl.textContent = '⏳ Subiendo…';
+            var ext = file.name.split('.').pop();
+            var path = itemId + '_' + Date.now() + '.' + ext;
+            sb.storage.from('comprobantes').upload(path, file, {upsert:true}).then(function(res) {
+              if (res.error) { lbl.textContent = '❌ Error'; return; }
+              var url = sb.storage.from('comprobantes').getPublicUrl(path).data.publicUrl;
+              var fname = file.name.length > 22 ? file.name.substring(0,20) + '…' : file.name;
+              if (!trackerState[itemId]) trackerState[itemId] = {status:'reservado',precio:0,adelanto:0,note:'',file_url:'',file_name:''};
+              trackerState[itemId].file_url  = url;
+              trackerState[itemId].file_name = fname;
+              trkUpsert(itemId).then(function() { renderBudget(); });
+            });
+          });
+        })(item.id, flbl);
+        flbl.appendChild(finp);
+        detail.appendChild(flbl);
+      }
+
+      card.appendChild(detail);
+    }
+    return card;
+  }
+
+  function trkUpsert(id) {
+    var s = trackerState[id] || {status:'proyectado',precio:0,adelanto:0,note:'',file_url:'',file_name:''};
+    return sb.from('tracker').upsert({
+      id:         id,
+      status:     normalizeStatus(s.status),
+      precio:     s.precio   || 0,
+      adelanto:   s.adelanto || 0,
+      note:       s.note     || '',
+      file_url:   s.file_url  || '',
+      file_name:  s.file_name || '',
+      date:       '',
+      updated_at: new Date().toISOString()
+    });
+  }
+
+  // ── BLUR / INPUT EVENTS ────────────────────────────────────
+  document.addEventListener('blur', function(e) {
+    var field = e.target.dataset.field;
+    var id    = e.target.dataset.id;
+    if (!field || !id) return;
+    if (!trackerState[id]) trackerState[id] = {status:'proyectado',precio:0,adelanto:0,note:'',file_url:'',file_name:''};
+
+    if (field === 'precio') {
+      var val = parseFloat(e.target.value) || 0;
+      trackerState[id].precio = val;
+      var destEl = document.getElementById('dest-' + id);
+      if (destEl) destEl.textContent = Math.max(0, val - (trackerState[id].adelanto || 0));
+      renderResumen(); trkUpsert(id);
+    } else if (field === 'adelanto') {
+      var val = parseFloat(e.target.value) || 0;
+      trackerState[id].adelanto = val;
+      var destEl = document.getElementById('dest-' + id);
+      if (destEl) destEl.textContent = Math.max(0, (trackerState[id].precio || 0) - val);
+      renderResumen(); trkUpsert(id);
+    } else if (field === 'note') {
+      trackerState[id].note = e.target.value;
+      trkUpsert(id);
+    }
+  }, true);
+
+  // ── REAL-TIME ──────────────────────────────────────────────
+  sb.channel('gastos_sync')
+    .on('postgres_changes', {event:'*', schema:'public', table:'tracker'}, function(p) {
+      if (p.new) {
+        var r = p.new;
+        var focused = document.activeElement;
+        if (focused && focused.dataset && (focused.dataset.field === 'precio' || focused.dataset.field === 'adelanto' || focused.dataset.field === 'note')) return;
+        trackerState[r.id] = {status:r.status||'proyectado', precio:r.precio||0, adelanto:r.adelanto||0, note:r.note||'', file_url:r.file_url||'', file_name:r.file_name||''};
+        renderBudget(); renderResumen();
+      }
+    })
+    .subscribe();
+
+  // ── INIT ──────────────────────────────────────────────────
+  var bc = document.getElementById('budgetContainer');
+  if (bc) bc.innerHTML = '<p style="color:var(--text-mid);font-size:.82rem;padding:1rem 0">Cargando datos…</p>';
+
+  sb.from('tracker').select('*').then(function(r) {
+    (r.data || []).forEach(function(row) {
+      trackerState[row.id] = {
+        status:    normalizeStatus(row.status),
+        precio:    row.precio    || 0,
+        adelanto:  row.adelanto  || 0,
+        note:      row.note      || '',
+        file_url:  row.file_url  || '',
+        file_name: row.file_name || ''
+      };
+    });
+    renderBudget();
+    renderResumen();
+  }).catch(function() {
+    var bc = document.getElementById('budgetContainer');
+    if (bc) bc.innerHTML = '<p style="color:#fca5a5;font-size:.82rem;padding:1rem 0">Error al conectar. Revisá la conexión.</p>';
+  });
+})();
+</script>
+</body>
+</html>

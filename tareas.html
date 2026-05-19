@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#0d1b2a">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Europa 2026">
+<title>Organización · Europa 2026</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,300;1,400&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<nav class="site-nav"><div class="nav-inner"><a class="nav-logo" href="home.html">Europa<span style="color:white">'</span>26</a><a href="home.html">🏠 Inicio</a><span class="nav-sep">·</span><a href="itinerario.html">Itinerario</a><span class="nav-sep">·</span><a href="barcelona.html">Barcelona</a><span class="nav-sep">·</span><a href="atenas.html">Atenas</a><span class="nav-sep">·</span><a href="grecia-islas.html">Grecia Islas</a><span class="nav-sep">·</span><a href="continental.html">Grecia Continental</a><span class="nav-sep">·</span><a href="budapest.html">Budapest</a><span class="nav-sep">·</span><a href="madrid.html">Madrid</a></div></nav>
+
+<!-- ── TAREAS & EQUIPAJE ── -->
+<section style="background:var(--cream);padding:4rem 2rem;padding-bottom:calc(6rem + env(safe-area-inset-bottom,0))" id="tareas">
+<div style="max-width:700px;margin:0 auto">
+  <p class="section-eyebrow" style="color:var(--gold)">Organización</p>
+  <h2 style="font-family:'Cormorant Garamond',serif;font-size:clamp(1.8rem,4vw,3rem);font-weight:400;margin-bottom:.4rem">Tareas & Equipaje</h2>
+  <p id="tasksSummary" style="font-size:.8rem;color:var(--text-mid);margin-bottom:1.5rem"></p>
+  <div class="tasks-grid" id="tasksGrid"></div>
+  <button class="tasks-reset" id="tasksReset">↺ Desmarcar tareas</button>
+
+  <h3 style="font-family:'Cormorant Garamond',serif;font-size:1.6rem;font-weight:400;margin:3rem 0 .3rem">Equipaje — Carry-on only</h3>
+  <p style="color:var(--text-mid);font-size:.8rem;margin-bottom:1.5rem">Mochila 30-35L · Máximo 10kg · Lavamos cada 3-4 días</p>
+  <div class="packing-cats" id="packGrid"></div>
+</div>
+</section>
+
+<footer class="site-footer"><p>Europa 2026 · <span>Septiembre</span> · Madrid · Barcelona · Grecia · Budapest</p></footer>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="shared.js"></script>
+<script>
+(function() {
+  var SB_URL = 'https://adzmnnmubbharcprjkhs.supabase.co';
+  var SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFkem1ubm11YmJoYXJjcHJqa2hzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg5MzI3MjcsImV4cCI6MjA5NDUwODcyN30.K_TdCUgIo23aqc0wCQBJI7BMWDTT6PND89n7x_MU6-A';
+  var sb = supabase.createClient(SB_URL, SB_KEY);
+  var tasksState = {};
+  var packState  = {};
+
+  var TASKS = [
+    {group:'Logística & Confirmaciones', items:[
+      {id:'g1', t:'Reservar excursión Balos o Elafonisi (Creta)'},
+      {id:'g2', t:'Planear traslados en Santorini (ATV o bus)'},
+      {id:'g3', t:'Confirmar horarios ferrys entre islas'},
+      {id:'r1', t:'Confirmar auto: retiro ATH, devolución SKG'}
+    ]},
+    {group:'Documentación & Preparación', items:[
+      {id:'d2', t:'Verificar pasaportes vigentes (mín. 6 meses desde vuelta)'},
+      {id:'d3', t:'Descargar Google Maps offline por zona'},
+      {id:'d4', t:'Conseguir SIM europea o eSIM activada antes'},
+      {id:'d5', t:'Confirmar que seguro auto incluye Grecia'}
+    ]}
+  ];
+
+  var PACKS = [
+    {cat:'Ropa (7 días, lavado en hostels)', items:[
+      {id:'pk_p1', t:'5 remeras livianas de secado rápido', must:true},
+      {id:'pk_p2', t:'2 pantalones/shorts livianos', must:true},
+      {id:'pk_p3', t:'1 pantalón largo (templos, noches Budapest)', must:true},
+      {id:'pk_p4', t:'Campera impermeable y liviana', must:true},
+      {id:'pk_p5', t:'2 trajes de baño (secado rápido)', must:true},
+      {id:'pk_p6', t:'7 mudas de ropa interior de microfibra', must:true},
+      {id:'pk_p7', t:'5 pares de medias'}
+    ]},
+    {cat:'Calzado — máximo 2 pares', items:[
+      {id:'pk_s1', t:'Zapatillas cómodas todo terreno', must:true},
+      {id:'pk_s2', t:'Ojotas/sandalia plana (playa + Santorini)', must:true}
+    ]},
+    {cat:'Higiene — líquidos 100ml en bolsa ZIP', items:[
+      {id:'pk_hy1', t:'Shampoo sólido', must:true},
+      {id:'pk_hy2', t:'Jabón sólido o pastilla'},
+      {id:'pk_hy3', t:'Desodorante sólido (no aerosol)'},
+      {id:'pk_hy4', t:'Pasta dental + cepillo viaje'},
+      {id:'pk_hy5', t:'Protector solar FPS 50+ (100ml)', must:true}
+    ]},
+    {cat:'Playa y Sol', items:[
+      {id:'pk_b1', t:'Gafas de sol', must:true},
+      {id:'pk_b2', t:'Gorra o sombrero plegable', must:true},
+      {id:'pk_b3', t:'Toalla de microfibra ultra fina', must:true},
+      {id:'pk_b4', t:'Bolsa seca impermeable (ferrys)'}
+    ]},
+    {cat:'Tecnología', items:[
+      {id:'pk_t1', t:'Adaptador europeo tipo F (Schuko)', must:true},
+      {id:'pk_t2', t:'Cargador multipuerto USB-C', must:true},
+      {id:'pk_t3', t:'Power bank 10.000mAh (límite cabina)', must:true},
+      {id:'pk_t4', t:'Auriculares'},
+      {id:'pk_t5', t:'SIM europea o eSIM activada antes', must:true}
+    ]},
+    {cat:'Farmacia básica', items:[
+      {id:'pk_h1', t:'Seguro de viaje activo en el celular', must:true},
+      {id:'pk_h2', t:'Ibuprofeno 400mg x10'},
+      {id:'pk_h3', t:'Antihistamínico'},
+      {id:'pk_h4', t:'Pastillas para mareo (ferrys)', must:true},
+      {id:'pk_h5', t:'Antidiarreico + suero oral'},
+      {id:'pk_h6', t:'Curitas surtidas'}
+    ]},
+    {cat:'Documentos y dinero', items:[
+      {id:'pk_d1', t:'Pasaporte vigente (mín. 6 meses desde vuelta)', must:true},
+      {id:'pk_d2', t:'Foto del pasaporte en la nube + copia física', must:true},
+      {id:'pk_d3', t:'Tarjeta Wise/Revolut sin comisión', must:true},
+      {id:'pk_d4', t:'Efectivo: 150 EUR para mercados'},
+      {id:'pk_d5', t:'Reservas descargadas offline', must:true},
+      {id:'pk_d6', t:'Candado con combinación (hostel)', must:true}
+    ]},
+    {cat:'La mochila', items:[
+      {id:'pk_m1', t:'Mochila 30-35L (cabe en cabina)', must:true},
+      {id:'pk_m2', t:'Organizadores tipo packing cubes'},
+      {id:'pk_m3', t:'Candado TSA exterior'},
+      {id:'pk_m4', t:'Botella de agua colapsable 500ml', must:true}
+    ]}
+  ];
+
+  function renderTasks() {
+    var grid = document.getElementById('tasksGrid');
+    if (!grid) return;
+    grid.innerHTML = '';
+    var total = 0, done = 0;
+    TASKS.forEach(function(group) {
+      var dG = group.items.filter(function(it) { return tasksState[it.id]; }).length;
+      total += group.items.length; done += dG;
+      var div = document.createElement('div'); div.className = 'task-group';
+      var title = document.createElement('div'); title.className = 'task-group-title';
+      title.innerHTML = group.group + '<span class="task-progress">' + dG + '/' + group.items.length + '</span>';
+      div.appendChild(title);
+      group.items.forEach(function(it) {
+        var d = !!tasksState[it.id];
+        var el = document.createElement('div'); el.className = 'task-item';
+        var cb = document.createElement('div'); cb.className = 'task-cb' + (d ? ' done' : '');
+        var lbl = document.createElement('span'); lbl.className = 'task-label' + (d ? ' done' : ''); lbl.textContent = it.t;
+        el.appendChild(cb); el.appendChild(lbl);
+        el.addEventListener('click', function() {
+          tasksState[it.id] = !tasksState[it.id]; renderTasks();
+          sb.from('tasks').upsert({id:it.id, done:!!tasksState[it.id], updated_at:new Date().toISOString()});
+        });
+        div.appendChild(el);
+      });
+      grid.appendChild(div);
+    });
+    var sum = document.getElementById('tasksSummary');
+    if (sum) sum.innerHTML = '<strong>' + done + ' de ' + total + '</strong> tareas completadas';
+  }
+
+  var resetBtn = document.getElementById('tasksReset');
+  if (resetBtn) resetBtn.addEventListener('click', function() {
+    if (confirm('¿Desmarcar todas las tareas?')) {
+      var rows = [];
+      TASKS.forEach(function(g) { g.items.forEach(function(it) { rows.push({id:it.id, done:false, updated_at:new Date().toISOString()}); }); });
+      tasksState = {}; renderTasks();
+      sb.from('tasks').upsert(rows);
+    }
+  });
+
+  function renderPack() {
+    var grid = document.getElementById('packGrid');
+    if (!grid) return;
+    grid.innerHTML = '';
+    PACKS.forEach(function(cat) {
+      var div = document.createElement('div'); div.className = 'packing-cat';
+      var title = document.createElement('div'); title.className = 'packing-cat-title'; title.textContent = cat.cat;
+      div.appendChild(title);
+      cat.items.forEach(function(item) {
+        var done = !!packState[item.id];
+        var el = document.createElement('div'); el.className = 'pack-item';
+        var cb = document.createElement('div'); cb.className = 'pcb' + (done ? ' done' : '');
+        var lbl = document.createElement('span'); if (done) lbl.className = 'done'; lbl.textContent = item.t;
+        if (item.must) { var m = document.createElement('span'); m.className = 'must'; m.textContent = 'imprescindible'; lbl.appendChild(m); }
+        el.appendChild(cb); el.appendChild(lbl);
+        el.addEventListener('click', function() {
+          packState[item.id] = !packState[item.id]; renderPack();
+          sb.from('packing').upsert({id:item.id, done:!!packState[item.id], updated_at:new Date().toISOString()});
+        });
+        div.appendChild(el);
+      });
+      grid.appendChild(div);
+    });
+  }
+
+  // ── REAL-TIME ──────────────────────────────────────────────
+  sb.channel('tareas_sync')
+    .on('postgres_changes', {event:'*', schema:'public', table:'tasks'}, function(p) {
+      if (p.new) { tasksState[p.new.id] = p.new.done; renderTasks(); }
+    })
+    .on('postgres_changes', {event:'*', schema:'public', table:'packing'}, function(p) {
+      if (p.new) { packState[p.new.id] = p.new.done; renderPack(); }
+    })
+    .subscribe();
+
+  // ── INIT ──────────────────────────────────────────────────
+  Promise.all([
+    sb.from('tasks').select('*').then(function(r) {
+      (r.data || []).forEach(function(row) { tasksState[row.id] = row.done; });
+    }),
+    sb.from('packing').select('*').then(function(r) {
+      (r.data || []).forEach(function(row) { packState[row.id] = row.done; });
+    })
+  ]).then(function() {
+    renderTasks();
+    renderPack();
+  });
+})();
+</script>
+</body>
+</html>
