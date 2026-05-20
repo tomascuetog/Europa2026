@@ -11,22 +11,67 @@
 <title>Organización · Europa 2026</title>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,300;1,400&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
+<style>
+.person-tabs{display:flex;gap:.5rem;margin:1.25rem 0 .75rem;}
+.person-tab{font-family:Outfit,sans-serif;font-size:.82rem;font-weight:600;padding:.5rem 1.4rem;border-radius:20px;border:2px solid rgba(13,27,42,.12);background:transparent;color:var(--text-mid);cursor:pointer;transition:all .15s;-webkit-tap-highlight-color:transparent;}
+.person-tab.active{background:var(--navy);color:#fff;border-color:var(--navy);}
+.person-progress{font-family:Outfit,sans-serif;font-size:.75rem;color:var(--text-mid);margin-bottom:1.25rem;}
+.pack-add-row{display:flex;gap:.5rem;align-items:center;margin-top:1.5rem;}
+.pack-add-inp{flex:1;border:1px solid rgba(13,27,42,.15);border-radius:8px;padding:.4rem .75rem;font-family:Outfit,sans-serif;font-size:.78rem;color:var(--navy);background:#fff;}
+.pack-add-inp:focus{outline:none;border-color:var(--gold);}
+.pack-add-btn{font-family:Outfit,sans-serif;font-size:.72rem;font-weight:600;color:var(--gold);background:none;border:1.5px dashed rgba(201,151,58,.5);border-radius:20px;padding:.35rem .9rem;cursor:pointer;white-space:nowrap;-webkit-tap-highlight-color:transparent;transition:all .15s;}
+.pack-add-btn:hover{background:rgba(201,151,58,.07);border-color:var(--gold);}
+.custom-section{margin-top:1.25rem;}
+.custom-section-title{font-family:Outfit,sans-serif;font-size:.62rem;letter-spacing:.15em;text-transform:uppercase;color:var(--gold);margin-bottom:.6rem;padding-bottom:.4rem;border-bottom:1px solid rgba(201,151,58,.2);}
+.pack-del{background:none;border:none;font-size:.75rem;color:rgba(13,27,42,.2);cursor:pointer;padding:0 .25rem;line-height:1;flex-shrink:0;margin-left:auto;-webkit-tap-highlight-color:transparent;}
+.pack-del:hover{color:#ef4444;}
+.pack-reset-row{margin-top:2rem;}
+</style>
 </head>
 <body>
-<nav class="site-nav"><div class="nav-inner"><a class="nav-logo" href="home.html">Europa<span style="color:white">'</span>26</a><a href="home.html">🏠 Inicio</a><span class="nav-sep">·</span><a href="itinerario.html">Itinerario</a><span class="nav-sep">·</span><a href="barcelona.html">Barcelona</a><span class="nav-sep">·</span><a href="atenas.html">Atenas</a><span class="nav-sep">·</span><a href="grecia-islas.html">Grecia Islas</a><span class="nav-sep">·</span><a href="continental.html">Grecia Continental</a><span class="nav-sep">·</span><a href="budapest.html">Budapest</a><span class="nav-sep">·</span><a href="madrid.html">Madrid</a></div></nav>
 
-<!-- ── TAREAS & EQUIPAJE ── -->
-<section style="background:var(--cream);padding:4rem 2rem;padding-bottom:calc(6rem + env(safe-area-inset-bottom,0))" id="tareas">
+<div class="city-header">
+  <a class="city-back" href="home.html">← Inicio</a>
+  <div class="city-header-title">Organización</div>
+  <div class="city-header-sub">Tareas & Equipaje · Europa Sep 2026</div>
+</div>
+
+<section style="background:var(--cream);padding:2.5rem 1.25rem;padding-bottom:calc(6rem + env(safe-area-inset-bottom,0))" id="tareas">
 <div style="max-width:700px;margin:0 auto">
-  <p class="section-eyebrow" style="color:var(--gold)">Organización</p>
-  <h2 style="font-family:'Cormorant Garamond',serif;font-size:clamp(1.8rem,4vw,3rem);font-weight:400;margin-bottom:.4rem">Tareas & Equipaje</h2>
+
+  <!-- ── TAREAS (compartidas) ── -->
+  <p class="section-eyebrow" style="color:var(--gold)">Logística</p>
+  <h2 style="font-family:'Cormorant Garamond',serif;font-size:clamp(1.6rem,4vw,2.5rem);font-weight:400;margin-bottom:.35rem">Tareas</h2>
   <p id="tasksSummary" style="font-size:.8rem;color:var(--text-mid);margin-bottom:1.5rem"></p>
   <div class="tasks-grid" id="tasksGrid"></div>
   <button class="tasks-reset" id="tasksReset">↺ Desmarcar tareas</button>
 
-  <h3 style="font-family:'Cormorant Garamond',serif;font-size:1.6rem;font-weight:400;margin:3rem 0 .3rem">Equipaje — Carry-on only</h3>
-  <p style="color:var(--text-mid);font-size:.8rem;margin-bottom:1.5rem">Mochila 30-35L · Máximo 10kg · Lavamos cada 3-4 días</p>
+  <!-- ── EQUIPAJE (por persona) ── -->
+  <h2 style="font-family:'Cormorant Garamond',serif;font-size:clamp(1.6rem,4vw,2.5rem);font-weight:400;margin:3rem 0 .2rem">Equipaje</h2>
+  <p style="color:var(--text-mid);font-size:.8rem;margin-bottom:.2rem">Mochila 30-35L · Carry-on only · Lavado cada 3-4 días</p>
+
+  <div class="person-tabs" id="personTabs">
+    <button class="person-tab" data-person="tecla">Tecla</button>
+    <button class="person-tab" data-person="tano">Tano</button>
+    <button class="person-tab" data-person="cubo">Cubo</button>
+  </div>
+
+  <p class="person-progress" id="packProgress"></p>
   <div class="packing-cats" id="packGrid"></div>
+  <div id="customSection" style="display:none" class="custom-section">
+    <div class="custom-section-title">Ítems personales</div>
+    <div class="packing-cat"><div id="customList"></div></div>
+  </div>
+
+  <div class="pack-add-row">
+    <input class="pack-add-inp" id="packAddInp" placeholder="Nuevo ítem para esta persona…" type="text">
+    <button class="pack-add-btn" id="packAddBtn">+ Agregar</button>
+  </div>
+
+  <div class="pack-reset-row">
+    <button class="tasks-reset" id="packReset">↺ Desmarcar equipaje</button>
+  </div>
+
 </div>
 </section>
 
@@ -39,9 +84,18 @@
   var SB_URL = 'https://adzmnnmubbharcprjkhs.supabase.co';
   var SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFkem1ubm11YmJoYXJjcHJqa2hzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg5MzI3MjcsImV4cCI6MjA5NDUwODcyN30.K_TdCUgIo23aqc0wCQBJI7BMWDTT6PND89n7x_MU6-A';
   var sb = supabase.createClient(SB_URL, SB_KEY);
-  var tasksState = {};
-  var packState  = {};
 
+  var tasksState = {};
+  var PERSONS = [
+    {id:'tecla', label:'Tecla'},
+    {id:'tano',  label:'Tano'},
+    {id:'cubo',  label:'Cubo'}
+  ];
+  var activePerson = localStorage.getItem('activePerson') || 'tecla';
+  var packPersonState = {}; // {personId: {itemId: {done, custom_label}}}
+  PERSONS.forEach(function(p) { packPersonState[p.id] = {}; });
+
+  // ── TASKS ──────────────────────────────────────────────────
   var TASKS = [
     {group:'Logística & Confirmaciones', items:[
       {id:'g1', t:'Reservar excursión Balos o Elafonisi (Creta)'},
@@ -57,6 +111,45 @@
     ]}
   ];
 
+  function renderTasks() {
+    var grid = document.getElementById('tasksGrid');
+    if (!grid) return;
+    grid.innerHTML = '';
+    var total = 0, done = 0;
+    TASKS.forEach(function(group) {
+      var dG = group.items.filter(function(it) { return tasksState[it.id]; }).length;
+      total += group.items.length; done += dG;
+      var div = document.createElement('div'); div.className = 'task-group';
+      var title = document.createElement('div'); title.className = 'task-group-title';
+      title.innerHTML = group.group + '<span class="task-progress">' + dG + '/' + group.items.length + '</span>';
+      div.appendChild(title);
+      group.items.forEach(function(it) {
+        var d = !!tasksState[it.id];
+        var el = document.createElement('div'); el.className = 'task-item';
+        var cb = document.createElement('div'); cb.className = 'task-cb' + (d ? ' done' : '');
+        var lbl = document.createElement('span'); lbl.className = 'task-label' + (d ? ' done' : ''); lbl.textContent = it.t;
+        el.appendChild(cb); el.appendChild(lbl);
+        el.addEventListener('click', function() {
+          tasksState[it.id] = !tasksState[it.id]; renderTasks();
+          sb.from('tasks').upsert({id:it.id, done:!!tasksState[it.id], updated_at:new Date().toISOString()});
+        });
+        div.appendChild(el);
+      });
+      grid.appendChild(div);
+    });
+    var sum = document.getElementById('tasksSummary');
+    if (sum) sum.innerHTML = '<strong>' + done + ' de ' + total + '</strong> tareas completadas';
+  }
+
+  document.getElementById('tasksReset').addEventListener('click', function() {
+    if (!confirm('¿Desmarcar todas las tareas?')) return;
+    var rows = [];
+    TASKS.forEach(function(g) { g.items.forEach(function(it) { rows.push({id:it.id, done:false, updated_at:new Date().toISOString()}); }); });
+    tasksState = {}; renderTasks();
+    sb.from('tasks').upsert(rows);
+  });
+
+  // ── PACKING ────────────────────────────────────────────────
   var PACKS = [
     {cat:'Ropa (7 días, lavado en hostels)', items:[
       {id:'pk_p1', t:'5 remeras livianas de secado rápido', must:true},
@@ -115,90 +208,187 @@
     ]}
   ];
 
-  function renderTasks() {
-    var grid = document.getElementById('tasksGrid');
-    if (!grid) return;
-    grid.innerHTML = '';
-    var total = 0, done = 0;
-    TASKS.forEach(function(group) {
-      var dG = group.items.filter(function(it) { return tasksState[it.id]; }).length;
-      total += group.items.length; done += dG;
-      var div = document.createElement('div'); div.className = 'task-group';
-      var title = document.createElement('div'); title.className = 'task-group-title';
-      title.innerHTML = group.group + '<span class="task-progress">' + dG + '/' + group.items.length + '</span>';
-      div.appendChild(title);
-      group.items.forEach(function(it) {
-        var d = !!tasksState[it.id];
-        var el = document.createElement('div'); el.className = 'task-item';
-        var cb = document.createElement('div'); cb.className = 'task-cb' + (d ? ' done' : '');
-        var lbl = document.createElement('span'); lbl.className = 'task-label' + (d ? ' done' : ''); lbl.textContent = it.t;
-        el.appendChild(cb); el.appendChild(lbl);
-        el.addEventListener('click', function() {
-          tasksState[it.id] = !tasksState[it.id]; renderTasks();
-          sb.from('tasks').upsert({id:it.id, done:!!tasksState[it.id], updated_at:new Date().toISOString()});
+  // ── PERSON TABS ───────────────────────────────────────────
+  function initPersonTabs() {
+    document.querySelectorAll('.person-tab').forEach(function(tab) {
+      tab.classList.toggle('active', tab.dataset.person === activePerson);
+      tab.addEventListener('click', function() {
+        activePerson = this.dataset.person;
+        localStorage.setItem('activePerson', activePerson);
+        document.querySelectorAll('.person-tab').forEach(function(t) {
+          t.classList.toggle('active', t.dataset.person === activePerson);
         });
-        div.appendChild(el);
+        renderPack();
       });
-      grid.appendChild(div);
     });
-    var sum = document.getElementById('tasksSummary');
-    if (sum) sum.innerHTML = '<strong>' + done + ' de ' + total + '</strong> tareas completadas';
   }
 
-  var resetBtn = document.getElementById('tasksReset');
-  if (resetBtn) resetBtn.addEventListener('click', function() {
-    if (confirm('¿Desmarcar todas las tareas?')) {
-      var rows = [];
-      TASKS.forEach(function(g) { g.items.forEach(function(it) { rows.push({id:it.id, done:false, updated_at:new Date().toISOString()}); }); });
-      tasksState = {}; renderTasks();
-      sb.from('tasks').upsert(rows);
-    }
-  });
-
+  // ── RENDER PACK ───────────────────────────────────────────
   function renderPack() {
     var grid = document.getElementById('packGrid');
     if (!grid) return;
     grid.innerHTML = '';
+    var personState = packPersonState[activePerson] || {};
+    var total = 0, done = 0;
+
     PACKS.forEach(function(cat) {
       var div = document.createElement('div'); div.className = 'packing-cat';
       var title = document.createElement('div'); title.className = 'packing-cat-title'; title.textContent = cat.cat;
       div.appendChild(title);
+
       cat.items.forEach(function(item) {
-        var done = !!packState[item.id];
-        var el = document.createElement('div'); el.className = 'pack-item';
-        var cb = document.createElement('div'); cb.className = 'pcb' + (done ? ' done' : '');
-        var lbl = document.createElement('span'); if (done) lbl.className = 'done'; lbl.textContent = item.t;
-        if (item.must) { var m = document.createElement('span'); m.className = 'must'; m.textContent = 'imprescindible'; lbl.appendChild(m); }
-        el.appendChild(cb); el.appendChild(lbl);
-        el.addEventListener('click', function() {
-          packState[item.id] = !packState[item.id]; renderPack();
-          sb.from('packing').upsert({id:item.id, done:!!packState[item.id], updated_at:new Date().toISOString()});
-        });
-        div.appendChild(el);
+        total++;
+        var itemState = personState[item.id] || {};
+        var isDone = !!itemState.done;
+        if (isDone) done++;
+        div.appendChild(makePackItem(item.id, item.t, isDone, item.must, false));
       });
+
       grid.appendChild(div);
     });
+
+    // Custom items
+    var customItems = Object.keys(personState).filter(function(id) {
+      return personState[id] && personState[id].custom_label;
+    });
+    var customSection = document.getElementById('customSection');
+    var customList = document.getElementById('customList');
+    if (customSection && customList) {
+      customList.innerHTML = '';
+      if (customItems.length) {
+        customSection.style.display = '';
+        customItems.forEach(function(id) {
+          var st = personState[id];
+          total++;
+          if (st.done) done++;
+          customList.appendChild(makePackItem(id, st.custom_label, !!st.done, false, true));
+        });
+      } else {
+        customSection.style.display = 'none';
+      }
+    }
+
+    var pLabel = PERSONS.filter(function(p){return p.id===activePerson;})[0].label;
+    var prog = document.getElementById('packProgress');
+    if (prog) prog.textContent = done + ' de ' + total + ' ítems marcados — ' + pLabel;
   }
 
-  // ── REAL-TIME ──────────────────────────────────────────────
+  function makePackItem(id, text, isDone, isMust, isCustom) {
+    var el = document.createElement('div'); el.className = 'pack-item';
+    var cb = document.createElement('div'); cb.className = 'pcb' + (isDone ? ' done' : '');
+    var lbl = document.createElement('span'); if (isDone) lbl.className = 'done'; lbl.textContent = text;
+    if (isMust) {
+      var m = document.createElement('span'); m.className = 'must'; m.textContent = 'imprescindible'; lbl.appendChild(m);
+    }
+    el.appendChild(cb); el.appendChild(lbl);
+
+    if (isCustom) {
+      var delBtn = document.createElement('button');
+      delBtn.className = 'pack-del'; delBtn.title = 'Eliminar'; delBtn.textContent = '×';
+      el.appendChild(delBtn);
+      delBtn.addEventListener('click', function(e) {
+        e.stopPropagation();
+        if (!confirm('¿Eliminar "' + text + '"?')) return;
+        delete packPersonState[activePerson][id];
+        sb.from('packing_person').delete().eq('id', id).eq('person', activePerson);
+        renderPack();
+      });
+    }
+
+    el.addEventListener('click', function(e) {
+      if (e.target.classList.contains('pack-del')) return;
+      var newDone = !isDone;
+      if (!packPersonState[activePerson]) packPersonState[activePerson] = {};
+      if (!packPersonState[activePerson][id]) packPersonState[activePerson][id] = {};
+      packPersonState[activePerson][id].done = newDone;
+      var upsertRow = {id:id, person:activePerson, done:newDone, updated_at:new Date().toISOString()};
+      if (isCustom) upsertRow.custom_label = packPersonState[activePerson][id].custom_label;
+      sb.from('packing_person').upsert(upsertRow);
+      renderPack();
+    });
+
+    return el;
+  }
+
+  // ── AGREGAR ÍTEM CUSTOM ───────────────────────────────────
+  function addCustomItem() {
+    var inp = document.getElementById('packAddInp');
+    var label = inp.value.trim();
+    if (!label) return;
+    var id = 'cust_' + activePerson + '_' + Date.now();
+    if (!packPersonState[activePerson]) packPersonState[activePerson] = {};
+    packPersonState[activePerson][id] = {done:false, custom_label:label};
+    sb.from('packing_person').upsert({id:id, person:activePerson, done:false, custom_label:label, updated_at:new Date().toISOString()});
+    inp.value = '';
+    renderPack();
+  }
+
+  document.getElementById('packAddBtn').addEventListener('click', addCustomItem);
+  document.getElementById('packAddInp').addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') addCustomItem();
+  });
+
+  // ── RESET EQUIPAJE ────────────────────────────────────────
+  document.getElementById('packReset').addEventListener('click', function() {
+    var pLabel = PERSONS.filter(function(p){return p.id===activePerson;})[0].label;
+    if (!confirm('¿Desmarcar todo el equipaje de ' + pLabel + '?')) return;
+    var rows = [];
+    var personState = packPersonState[activePerson] || {};
+    Object.keys(personState).forEach(function(id) {
+      personState[id].done = false;
+      var row = {id:id, person:activePerson, done:false, updated_at:new Date().toISOString()};
+      if (personState[id].custom_label) row.custom_label = personState[id].custom_label;
+      rows.push(row);
+    });
+    if (rows.length) sb.from('packing_person').upsert(rows);
+    renderPack();
+  });
+
+  // ── REAL-TIME ─────────────────────────────────────────────
   sb.channel('tareas_sync')
     .on('postgres_changes', {event:'*', schema:'public', table:'tasks'}, function(p) {
       if (p.new) { tasksState[p.new.id] = p.new.done; renderTasks(); }
     })
-    .on('postgres_changes', {event:'*', schema:'public', table:'packing'}, function(p) {
-      if (p.new) { packState[p.new.id] = p.new.done; renderPack(); }
+    .on('postgres_changes', {event:'INSERT', schema:'public', table:'packing_person'}, function(p) {
+      if (!p.new) return;
+      var r = p.new;
+      if (!packPersonState[r.person]) packPersonState[r.person] = {};
+      packPersonState[r.person][r.id] = {done:r.done, custom_label:r.custom_label};
+      if (r.person === activePerson) renderPack();
+    })
+    .on('postgres_changes', {event:'UPDATE', schema:'public', table:'packing_person'}, function(p) {
+      if (!p.new) return;
+      var r = p.new;
+      if (!packPersonState[r.person]) packPersonState[r.person] = {};
+      packPersonState[r.person][r.id] = {done:r.done, custom_label:r.custom_label};
+      if (r.person === activePerson) renderPack();
+    })
+    .on('postgres_changes', {event:'DELETE', schema:'public', table:'packing_person'}, function(p) {
+      if (!p.old) return;
+      var r = p.old;
+      if (packPersonState[r.person]) delete packPersonState[r.person][r.id];
+      if (r.person === activePerson) renderPack();
     })
     .subscribe();
 
-  // ── INIT ──────────────────────────────────────────────────
+  // ── INIT ─────────────────────────────────────────────────
+  initPersonTabs();
+
   Promise.all([
     sb.from('tasks').select('*').then(function(r) {
       (r.data || []).forEach(function(row) { tasksState[row.id] = row.done; });
     }),
-    sb.from('packing').select('*').then(function(r) {
-      (r.data || []).forEach(function(row) { packState[row.id] = row.done; });
+    sb.from('packing_person').select('*').then(function(r) {
+      (r.data || []).forEach(function(row) {
+        if (!packPersonState[row.person]) packPersonState[row.person] = {};
+        packPersonState[row.person][row.id] = {done:row.done, custom_label:row.custom_label};
+      });
     })
   ]).then(function() {
+    renderTasks();
+    renderPack();
+  }).catch(function(err) {
+    console.error('Error al cargar datos:', err);
     renderTasks();
     renderPack();
   });
