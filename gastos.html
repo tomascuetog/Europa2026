@@ -61,6 +61,9 @@
   .res-val{font-size:1.65rem;}
   .bi-split-lbl{min-width:100px;}
 }
+.save-toast{position:fixed;bottom:calc(5rem + env(safe-area-inset-bottom,0));left:50%;transform:translateX(-50%);font-family:Outfit,sans-serif;font-size:.75rem;font-weight:600;padding:.45rem 1.2rem;border-radius:20px;opacity:0;transition:opacity .25s;z-index:9999;pointer-events:none;white-space:nowrap;}
+.save-toast.ok{background:rgba(74,222,128,.92);color:#14532d;}
+.save-toast.err{background:rgba(239,68,68,.92);color:#fff;}
 </style>
 </head>
 <body>
@@ -68,6 +71,7 @@
   <img class="modal-photo" id="mImg" src="" alt="">
   <div class="modal-footer"><div class="modal-title" id="mTitle"></div><button class="modal-close" id="mClose">✕ Cerrar</button></div>
 </div></div>
+<div class="save-toast" id="saveToast"></div>
 <div class="city-header">
   <a class="city-back" href="home.html">← Inicio</a>
   <div class="city-header-title">Gastos & Reservas</div>
@@ -125,6 +129,23 @@
   var SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFkem1ubm11YmJoYXJjcHJqa2hzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg5MzI3MjcsImV4cCI6MjA5NDUwODcyN30.K_TdCUgIo23aqc0wCQBJI7BMWDTT6PND89n7x_MU6-A';
   var sb = supabase.createClient(SB_URL, SB_KEY);
   var trackerState = {};
+  var LS_KEY = 'europa2026_tracker_v1';
+
+  function saveLocal() {
+    try { localStorage.setItem(LS_KEY, JSON.stringify(trackerState)); } catch(e) {}
+  }
+  function loadLocal() {
+    try { var r = localStorage.getItem(LS_KEY); if (r) trackerState = JSON.parse(r); } catch(e) {}
+  }
+  function showToast(msg, isErr) {
+    var t = document.getElementById('saveToast');
+    if (!t) return;
+    t.textContent = msg;
+    t.className = 'save-toast ' + (isErr ? 'err' : 'ok');
+    t.style.opacity = '1';
+    clearTimeout(t._tid);
+    t._tid = setTimeout(function() { t.style.opacity = '0'; }, isErr ? 3500 : 1800);
+  }
 
   var BUDGET_GROUPS = [
     {group:'Internacionales', items:[
@@ -359,6 +380,7 @@
   }
 
   function trkUpsert(id) {
+    saveLocal(); // Guardar localmente de inmediato
     var s = trackerState[id] || {status:'proyectado',precio:0,adelanto:0,note:'',file_url:'',file_name:''};
     return sb.from('tracker').upsert({
       id:         id,
@@ -370,6 +392,16 @@
       file_name:  s.file_name || '',
       date:       '',
       updated_at: new Date().toISOString()
+    }).then(function(res) {
+      if (res.error) {
+        console.error('Supabase error:', res.error.message, res.error.code);
+        showToast('⚠️ Sin sincronizar — guardado local (' + (res.error.code || res.error.message) + ')', true);
+      } else {
+        showToast('✓ Guardado', false);
+      }
+    }).catch(function(err) {
+      console.error('Red error:', err);
+      showToast('⚠️ Sin conexión — guardado local', true);
     });
   }
 
@@ -412,10 +444,26 @@
     .subscribe();
 
   // ── INIT ──────────────────────────────────────────────────
-  var bc = document.getElementById('budgetContainer');
-  if (bc) bc.innerHTML = '<p style="color:var(--text-mid);font-size:.82rem;padding:1rem 0">Cargando datos…</p>';
+  // 1) Mostrar datos locales de inmediato (sin esperar red)
+  loadLocal();
+  if (Object.keys(trackerState).length > 0) {
+    renderBudget();
+    renderResumen();
+  } else {
+    var bc = document.getElementById('budgetContainer');
+    if (bc) bc.innerHTML = '<p style="color:var(--text-mid);font-size:.82rem;padding:1rem 0">Cargando datos…</p>';
+  }
 
+  // 2) Sincronizar con Supabase y actualizar
   sb.from('tracker').select('*').then(function(r) {
+    if (r.error) {
+      console.error('Error cargando tracker:', r.error.message, r.error.code);
+      if (Object.keys(trackerState).length === 0) {
+        var bc = document.getElementById('budgetContainer');
+        if (bc) bc.innerHTML = '<p style="color:#fca5a5;font-size:.82rem;padding:1rem 0">Error al conectar con Supabase: ' + r.error.message + '</p>';
+      }
+      return;
+    }
     (r.data || []).forEach(function(row) {
       trackerState[row.id] = {
         status:    normalizeStatus(row.status),
@@ -426,11 +474,15 @@
         file_name: row.file_name || ''
       };
     });
+    saveLocal(); // Actualizar caché local con datos del servidor
     renderBudget();
     renderResumen();
-  }).catch(function() {
-    var bc = document.getElementById('budgetContainer');
-    if (bc) bc.innerHTML = '<p style="color:#fca5a5;font-size:.82rem;padding:1rem 0">Error al conectar. Revisá la conexión.</p>';
+  }).catch(function(err) {
+    console.error('Error de red:', err);
+    if (Object.keys(trackerState).length === 0) {
+      var bc = document.getElementById('budgetContainer');
+      if (bc) bc.innerHTML = '<p style="color:#fca5a5;font-size:.82rem;padding:1rem 0">Sin conexión. Los datos locales se muestran si existen.</p>';
+    }
   });
 })();
 </script>
