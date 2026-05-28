@@ -31,7 +31,10 @@
 <body>
 
 <div class="city-header">
-  <a class="city-back" href="home.html">← Inicio</a>
+  <div style="display:flex;justify-content:space-between;align-items:flex-start">
+    <a class="city-back" href="home.html">← Inicio</a>
+    <button onclick="(function(){if('serviceWorker' in navigator){navigator.serviceWorker.getRegistrations().then(function(r){r.forEach(function(s){s.unregister();});caches.keys().then(function(n){Promise.all(n.map(function(k){return caches.delete(k);})).then(function(){window.location.reload(true);});});});}else{window.location.reload(true);}})()" style="font-family:Outfit,sans-serif;font-size:.65rem;font-weight:600;color:rgba(255,255,255,.4);background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);border-radius:20px;padding:.25rem .7rem;cursor:pointer;-webkit-tap-highlight-color:transparent">↺ Actualizar app</button>
+  </div>
   <div class="city-header-title">Organización</div>
   <div class="city-header-sub">Tareas & Equipaje · Europa Sep 2026</div>
 </div>

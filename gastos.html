@@ -73,7 +73,10 @@
 </div></div>
 <div class="save-toast" id="saveToast"></div>
 <div class="city-header">
-  <a class="city-back" href="home.html">← Inicio</a>
+  <div style="display:flex;justify-content:space-between;align-items:flex-start">
+    <a class="city-back" href="home.html">← Inicio</a>
+    <button onclick="(function(){if('serviceWorker' in navigator){navigator.serviceWorker.getRegistrations().then(function(r){r.forEach(function(s){s.unregister();});caches.keys().then(function(n){Promise.all(n.map(function(k){return caches.delete(k);})).then(function(){window.location.reload(true);});});});}else{window.location.reload(true);}})()" style="font-family:Outfit,sans-serif;font-size:.65rem;font-weight:600;color:rgba(255,255,255,.4);background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);border-radius:20px;padding:.25rem .7rem;cursor:pointer;-webkit-tap-highlight-color:transparent">↺ Actualizar app</button>
+  </div>
   <div class="city-header-title">Gastos & Reservas</div>
   <div class="city-header-sub">Reservas & Costos · p/persona · Sep 2026</div>
 </div>
@@ -392,7 +395,7 @@
       file_name:  s.file_name || '',
       date:       '',
       updated_at: new Date().toISOString()
-    }).then(function(res) {
+    }, { onConflict: 'id' }).then(function(res) {
       if (res.error) {
         console.error('Supabase error:', res.error.message, res.error.code);
         showToast('⚠️ Sin sincronizar — guardado local (' + (res.error.code || res.error.message) + ')', true);
