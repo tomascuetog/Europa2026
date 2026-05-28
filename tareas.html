@@ -340,7 +340,7 @@
       savePackLocal();
       var upsertRow = {id:id, person:activePerson, done:newDone, updated_at:new Date().toISOString()};
       if (isCustom) upsertRow.custom_label = packPersonState[activePerson][id].custom_label;
-      sb.from('packing_person').upsert(upsertRow, {onConflict:'id,person'})
+      sb.from('packing_person').upsert(upsertRow)
         .then(function(res){ if(res.error) showToast('⚠️ Sin sincronizar ('+res.error.code+')',true); else showToast('✓ Guardado',false); });
       renderPack();
     });
@@ -357,7 +357,7 @@
     if (!packPersonState[activePerson]) packPersonState[activePerson] = {};
     packPersonState[activePerson][id] = {done:false, custom_label:label};
     savePackLocal();
-    sb.from('packing_person').upsert({id:id, person:activePerson, done:false, custom_label:label, updated_at:new Date().toISOString()}, {onConflict:'id,person'})
+    sb.from('packing_person').upsert({id:id, person:activePerson, done:false, custom_label:label, updated_at:new Date().toISOString()})
       .then(function(res){ if(res.error) showToast('⚠️ Sin sincronizar ('+res.error.code+')',true); else showToast('✓ Guardado',false); });
     inp.value = '';
     renderPack();
@@ -381,7 +381,7 @@
       rows.push(row);
     });
     savePackLocal();
-    if (rows.length) sb.from('packing_person').upsert(rows, {onConflict:'id,person'})
+    if (rows.length) sb.from('packing_person').upsert(rows)
       .then(function(res){ if(res.error) showToast('⚠️ Sin sincronizar ('+res.error.code+')',true); });
     renderPack();
   });

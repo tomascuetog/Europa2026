@@ -395,7 +395,7 @@
       file_name:  s.file_name || '',
       date:       '',
       updated_at: new Date().toISOString()
-    }, { onConflict: 'id' }).then(function(res) {
+    }).then(function(res) {
       if (res.error) {
         console.error('Supabase error:', res.error.message, res.error.code);
         showToast('⚠️ Sin sincronizar — guardado local (' + (res.error.code || res.error.message) + ')', true);
