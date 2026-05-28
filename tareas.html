@@ -26,10 +26,14 @@
 .pack-del{background:none;border:none;font-size:.75rem;color:rgba(13,27,42,.2);cursor:pointer;padding:0 .25rem;line-height:1;flex-shrink:0;margin-left:auto;-webkit-tap-highlight-color:transparent;}
 .pack-del:hover{color:#ef4444;}
 .pack-reset-row{margin-top:2rem;}
+.save-toast{position:fixed;bottom:calc(5rem + env(safe-area-inset-bottom,0));left:50%;transform:translateX(-50%);font-family:Outfit,sans-serif;font-size:.75rem;font-weight:600;padding:.45rem 1.2rem;border-radius:20px;opacity:0;transition:opacity .25s;z-index:9999;pointer-events:none;white-space:nowrap;}
+.save-toast.ok{background:rgba(74,222,128,.92);color:#14532d;}
+.save-toast.err{background:rgba(239,68,68,.92);color:#fff;}
 </style>
 </head>
 <body>
 
+<div class="save-toast" id="saveToast"></div>
 <div class="city-header">
   <div style="display:flex;justify-content:space-between;align-items:flex-start">
     <a class="city-back" href="home.html">← Inicio</a>
@@ -98,6 +102,31 @@
   var packPersonState = {}; // {personId: {itemId: {done, custom_label}}}
   PERSONS.forEach(function(p) { packPersonState[p.id] = {}; });
 
+  var LS_TASKS = 'europa2026_tasks_v1';
+  var LS_PACK  = 'europa2026_packing_v1';
+
+  function saveTasksLocal() { try { localStorage.setItem(LS_TASKS, JSON.stringify(tasksState)); } catch(e) {} }
+  function loadTasksLocal()  { try { var r=localStorage.getItem(LS_TASKS); if(r) tasksState=JSON.parse(r); } catch(e) {} }
+  function savePackLocal()   { try { localStorage.setItem(LS_PACK, JSON.stringify(packPersonState)); } catch(e) {} }
+  function loadPackLocal()   {
+    try {
+      var r=localStorage.getItem(LS_PACK);
+      if(r) {
+        var parsed=JSON.parse(r);
+        PERSONS.forEach(function(p) { packPersonState[p.id] = parsed[p.id] || {}; });
+      }
+    } catch(e) {}
+  }
+  function showToast(msg, isErr) {
+    var t=document.getElementById('saveToast');
+    if(!t) return;
+    t.textContent=msg;
+    t.className='save-toast '+(isErr?'err':'ok');
+    t.style.opacity='1';
+    clearTimeout(t._tid);
+    t._tid=setTimeout(function(){t.style.opacity='0';}, isErr?3500:1800);
+  }
+
   // ── TASKS ──────────────────────────────────────────────────
   var TASKS = [
     {group:'Logística & Confirmaciones', items:[
@@ -133,8 +162,11 @@
         var lbl = document.createElement('span'); lbl.className = 'task-label' + (d ? ' done' : ''); lbl.textContent = it.t;
         el.appendChild(cb); el.appendChild(lbl);
         el.addEventListener('click', function() {
-          tasksState[it.id] = !tasksState[it.id]; renderTasks();
-          sb.from('tasks').upsert({id:it.id, done:!!tasksState[it.id], updated_at:new Date().toISOString()});
+          tasksState[it.id] = !tasksState[it.id];
+          saveTasksLocal();
+          renderTasks();
+          sb.from('tasks').upsert({id:it.id, done:!!tasksState[it.id], updated_at:new Date().toISOString()})
+            .then(function(res){ if(res.error) showToast('⚠️ Sin sincronizar ('+res.error.code+')',true); else showToast('✓ Guardado',false); });
         });
         div.appendChild(el);
       });
@@ -148,8 +180,8 @@
     if (!confirm('¿Desmarcar todas las tareas?')) return;
     var rows = [];
     TASKS.forEach(function(g) { g.items.forEach(function(it) { rows.push({id:it.id, done:false, updated_at:new Date().toISOString()}); }); });
-    tasksState = {}; renderTasks();
-    sb.from('tasks').upsert(rows);
+    tasksState = {}; saveTasksLocal(); renderTasks();
+    sb.from('tasks').upsert(rows).then(function(res){ if(res.error) showToast('⚠️ Sin sincronizar ('+res.error.code+')',true); });
   });
 
   // ── PACKING ────────────────────────────────────────────────
@@ -293,6 +325,7 @@
         e.stopPropagation();
         if (!confirm('¿Eliminar "' + text + '"?')) return;
         delete packPersonState[activePerson][id];
+        savePackLocal();
         sb.from('packing_person').delete().eq('id', id).eq('person', activePerson);
         renderPack();
       });
@@ -304,9 +337,11 @@
       if (!packPersonState[activePerson]) packPersonState[activePerson] = {};
       if (!packPersonState[activePerson][id]) packPersonState[activePerson][id] = {};
       packPersonState[activePerson][id].done = newDone;
+      savePackLocal();
       var upsertRow = {id:id, person:activePerson, done:newDone, updated_at:new Date().toISOString()};
       if (isCustom) upsertRow.custom_label = packPersonState[activePerson][id].custom_label;
-      sb.from('packing_person').upsert(upsertRow);
+      sb.from('packing_person').upsert(upsertRow, {onConflict:'id,person'})
+        .then(function(res){ if(res.error) showToast('⚠️ Sin sincronizar ('+res.error.code+')',true); else showToast('✓ Guardado',false); });
       renderPack();
     });
 
@@ -321,7 +356,9 @@
     var id = 'cust_' + activePerson + '_' + Date.now();
     if (!packPersonState[activePerson]) packPersonState[activePerson] = {};
     packPersonState[activePerson][id] = {done:false, custom_label:label};
-    sb.from('packing_person').upsert({id:id, person:activePerson, done:false, custom_label:label, updated_at:new Date().toISOString()});
+    savePackLocal();
+    sb.from('packing_person').upsert({id:id, person:activePerson, done:false, custom_label:label, updated_at:new Date().toISOString()}, {onConflict:'id,person'})
+      .then(function(res){ if(res.error) showToast('⚠️ Sin sincronizar ('+res.error.code+')',true); else showToast('✓ Guardado',false); });
     inp.value = '';
     renderPack();
   }
@@ -343,20 +380,23 @@
       if (personState[id].custom_label) row.custom_label = personState[id].custom_label;
       rows.push(row);
     });
-    if (rows.length) sb.from('packing_person').upsert(rows);
+    savePackLocal();
+    if (rows.length) sb.from('packing_person').upsert(rows, {onConflict:'id,person'})
+      .then(function(res){ if(res.error) showToast('⚠️ Sin sincronizar ('+res.error.code+')',true); });
     renderPack();
   });
 
   // ── REAL-TIME ─────────────────────────────────────────────
   sb.channel('tareas_sync')
     .on('postgres_changes', {event:'*', schema:'public', table:'tasks'}, function(p) {
-      if (p.new) { tasksState[p.new.id] = p.new.done; renderTasks(); }
+      if (p.new) { tasksState[p.new.id] = p.new.done; saveTasksLocal(); renderTasks(); }
     })
     .on('postgres_changes', {event:'INSERT', schema:'public', table:'packing_person'}, function(p) {
       if (!p.new) return;
       var r = p.new;
       if (!packPersonState[r.person]) packPersonState[r.person] = {};
       packPersonState[r.person][r.id] = {done:r.done, custom_label:r.custom_label};
+      savePackLocal();
       if (r.person === activePerson) renderPack();
     })
     .on('postgres_changes', {event:'UPDATE', schema:'public', table:'packing_person'}, function(p) {
@@ -364,35 +404,41 @@
       var r = p.new;
       if (!packPersonState[r.person]) packPersonState[r.person] = {};
       packPersonState[r.person][r.id] = {done:r.done, custom_label:r.custom_label};
+      savePackLocal();
       if (r.person === activePerson) renderPack();
     })
     .on('postgres_changes', {event:'DELETE', schema:'public', table:'packing_person'}, function(p) {
       if (!p.old) return;
       var r = p.old;
       if (packPersonState[r.person]) delete packPersonState[r.person][r.id];
+      savePackLocal();
       if (r.person === activePerson) renderPack();
     })
     .subscribe();
 
   // ── INIT ─────────────────────────────────────────────────
+  // 1) Mostrar datos locales de inmediato
+  loadTasksLocal();
+  loadPackLocal();
   initPersonTabs();
+  renderTasks();
+  renderPack();
 
-  Promise.all([
-    sb.from('tasks').select('*').then(function(r) {
-      (r.data || []).forEach(function(row) { tasksState[row.id] = row.done; });
-    }),
-    sb.from('packing_person').select('*').then(function(r) {
-      (r.data || []).forEach(function(row) {
-        if (!packPersonState[row.person]) packPersonState[row.person] = {};
-        packPersonState[row.person][row.id] = {done:row.done, custom_label:row.custom_label};
-      });
-    })
-  ]).then(function() {
+  // 2) Sincronizar con Supabase en segundo plano
+  sb.from('tasks').select('*').then(function(r) {
+    if (r.error) { console.error('tasks:', r.error); return; }
+    (r.data || []).forEach(function(row) { tasksState[row.id] = row.done; });
+    saveTasksLocal();
     renderTasks();
-    renderPack();
-  }).catch(function(err) {
-    console.error('Error al cargar datos:', err);
-    renderTasks();
+  });
+
+  sb.from('packing_person').select('*').then(function(r) {
+    if (r.error) { console.error('packing_person:', r.error); return; }
+    (r.data || []).forEach(function(row) {
+      if (!packPersonState[row.person]) packPersonState[row.person] = {};
+      packPersonState[row.person][row.id] = {done:row.done, custom_label:row.custom_label};
+    });
+    savePackLocal();
     renderPack();
   });
 })();
