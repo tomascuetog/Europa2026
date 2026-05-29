@@ -22,8 +22,13 @@
 .res-sub{font-family:Outfit,sans-serif;font-size:.65rem;color:rgba(255,255,255,.25);margin-top:.15rem;}
 
 /* ── BUDGET ITEMS ────────────────────────── */
-.bg-group-title{font-family:Outfit,sans-serif;font-size:.62rem;letter-spacing:.2em;text-transform:uppercase;color:var(--gold);padding:.4rem 0;margin:1.75rem 0 .6rem;border-bottom:1px solid rgba(201,151,58,.2);}
-.bg-group-title:first-child{margin-top:0;}
+.bg-group-header{display:flex;align-items:center;justify-content:space-between;margin:1.75rem 0 .6rem;border-bottom:1px solid rgba(201,151,58,.2);padding-bottom:.4rem;}
+.bg-group-header:first-child{margin-top:0;}
+.bg-group-title{font-family:Outfit,sans-serif;font-size:.62rem;letter-spacing:.2em;text-transform:uppercase;color:var(--gold);}
+.bg-group-add-btn{display:none;font-family:Outfit,sans-serif;font-size:.65rem;font-weight:600;color:var(--gold);background:none;border:1px dashed rgba(201,151,58,.5);border-radius:20px;padding:.2rem .65rem;cursor:pointer;-webkit-tap-highlight-color:transparent;transition:all .15s;}
+.bg-group-add-btn:hover{background:rgba(201,151,58,.08);}
+.edit-mode .bg-group-add-btn{display:inline-flex;}
+
 .budget-item{background:#fff;border-radius:14px;padding:.95rem 1.1rem;margin-bottom:.55rem;border:1px solid rgba(13,27,42,.07);transition:border-color .2s,box-shadow .2s;}
 .budget-item.reservado{border-color:rgba(74,222,128,.25);box-shadow:0 2px 12px rgba(74,222,128,.06);}
 .bi-main{display:flex;align-items:center;gap:.65rem;}
@@ -61,17 +66,92 @@
   .res-val{font-size:1.65rem;}
   .bi-split-lbl{min-width:100px;}
 }
+
+/* ── EDIT ITEM BUTTONS ─────────────────── */
+.bi-edit-btns{display:none;align-items:center;gap:.3rem;flex-shrink:0;margin-left:.25rem;}
+.edit-mode .bi-edit-btns{display:flex;}
+.bi-btn-icon{font-family:Outfit,sans-serif;font-size:.72rem;background:none;border:1px solid rgba(13,27,42,.15);border-radius:8px;width:26px;height:26px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--text-mid);-webkit-tap-highlight-color:transparent;transition:all .15s;padding:0;}
+.bi-btn-icon:hover{border-color:var(--gold);color:var(--gold);}
+.bi-btn-icon.del:hover{border-color:#ef4444;color:#ef4444;}
+
+/* ── SECTION HEADER ────────────────────── */
+.section-header-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:2rem;}
+.edit-toggle-btn{font-family:Outfit,sans-serif;font-size:.72rem;font-weight:600;color:var(--text-mid);background:rgba(13,27,42,.06);border:1px solid rgba(13,27,42,.12);border-radius:20px;padding:.35rem .85rem;cursor:pointer;-webkit-tap-highlight-color:transparent;transition:all .15s;}
+.edit-toggle-btn:hover{border-color:var(--gold);color:var(--gold);}
+.edit-toggle-btn.active{background:var(--navy);color:#fff;border-color:var(--navy);}
+
+/* ── NEW TRAMO BUTTON ──────────────────── */
+.new-tramo-btn{display:none;font-family:Outfit,sans-serif;font-size:.75rem;font-weight:600;color:var(--gold);background:none;border:1.5px dashed rgba(201,151,58,.5);border-radius:12px;padding:.6rem 1.2rem;cursor:pointer;width:100%;margin-top:1rem;-webkit-tap-highlight-color:transparent;transition:all .15s;}
+.new-tramo-btn:hover{background:rgba(201,151,58,.07);}
+.edit-mode .new-tramo-btn{display:block;}
+
+/* ── BOTTOM SHEET ──────────────────────── */
+.sheet-overlay{position:fixed;inset:0;background:rgba(0,0,0,0);z-index:1000;pointer-events:none;transition:background .25s;}
+.sheet-overlay.open{background:rgba(0,0,0,.45);pointer-events:all;}
+.bottom-sheet{position:fixed;bottom:0;left:0;right:0;background:#fff;border-radius:20px 20px 0 0;padding:1.5rem 1.5rem calc(1.5rem + env(safe-area-inset-bottom,0));z-index:1001;transform:translateY(100%);transition:transform .3s cubic-bezier(.32,.72,0,1);max-height:90vh;overflow-y:auto;}
+.bottom-sheet.open{transform:translateY(0);}
+.sheet-handle{width:40px;height:4px;background:rgba(13,27,42,.12);border-radius:2px;margin:0 auto 1.25rem;}
+.sheet-title{font-family:'Cormorant Garamond',serif;font-size:1.4rem;font-weight:400;color:var(--navy);margin-bottom:1.25rem;}
+.sheet-field{margin-bottom:1rem;}
+.sheet-label{font-family:Outfit,sans-serif;font-size:.68rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--text-mid);display:block;margin-bottom:.4rem;}
+.sheet-input,.sheet-select{width:100%;border:1.5px solid rgba(13,27,42,.15);border-radius:10px;padding:.55rem .8rem;font-family:Outfit,sans-serif;font-size:.85rem;color:var(--navy);background:#fff;appearance:none;-webkit-appearance:none;}
+.sheet-input:focus,.sheet-select:focus{outline:none;border-color:var(--gold);}
+.sheet-new-group-inp{display:none;margin-top:.5rem;}
+.sheet-btns{display:flex;gap:.75rem;margin-top:1.5rem;}
+.sheet-save-btn{flex:1;background:var(--navy);color:#fff;font-family:Outfit,sans-serif;font-size:.82rem;font-weight:600;border:none;border-radius:12px;padding:.8rem;cursor:pointer;-webkit-tap-highlight-color:transparent;transition:background .15s;}
+.sheet-save-btn:hover{background:#1a2f47;}
+.sheet-cancel-btn{background:rgba(13,27,42,.07);color:var(--text-mid);font-family:Outfit,sans-serif;font-size:.82rem;font-weight:600;border:none;border-radius:12px;padding:.8rem 1.25rem;cursor:pointer;-webkit-tap-highlight-color:transparent;transition:background .15s;}
+.sheet-cancel-btn:hover{background:rgba(13,27,42,.12);}
+
+/* ── TOAST ─────────────────────────────── */
 .save-toast{position:fixed;bottom:calc(5rem + env(safe-area-inset-bottom,0));left:50%;transform:translateX(-50%);font-family:Outfit,sans-serif;font-size:.75rem;font-weight:600;padding:.45rem 1.2rem;border-radius:20px;opacity:0;transition:opacity .25s;z-index:9999;pointer-events:none;white-space:nowrap;}
 .save-toast.ok{background:rgba(74,222,128,.92);color:#14532d;}
 .save-toast.err{background:rgba(239,68,68,.92);color:#fff;}
 </style>
 </head>
 <body>
+
+<!-- Bottom sheet overlay -->
+<div class="sheet-overlay" id="sheetOverlay"></div>
+<div class="bottom-sheet" id="bottomSheet">
+  <div class="sheet-handle"></div>
+  <div class="sheet-title" id="sheetTitle">Nuevo ítem</div>
+  <div class="sheet-field">
+    <label class="sheet-label">Tramo</label>
+    <select class="sheet-select" id="sheetGroup"></select>
+    <input class="sheet-input sheet-new-group-inp" id="sheetNewGroup" placeholder="Nombre del nuevo tramo…" type="text">
+  </div>
+  <div class="sheet-field">
+    <label class="sheet-label">Descripción</label>
+    <input class="sheet-input" id="sheetLabel" placeholder="Descripción del gasto…" type="text">
+  </div>
+  <div class="sheet-field">
+    <label class="sheet-label">Precio estimado (USD)</label>
+    <input class="sheet-input" id="sheetEst" placeholder="0" type="number" min="0">
+  </div>
+  <div class="sheet-field">
+    <label class="sheet-label">Tipo</label>
+    <select class="sheet-select" id="sheetTag">
+      <option value="transporte">Transporte</option>
+      <option value="hospedaje">Hospedaje</option>
+      <option value="actividad">Actividad</option>
+      <option value="otro">Otro</option>
+    </select>
+  </div>
+  <div class="sheet-btns">
+    <button class="sheet-save-btn" id="sheetSave">Guardar</button>
+    <button class="sheet-cancel-btn" id="sheetCancel">Cancelar</button>
+  </div>
+</div>
+
+<!-- Modal for file preview -->
 <div class="modal-overlay" id="modal"><div class="modal-card">
   <img class="modal-photo" id="mImg" src="" alt="">
   <div class="modal-footer"><div class="modal-title" id="mTitle"></div><button class="modal-close" id="mClose">✕ Cerrar</button></div>
 </div></div>
+
 <div class="save-toast" id="saveToast"></div>
+
 <div class="city-header">
   <div style="display:flex;justify-content:space-between;align-items:flex-start">
     <a class="city-back" href="home.html">← Inicio</a>
@@ -115,31 +195,125 @@
 <!-- ── PRESUPUESTO / RESERVAS ── -->
 <section style="background:var(--cream-dark);padding:4rem 2rem;padding-bottom:calc(6rem + env(safe-area-inset-bottom,0))" id="presupuesto">
 <div style="max-width:700px;margin:0 auto">
-  <p class="section-eyebrow" style="color:var(--gold)">Reservas & Costos</p>
-  <h2 style="font-family:'Cormorant Garamond',serif;font-size:clamp(1.8rem,4vw,3rem);font-weight:400;margin-bottom:.4rem">Ítems del viaje</h2>
+  <div class="section-header-row">
+    <div>
+      <p class="section-eyebrow" style="color:var(--gold);margin-bottom:.25rem">Reservas & Costos</p>
+      <h2 style="font-family:'Cormorant Garamond',serif;font-size:clamp(1.8rem,4vw,3rem);font-weight:400;margin-bottom:0">Ítems del viaje</h2>
+    </div>
+    <button class="edit-toggle-btn" id="editToggleBtn">✏️ Editar</button>
+  </div>
   <p style="color:var(--text-mid);font-size:.8rem;margin-bottom:2rem">Tocá <strong>Proyectado</strong> para marcarlo como Reservado · Editá el precio real · Ingresá el adelanto si ya pagaste una parte</p>
   <div id="budgetContainer"></div>
+  <button class="new-tramo-btn" id="newTramoBtn">＋ Nuevo tramo</button>
 </div>
 </section>
 
 <footer class="site-footer"><p>Europa 2026 · <span>Septiembre</span> · Madrid · Barcelona · Grecia · Budapest</p></footer>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="shared.js"></script>
 <script>
 (function() {
   var SB_URL = 'https://adzmnnmubbharcprjkhs.supabase.co';
   var SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFkem1ubm11YmJoYXJjcHJqa2hzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg5MzI3MjcsImV4cCI6MjA5NDUwODcyN30.K_TdCUgIo23aqc0wCQBJI7BMWDTT6PND89n7x_MU6-A';
   var sb = supabase.createClient(SB_URL, SB_KEY);
-  var trackerState = {};
-  var LS_KEY = 'europa2026_tracker_v1';
 
-  function saveLocal() {
-    try { localStorage.setItem(LS_KEY, JSON.stringify(trackerState)); } catch(e) {}
+  var trackerState = {};
+  var catalogItems = []; // flat array of items with group info
+  var editMode = false;
+  var catalogEditable = true; // becomes false if budget_items table missing
+
+  var LS_TRACKER = 'europa2026_tracker_v1';
+  var LS_CATALOG = 'europa2026_budget_catalog_v1';
+
+  // ── DEFAULT GROUPS ─────────────────────────────────────────
+  var DEFAULT_GROUPS = [
+    {group:'Internacionales', order:0, items:[
+      {id:'tr1',  label:'Vuelo Bs. As. → Madrid (ida)',       est:500, tag:'transporte', order:0},
+      {id:'tr2',  label:'Vuelo Madrid → Bs. As. (vuelta)',    est:500, tag:'transporte', order:1},
+      {id:'tr26', label:'Seguro de viaje internacional',      est:80,  tag:'otro',       order:2}
+    ]},
+    {group:'Madrid → Barcelona', order:1, items:[
+      {id:'tr3',  label:'Tren AVE Madrid → Barcelona',        est:53,  tag:'transporte', order:0}
+    ]},
+    {group:'Barcelona · 4–7 Sep', order:2, items:[
+      {id:'tr12', label:'BCN Sports Hostel (3 noches)',       est:102, tag:'hospedaje',  order:0},
+      {id:'tr22', label:'Sagrada Família',                    est:30,  tag:'actividad',  order:1},
+      {id:'tr23', label:'Park Güell (zona monumental)',       est:13,  tag:'actividad',  order:2}
+    ]},
+    {group:'Barcelona → Atenas', order:3, items:[
+      {id:'tr4',  label:'Vuelo Barcelona → Atenas',           est:76,  tag:'transporte', order:0}
+    ]},
+    {group:'Atenas I · 7–8 Sep', order:4, items:[
+      {id:'tr13', label:'Safestay Monastiraki (1 noche)',     est:23,  tag:'hospedaje',  order:0},
+      {id:'tr21', label:'Acrópolis de Atenas',                est:20,  tag:'actividad',  order:1}
+    ]},
+    {group:'Santorini · 8–10 Sep', order:5, items:[
+      {id:'tr5',  label:'Ferry Pireo → Santorini',            est:45,  tag:'transporte', order:0},
+      {id:'tr14', label:'Santorini Camping (2 noches)',       est:52,  tag:'hospedaje',  order:1}
+    ]},
+    {group:'Naxos · 10–12 Sep', order:6, items:[
+      {id:'tr6',  label:'Ferry Santorini → Naxos',            est:37,  tag:'transporte', order:0},
+      {id:'tr15', label:'Katerina Roza Studios (2 noches)',   est:49,  tag:'hospedaje',  order:1}
+    ]},
+    {group:'Creta · 12–15 Sep', order:7, items:[
+      {id:'tr7',  label:'Vuelo Naxos → Creta',                est:56,  tag:'transporte', order:0},
+      {id:'tr16', label:'Cocoon City Hostel (3 noches)',      est:87,  tag:'hospedaje',  order:1},
+      {id:'tr24', label:'Palacio de Cnosos',                  est:16,  tag:'actividad',  order:2}
+    ]},
+    {group:'Road Trip · 15–19 Sep', order:8, items:[
+      {id:'tr8',  label:'Vuelo Creta → Atenas',               est:76,  tag:'transporte', order:0},
+      {id:'tr17', label:'Safestay Monastiraki II (1 noche)',  est:23,  tag:'hospedaje',  order:1},
+      {id:'tr11', label:'Auto alquiler (4 días)',              est:120, tag:'transporte', order:2},
+      {id:'tr11b',label:'Gasolina road trip (~600 km)',        est:40,  tag:'transporte', order:3},
+      {id:'tr18', label:'Nauplia — hostel (1 noche)',          est:25,  tag:'hospedaje',  order:4},
+      {id:'tr19', label:'Meteora — hostel (1 noche)',          est:25,  tag:'hospedaje',  order:5}
+    ]},
+    {group:'Budapest · 19–22 Sep', order:9, items:[
+      {id:'tr9',  label:'Vuelo Salónica → Budapest',          est:68,  tag:'transporte', order:0},
+      {id:'tr20', label:'The Hive (3 noches)',                est:57,  tag:'hospedaje',  order:1},
+      {id:'tr25', label:'Baños Széchenyi',                    est:20,  tag:'actividad',  order:2},
+      {id:'tr25b',label:'Tour Parlamento Budapest',           est:20,  tag:'actividad',  order:3}
+    ]},
+    {group:'Budapest → Madrid', order:10, items:[
+      {id:'tr10', label:'Vuelo Budapest → Madrid',            est:100, tag:'transporte', order:0}
+    ]}
+  ];
+
+  // ── LOCAL STORAGE ─────────────────────────────────────────
+  function saveTrackerLocal() {
+    try { localStorage.setItem(LS_TRACKER, JSON.stringify(trackerState)); } catch(e) {}
   }
-  function loadLocal() {
-    try { var r = localStorage.getItem(LS_KEY); if (r) trackerState = JSON.parse(r); } catch(e) {}
+  function loadTrackerLocal() {
+    try { var r = localStorage.getItem(LS_TRACKER); if (r) trackerState = JSON.parse(r); } catch(e) {}
   }
+  function saveCatalogLocal() {
+    try { localStorage.setItem(LS_CATALOG, JSON.stringify(catalogItems)); } catch(e) {}
+  }
+  function loadCatalogLocal() {
+    try { var r = localStorage.getItem(LS_CATALOG); if (r) catalogItems = JSON.parse(r); } catch(e) {}
+    if (!catalogItems || !catalogItems.length) catalogItems = defaultsToFlat();
+  }
+
+  function defaultsToFlat() {
+    var flat = [];
+    DEFAULT_GROUPS.forEach(function(g) {
+      g.items.forEach(function(it) {
+        flat.push({
+          id: it.id,
+          group_name: g.group,
+          group_order: g.order,
+          label: it.label,
+          est: it.est,
+          tag: it.tag,
+          item_order: it.order,
+          deleted: false
+        });
+      });
+    });
+    return flat;
+  }
+
+  // ── TOAST ─────────────────────────────────────────────────
   function showToast(msg, isErr) {
     var t = document.getElementById('saveToast');
     if (!t) return;
@@ -150,58 +324,23 @@
     t._tid = setTimeout(function() { t.style.opacity = '0'; }, isErr ? 3500 : 1800);
   }
 
-  var BUDGET_GROUPS = [
-    {group:'Internacionales', items:[
-      {id:'tr1',  label:'Vuelo Bs. As. → Madrid (ida)',       est:500, tag:'transporte'},
-      {id:'tr2',  label:'Vuelo Madrid → Bs. As. (vuelta)',    est:500, tag:'transporte'},
-      {id:'tr26', label:'Seguro de viaje internacional',      est:80,  tag:'otro'}
-    ]},
-    {group:'Madrid → Barcelona', items:[
-      {id:'tr3',  label:'Tren AVE Madrid → Barcelona',        est:53,  tag:'transporte'}
-    ]},
-    {group:'Barcelona · 4–7 Sep', items:[
-      {id:'tr12', label:'BCN Sports Hostel (3 noches)',       est:102, tag:'hospedaje'},
-      {id:'tr22', label:'Sagrada Família',                    est:30,  tag:'actividad'},
-      {id:'tr23', label:'Park Güell (zona monumental)',       est:13,  tag:'actividad'}
-    ]},
-    {group:'Barcelona → Atenas', items:[
-      {id:'tr4',  label:'Vuelo Barcelona → Atenas',           est:76,  tag:'transporte'}
-    ]},
-    {group:'Atenas I · 7–8 Sep', items:[
-      {id:'tr13', label:'Safestay Monastiraki (1 noche)',     est:23,  tag:'hospedaje'},
-      {id:'tr21', label:'Acrópolis de Atenas',                est:20,  tag:'actividad'}
-    ]},
-    {group:'Santorini · 8–10 Sep', items:[
-      {id:'tr5',  label:'Ferry Pireo → Santorini',            est:45,  tag:'transporte'},
-      {id:'tr14', label:'Santorini Camping (2 noches)',       est:52,  tag:'hospedaje'}
-    ]},
-    {group:'Naxos · 10–12 Sep', items:[
-      {id:'tr6',  label:'Ferry Santorini → Naxos',            est:37,  tag:'transporte'},
-      {id:'tr15', label:'Katerina Roza Studios (2 noches)',   est:49,  tag:'hospedaje'}
-    ]},
-    {group:'Creta · 12–15 Sep', items:[
-      {id:'tr7',  label:'Vuelo Naxos → Creta',                est:56,  tag:'transporte'},
-      {id:'tr16', label:'Cocoon City Hostel (3 noches)',      est:87,  tag:'hospedaje'},
-      {id:'tr24', label:'Palacio de Cnosos',                  est:16,  tag:'actividad'}
-    ]},
-    {group:'Road Trip · 15–19 Sep', items:[
-      {id:'tr8',  label:'Vuelo Creta → Atenas',               est:76,  tag:'transporte'},
-      {id:'tr17', label:'Safestay Monastiraki II (1 noche)',  est:23,  tag:'hospedaje'},
-      {id:'tr11', label:'Auto alquiler (4 días)',              est:120, tag:'transporte'},
-      {id:'tr11b',label:'Gasolina road trip (~600 km)',        est:40,  tag:'transporte'},
-      {id:'tr18', label:'Nauplia — hostel (1 noche)',          est:25,  tag:'hospedaje'},
-      {id:'tr19', label:'Meteora — hostel (1 noche)',          est:25,  tag:'hospedaje'}
-    ]},
-    {group:'Budapest · 19–22 Sep', items:[
-      {id:'tr9',  label:'Vuelo Salónica → Budapest',          est:68,  tag:'transporte'},
-      {id:'tr20', label:'The Hive (3 noches)',                est:57,  tag:'hospedaje'},
-      {id:'tr25', label:'Baños Széchenyi',                    est:20,  tag:'actividad'},
-      {id:'tr25b',label:'Tour Parlamento Budapest',           est:20,  tag:'actividad'}
-    ]},
-    {group:'Budapest → Madrid', items:[
-      {id:'tr10', label:'Vuelo Budapest → Madrid',            est:100, tag:'transporte'}
-    ]}
-  ];
+  // ── CATALOG UTILS ─────────────────────────────────────────
+  function getGroups() {
+    // Returns [{group_name, group_order, items:[...]}] sorted
+    var map = {};
+    catalogItems.filter(function(it) { return !it.deleted; }).forEach(function(it) {
+      if (!map[it.group_name]) {
+        map[it.group_name] = {group_name: it.group_name, group_order: it.group_order, items: []};
+      }
+      map[it.group_name].items.push(it);
+    });
+    var groups = Object.values(map);
+    groups.sort(function(a, b) { return a.group_order - b.group_order; });
+    groups.forEach(function(g) {
+      g.items.sort(function(a, b) { return a.item_order - b.item_order; });
+    });
+    return groups;
+  }
 
   function normalizeStatus(s) {
     if (s === 'pagado' || s === 'reservado') return 'reservado';
@@ -214,17 +353,17 @@
   // ── RESUMEN ────────────────────────────────────────────────
   function renderResumen() {
     var yaPagado = 0, aPagarAlla = 0, porReservar = 0, totalEst = 0;
-    BUDGET_GROUPS.forEach(function(g) {
+    getGroups().forEach(function(g) {
       g.items.forEach(function(item) {
-        totalEst += item.est;
+        totalEst += (item.est || 0);
         var s = trackerState[item.id];
         if (s && normalizeStatus(s.status) === 'reservado') {
-          var precio   = s.precio  || item.est;
+          var precio   = s.precio > 0 ? s.precio : item.est;
           var adelanto = s.adelanto || 0;
           yaPagado   += adelanto;
           aPagarAlla += Math.max(0, precio - adelanto);
         } else {
-          var estPrice = (s && s.precio > 0) ? s.precio : item.est;
+          var estPrice = (s && s.precio > 0) ? s.precio : (item.est || 0);
           porReservar += estPrice;
         }
       });
@@ -241,11 +380,35 @@
     var container = document.getElementById('budgetContainer');
     if (!container) return;
     container.innerHTML = '';
-    BUDGET_GROUPS.forEach(function(group) {
+    var groups = getGroups();
+    if (!groups.length) {
+      container.innerHTML = '<p style="color:var(--text-mid);font-size:.82rem;padding:1rem 0">Cargando datos…</p>';
+      return;
+    }
+    groups.forEach(function(group) {
+      // Group header
+      var gh = document.createElement('div');
+      gh.className = 'bg-group-header';
+
       var gt = document.createElement('div');
       gt.className = 'bg-group-title';
-      gt.textContent = group.group;
-      container.appendChild(gt);
+      gt.textContent = group.group_name;
+      gh.appendChild(gt);
+
+      if (catalogEditable) {
+        var addBtn = document.createElement('button');
+        addBtn.className = 'bg-group-add-btn';
+        addBtn.textContent = '+ Ítem';
+        (function(gname, gorder) {
+          addBtn.addEventListener('click', function() {
+            openSheet(null, gname, gorder);
+          });
+        })(group.group_name, group.group_order);
+        gh.appendChild(addBtn);
+      }
+
+      container.appendChild(gh);
+
       group.items.forEach(function(item) {
         container.appendChild(buildItem(item));
       });
@@ -274,7 +437,7 @@
       var ns = isRes ? 'proyectado' : 'reservado';
       trackerState[item.id].status = ns;
       if (ns === 'proyectado') trackerState[item.id].adelanto = 0;
-      if (ns === 'reservado' && !trackerState[item.id].precio) trackerState[item.id].precio = item.est;
+      if (ns === 'reservado' && !(trackerState[item.id].precio)) trackerState[item.id].precio = item.est;
       trkUpsert(item.id);
       renderBudget();
       renderResumen();
@@ -306,6 +469,39 @@
     pw.appendChild(sym); pw.appendChild(pi);
     mainRow.appendChild(pw);
 
+    // ─ edit buttons (shown only in edit mode) ─
+    if (catalogEditable) {
+      var editBtns = document.createElement('div');
+      editBtns.className = 'bi-edit-btns';
+
+      var editBtn = document.createElement('button');
+      editBtn.className = 'bi-btn-icon';
+      editBtn.title = 'Editar';
+      editBtn.textContent = '✏️';
+      (function(it) {
+        editBtn.addEventListener('click', function(e) {
+          e.stopPropagation();
+          openSheet(it, it.group_name, it.group_order);
+        });
+      })(item);
+      editBtns.appendChild(editBtn);
+
+      var delBtn = document.createElement('button');
+      delBtn.className = 'bi-btn-icon del';
+      delBtn.title = 'Eliminar';
+      delBtn.textContent = '×';
+      (function(it) {
+        delBtn.addEventListener('click', function(e) {
+          e.stopPropagation();
+          if (!confirm('¿Eliminar "' + it.label + '"?')) return;
+          deleteItem(it.id);
+        });
+      })(item);
+      editBtns.appendChild(delBtn);
+
+      mainRow.appendChild(editBtns);
+    }
+
     card.appendChild(mainRow);
 
     // ─ detail (only when reservado) ─
@@ -313,7 +509,6 @@
       var detail = document.createElement('div');
       detail.className = 'bi-detail';
 
-      // Split siempre visible al reservar
       var splitWrap = document.createElement('div');
       splitWrap.className = 'bi-split-wrap';
 
@@ -382,8 +577,9 @@
     return card;
   }
 
+  // ── TRACKER UPSERT ─────────────────────────────────────────
   function trkUpsert(id) {
-    saveLocal(); // Guardar localmente de inmediato
+    saveTrackerLocal();
     var s = trackerState[id] || {status:'proyectado',precio:0,adelanto:0,note:'',file_url:'',file_name:''};
     return sb.from('tracker').upsert({
       id:         id,
@@ -397,16 +593,201 @@
       updated_at: new Date().toISOString()
     }).then(function(res) {
       if (res.error) {
-        console.error('Supabase error:', res.error.message, res.error.code);
-        showToast('⚠️ Sin sincronizar — guardado local (' + (res.error.code || res.error.message) + ')', true);
+        showToast('⚠️ Sin sincronizar (' + (res.error.code || res.error.message) + ')', true);
       } else {
         showToast('✓ Guardado', false);
       }
-    }).catch(function(err) {
-      console.error('Red error:', err);
+    }).catch(function() {
       showToast('⚠️ Sin conexión — guardado local', true);
     });
   }
+
+  // ── CATALOG CRUD ───────────────────────────────────────────
+  function saveItemToCatalog(item) {
+    // Update or insert in catalogItems
+    var idx = catalogItems.findIndex(function(it) { return it.id === item.id; });
+    if (idx >= 0) {
+      catalogItems[idx] = item;
+    } else {
+      catalogItems.push(item);
+    }
+    saveCatalogLocal();
+    renderBudget();
+    renderResumen();
+
+    // Upsert to Supabase
+    sb.from('budget_items').upsert({
+      id:          item.id,
+      group_name:  item.group_name,
+      group_order: item.group_order,
+      label:       item.label,
+      est:         item.est,
+      tag:         item.tag,
+      item_order:  item.item_order,
+      deleted:     false,
+      updated_at:  new Date().toISOString()
+    }).then(function(res) {
+      if (res.error) showToast('⚠️ Sin sincronizar (' + (res.error.code || res.error.message) + ')', true);
+      else showToast('✓ Guardado', false);
+    }).catch(function() {
+      showToast('⚠️ Sin conexión — guardado local', true);
+    });
+  }
+
+  function deleteItem(id) {
+    var idx = catalogItems.findIndex(function(it) { return it.id === id; });
+    if (idx >= 0) catalogItems[idx].deleted = true;
+    saveCatalogLocal();
+    renderBudget();
+    renderResumen();
+
+    sb.from('budget_items').upsert({
+      id:         id,
+      deleted:    true,
+      updated_at: new Date().toISOString()
+    }).then(function(res) {
+      if (res.error) showToast('⚠️ Sin sincronizar (' + (res.error.code || res.error.message) + ')', true);
+      else showToast('✓ Eliminado', false);
+    }).catch(function() {
+      showToast('⚠️ Sin conexión — guardado local', true);
+    });
+  }
+
+  // ── EDIT MODE TOGGLE ───────────────────────────────────────
+  var presupuestoSection = document.getElementById('presupuesto');
+  document.getElementById('editToggleBtn').addEventListener('click', function() {
+    editMode = !editMode;
+    this.textContent = editMode ? '✓ Listo' : '✏️ Editar';
+    this.classList.toggle('active', editMode);
+    if (editMode) {
+      presupuestoSection.querySelector('div').classList.add('edit-mode');
+    } else {
+      presupuestoSection.querySelector('div').classList.remove('edit-mode');
+    }
+  });
+
+  document.getElementById('newTramoBtn').addEventListener('click', function() {
+    openSheet(null, null, null, true);
+  });
+
+  // ── BOTTOM SHEET ───────────────────────────────────────────
+  var sheetEditingItem = null;
+
+  function openSheet(item, defaultGroup, defaultGroupOrder, forceNewGroup) {
+    sheetEditingItem = item;
+    var title = document.getElementById('sheetTitle');
+    title.textContent = item ? 'Editar ítem' : 'Nuevo ítem';
+
+    // Populate group select
+    var groupSel = document.getElementById('sheetGroup');
+    groupSel.innerHTML = '';
+    var groups = getGroups();
+    groups.forEach(function(g) {
+      var opt = document.createElement('option');
+      opt.value = g.group_name;
+      opt.textContent = g.group_name;
+      if (defaultGroup && g.group_name === defaultGroup) opt.selected = true;
+      groupSel.appendChild(opt);
+    });
+    var newOpt = document.createElement('option');
+    newOpt.value = '__new__';
+    newOpt.textContent = 'Nuevo tramo…';
+    groupSel.appendChild(newOpt);
+
+    var newGroupInp = document.getElementById('sheetNewGroup');
+
+    if (forceNewGroup) {
+      groupSel.value = '__new__';
+      newGroupInp.style.display = 'block';
+      newGroupInp.value = '';
+    } else {
+      newGroupInp.style.display = 'none';
+      newGroupInp.value = '';
+      if (defaultGroup) groupSel.value = defaultGroup;
+    }
+
+    // Fill fields if editing
+    document.getElementById('sheetLabel').value = item ? item.label : '';
+    document.getElementById('sheetEst').value   = item ? item.est   : '';
+    document.getElementById('sheetTag').value   = item ? item.tag   : 'transporte';
+
+    // Show sheet
+    document.getElementById('sheetOverlay').classList.add('open');
+    document.getElementById('bottomSheet').classList.add('open');
+    setTimeout(function() { document.getElementById('sheetLabel').focus(); }, 350);
+  }
+
+  function closeSheet() {
+    document.getElementById('sheetOverlay').classList.remove('open');
+    document.getElementById('bottomSheet').classList.remove('open');
+    sheetEditingItem = null;
+  }
+
+  document.getElementById('sheetGroup').addEventListener('change', function() {
+    var newGroupInp = document.getElementById('sheetNewGroup');
+    newGroupInp.style.display = this.value === '__new__' ? 'block' : 'none';
+    if (this.value === '__new__') newGroupInp.focus();
+  });
+
+  document.getElementById('sheetOverlay').addEventListener('click', closeSheet);
+  document.getElementById('sheetCancel').addEventListener('click', closeSheet);
+
+  document.getElementById('sheetSave').addEventListener('click', function() {
+    var groupSel    = document.getElementById('sheetGroup');
+    var groupName   = groupSel.value;
+    var groupOrder  = 0;
+    var newGroupInp = document.getElementById('sheetNewGroup');
+    var labelVal    = document.getElementById('sheetLabel').value.trim();
+    var estVal      = parseFloat(document.getElementById('sheetEst').value) || 0;
+    var tagVal      = document.getElementById('sheetTag').value;
+
+    if (groupName === '__new__') {
+      groupName = newGroupInp.value.trim();
+      if (!groupName) { newGroupInp.focus(); return; }
+      // Calculate next group order
+      var groups = getGroups();
+      groupOrder = groups.length > 0 ? (groups[groups.length-1].group_order + 1) : 0;
+    } else {
+      var groups = getGroups();
+      var found = groups.find(function(g) { return g.group_name === groupName; });
+      groupOrder = found ? found.group_order : 0;
+    }
+
+    if (!labelVal) { document.getElementById('sheetLabel').focus(); return; }
+
+    var item;
+    if (sheetEditingItem) {
+      // Edit existing
+      item = {
+        id:          sheetEditingItem.id,
+        group_name:  groupName,
+        group_order: groupOrder,
+        label:       labelVal,
+        est:         estVal,
+        tag:         tagVal,
+        item_order:  sheetEditingItem.item_order,
+        deleted:     false
+      };
+    } else {
+      // New item — compute item_order within group
+      var groups = getGroups();
+      var gFound = groups.find(function(g) { return g.group_name === groupName; });
+      var nextOrder = gFound ? gFound.items.length : 0;
+      item = {
+        id:          'ci_' + Date.now(),
+        group_name:  groupName,
+        group_order: groupOrder,
+        label:       labelVal,
+        est:         estVal,
+        tag:         tagVal,
+        item_order:  nextOrder,
+        deleted:     false
+      };
+    }
+
+    saveItemToCatalog(item);
+    closeSheet();
+  });
 
   // ── BLUR / INPUT EVENTS ────────────────────────────────────
   document.addEventListener('blur', function(e) {
@@ -444,27 +825,58 @@
         renderBudget(); renderResumen();
       }
     })
+    .on('postgres_changes', {event:'*', schema:'public', table:'budget_items'}, function(p) {
+      if (!p.new) return;
+      var r = p.new;
+      var idx = catalogItems.findIndex(function(it) { return it.id === r.id; });
+      var item = {
+        id:          r.id,
+        group_name:  r.group_name,
+        group_order: r.group_order,
+        label:       r.label,
+        est:         r.est,
+        tag:         r.tag,
+        item_order:  r.item_order,
+        deleted:     r.deleted
+      };
+      if (idx >= 0) { catalogItems[idx] = item; } else { catalogItems.push(item); }
+      saveCatalogLocal();
+      renderBudget();
+      renderResumen();
+    })
     .subscribe();
 
-  // ── INIT ──────────────────────────────────────────────────
-  // 1) Mostrar datos locales de inmediato (sin esperar red)
-  loadLocal();
-  if (Object.keys(trackerState).length > 0) {
-    renderBudget();
-    renderResumen();
-  } else {
-    var bc = document.getElementById('budgetContainer');
-    if (bc) bc.innerHTML = '<p style="color:var(--text-mid);font-size:.82rem;padding:1rem 0">Cargando datos…</p>';
+  // ── SEED budget_items ──────────────────────────────────────
+  function seedBudgetItems() {
+    var rows = defaultsToFlat().map(function(it) {
+      return {
+        id:          it.id,
+        group_name:  it.group_name,
+        group_order: it.group_order,
+        label:       it.label,
+        est:         it.est,
+        tag:         it.tag,
+        item_order:  it.item_order,
+        deleted:     false,
+        updated_at:  new Date().toISOString()
+      };
+    });
+    sb.from('budget_items').upsert(rows).then(function(res) {
+      if (res.error) console.error('Seed error:', res.error);
+    });
   }
 
-  // 2) Sincronizar con Supabase y actualizar
+  // ── INIT ──────────────────────────────────────────────────
+  // 1) Load from localStorage immediately
+  loadTrackerLocal();
+  loadCatalogLocal();
+  renderBudget();
+  renderResumen();
+
+  // 2) Sync tracker from Supabase
   sb.from('tracker').select('*').then(function(r) {
     if (r.error) {
-      console.error('Error cargando tracker:', r.error.message, r.error.code);
-      if (Object.keys(trackerState).length === 0) {
-        var bc = document.getElementById('budgetContainer');
-        if (bc) bc.innerHTML = '<p style="color:#fca5a5;font-size:.82rem;padding:1rem 0">Error al conectar con Supabase: ' + r.error.message + '</p>';
-      }
+      console.error('Error cargando tracker:', r.error.message);
       return;
     }
     (r.data || []).forEach(function(row) {
@@ -477,16 +889,53 @@
         file_name: row.file_name || ''
       };
     });
-    saveLocal(); // Actualizar caché local con datos del servidor
+    saveTrackerLocal();
+    renderBudget();
+    renderResumen();
+  }).catch(function(err) { console.error('Red error tracker:', err); });
+
+  // 3) Sync budget_items catalog from Supabase
+  sb.from('budget_items').select('*').then(function(r) {
+    if (r.error) {
+      // Table might not exist yet — use hardcoded fallback
+      console.warn('budget_items table error:', r.error.message, r.error.code);
+      catalogEditable = false;
+      var editBtn = document.getElementById('editToggleBtn');
+      if (editBtn) editBtn.style.display = 'none';
+      return;
+    }
+    var rows = (r.data || []).filter(function(row) { return !row.deleted; });
+    if (rows.length === 0) {
+      // First time — seed from defaults
+      catalogItems = defaultsToFlat();
+      saveCatalogLocal();
+      seedBudgetItems();
+    } else {
+      // Map all rows (including deleted) for proper state
+      catalogItems = (r.data || []).map(function(row) {
+        return {
+          id:          row.id,
+          group_name:  row.group_name,
+          group_order: row.group_order,
+          label:       row.label,
+          est:         row.est,
+          tag:         row.tag,
+          item_order:  row.item_order,
+          deleted:     row.deleted
+        };
+      });
+      saveCatalogLocal();
+    }
     renderBudget();
     renderResumen();
   }).catch(function(err) {
-    console.error('Error de red:', err);
-    if (Object.keys(trackerState).length === 0) {
-      var bc = document.getElementById('budgetContainer');
-      if (bc) bc.innerHTML = '<p style="color:#fca5a5;font-size:.82rem;padding:1rem 0">Sin conexión. Los datos locales se muestran si existen.</p>';
-    }
+    console.error('Red error budget_items:', err);
+    // Use cached/hardcoded catalog
+    catalogEditable = false;
+    var editBtn = document.getElementById('editToggleBtn');
+    if (editBtn) editBtn.style.display = 'none';
   });
+
 })();
 </script>
 </body>

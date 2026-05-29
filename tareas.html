@@ -12,10 +12,13 @@
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,300;1,400&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
 <style>
+/* ── PERSON TABS ──────────────────────── */
 .person-tabs{display:flex;gap:.5rem;margin:1.25rem 0 .75rem;}
 .person-tab{font-family:Outfit,sans-serif;font-size:.82rem;font-weight:600;padding:.5rem 1.4rem;border-radius:20px;border:2px solid rgba(13,27,42,.12);background:transparent;color:var(--text-mid);cursor:pointer;transition:all .15s;-webkit-tap-highlight-color:transparent;}
 .person-tab.active{background:var(--navy);color:#fff;border-color:var(--navy);}
 .person-progress{font-family:Outfit,sans-serif;font-size:.75rem;color:var(--text-mid);margin-bottom:1.25rem;}
+
+/* ── CUSTOM ADD ROW ───────────────────── */
 .pack-add-row{display:flex;gap:.5rem;align-items:center;margin-top:1.5rem;}
 .pack-add-inp{flex:1;border:1px solid rgba(13,27,42,.15);border-radius:8px;padding:.4rem .75rem;font-family:Outfit,sans-serif;font-size:.78rem;color:var(--navy);background:#fff;}
 .pack-add-inp:focus{outline:none;border-color:var(--gold);}
@@ -26,14 +29,129 @@
 .pack-del{background:none;border:none;font-size:.75rem;color:rgba(13,27,42,.2);cursor:pointer;padding:0 .25rem;line-height:1;flex-shrink:0;margin-left:auto;-webkit-tap-highlight-color:transparent;}
 .pack-del:hover{color:#ef4444;}
 .pack-reset-row{margin-top:2rem;}
+
+/* ── SECTION HEADER ROW ───────────────── */
+.section-header-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:.5rem;}
+.edit-toggle-btn{font-family:Outfit,sans-serif;font-size:.72rem;font-weight:600;color:var(--text-mid);background:rgba(13,27,42,.06);border:1px solid rgba(13,27,42,.12);border-radius:20px;padding:.35rem .85rem;cursor:pointer;-webkit-tap-highlight-color:transparent;transition:all .15s;white-space:nowrap;flex-shrink:0;}
+.edit-toggle-btn:hover{border-color:var(--gold);color:var(--gold);}
+.edit-toggle-btn.active{background:var(--navy);color:#fff;border-color:var(--navy);}
+
+/* ── TASK EDIT BUTTONS ────────────────── */
+.task-edit-btns{display:none;align-items:center;gap:.3rem;flex-shrink:0;margin-left:auto;}
+.task-edit-mode .task-edit-btns{display:flex;}
+.ti-btn{font-family:Outfit,sans-serif;font-size:.7rem;background:none;border:1px solid rgba(13,27,42,.15);border-radius:6px;width:24px;height:24px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--text-mid);-webkit-tap-highlight-color:transparent;transition:all .15s;padding:0;flex-shrink:0;}
+.ti-btn:hover{border-color:var(--gold);color:var(--gold);}
+.ti-btn.del:hover{border-color:#ef4444;color:#ef4444;}
+
+/* ── GROUP ADD BUTTON ─────────────────── */
+.task-group-add-btn{display:none;font-family:Outfit,sans-serif;font-size:.63rem;font-weight:600;color:var(--gold);background:none;border:1px dashed rgba(201,151,58,.5);border-radius:20px;padding:.18rem .55rem;cursor:pointer;-webkit-tap-highlight-color:transparent;transition:all .15s;white-space:nowrap;}
+.task-group-add-btn:hover{background:rgba(201,151,58,.07);}
+.task-edit-mode .task-group-add-btn{display:inline-flex;}
+
+/* ── NEW GROUP BUTTON ─────────────────── */
+.new-group-btn{display:none;font-family:Outfit,sans-serif;font-size:.75rem;font-weight:600;color:var(--gold);background:none;border:1.5px dashed rgba(201,151,58,.5);border-radius:12px;padding:.6rem 1.2rem;cursor:pointer;width:100%;margin-top:1.25rem;-webkit-tap-highlight-color:transparent;transition:all .15s;}
+.new-group-btn:hover{background:rgba(201,151,58,.07);}
+.task-edit-mode .new-group-btn{display:block;}
+
+/* ── PACK EDIT BUTTONS ────────────────── */
+.pack-edit-btns{display:none;align-items:center;gap:.3rem;flex-shrink:0;margin-left:.25rem;}
+.pack-edit-mode .pack-edit-btns{display:flex;}
+.pack-edit-mode .pack-del{display:none;}/* hide individual del btn in edit mode — use edit-btns instead */
+.pi-btn{font-family:Outfit,sans-serif;font-size:.7rem;background:none;border:1px solid rgba(13,27,42,.15);border-radius:6px;width:22px;height:22px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--text-mid);-webkit-tap-highlight-color:transparent;transition:all .15s;padding:0;flex-shrink:0;}
+.pi-btn:hover{border-color:var(--gold);color:var(--gold);}
+.pi-btn.del:hover{border-color:#ef4444;color:#ef4444;}
+
+/* ── PACK CAT ADD BUTTON ──────────────── */
+.pack-cat-add-btn{display:none;font-family:Outfit,sans-serif;font-size:.63rem;font-weight:600;color:var(--gold);background:none;border:1px dashed rgba(201,151,58,.5);border-radius:20px;padding:.2rem .6rem;cursor:pointer;white-space:nowrap;-webkit-tap-highlight-color:transparent;transition:all .15s;margin-top:.5rem;}
+.pack-cat-add-btn:hover{background:rgba(201,151,58,.07);}
+.pack-edit-mode .pack-cat-add-btn{display:block;}
+
+/* ── PACK ITEM LAYOUT ─────────────────── */
+.pack-item{display:flex;align-items:center;gap:.6rem;padding:.3rem 0;border-bottom:1px solid var(--cream-dark);cursor:pointer;}
+.pack-item:last-child{border-bottom:none;}
+.pack-item .pcb{width:16px;height:16px;border-radius:3px;border:2px solid #d1d5db;flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:all .2s;background:white;}
+.pack-item .pcb.done{background:var(--gold);border-color:var(--gold);}
+.pack-item .pcb.done::after{content:'✓';color:white;font-size:9px;font-weight:700;}
+.pack-item span{font-size:.77rem;color:var(--text);transition:all .2s;flex:1;}
+.pack-item span.done{text-decoration:line-through;color:var(--text-mid);}
+.pack-item span .must{font-size:.6rem;background:#fef3c7;color:#92400e;padding:.1rem .3rem;border-radius:4px;margin-left:.3rem;}
+.pack-item.hidden-item{opacity:.4;}
+
+/* ── TOAST ─────────────────────────────── */
 .save-toast{position:fixed;bottom:calc(5rem + env(safe-area-inset-bottom,0));left:50%;transform:translateX(-50%);font-family:Outfit,sans-serif;font-size:.75rem;font-weight:600;padding:.45rem 1.2rem;border-radius:20px;opacity:0;transition:opacity .25s;z-index:9999;pointer-events:none;white-space:nowrap;}
 .save-toast.ok{background:rgba(74,222,128,.92);color:#14532d;}
 .save-toast.err{background:rgba(239,68,68,.92);color:#fff;}
+
+/* ── BOTTOM SHEET ──────────────────────── */
+.sheet-overlay{position:fixed;inset:0;background:rgba(0,0,0,0);z-index:1000;pointer-events:none;transition:background .25s;}
+.sheet-overlay.open{background:rgba(0,0,0,.45);pointer-events:all;}
+.bottom-sheet{position:fixed;bottom:0;left:0;right:0;background:#fff;border-radius:20px 20px 0 0;padding:1.5rem 1.5rem calc(1.5rem + env(safe-area-inset-bottom,0));z-index:1001;transform:translateY(100%);transition:transform .3s cubic-bezier(.32,.72,0,1);max-height:90vh;overflow-y:auto;}
+.bottom-sheet.open{transform:translateY(0);}
+.sheet-handle{width:40px;height:4px;background:rgba(13,27,42,.12);border-radius:2px;margin:0 auto 1.25rem;}
+.sheet-title{font-family:'Cormorant Garamond',serif;font-size:1.4rem;font-weight:400;color:var(--navy);margin-bottom:1.25rem;}
+.sheet-field{margin-bottom:1rem;}
+.sheet-label{font-family:Outfit,sans-serif;font-size:.68rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--text-mid);display:block;margin-bottom:.4rem;}
+.sheet-input,.sheet-select{width:100%;border:1.5px solid rgba(13,27,42,.15);border-radius:10px;padding:.55rem .8rem;font-family:Outfit,sans-serif;font-size:.85rem;color:var(--navy);background:#fff;appearance:none;-webkit-appearance:none;}
+.sheet-input:focus,.sheet-select:focus{outline:none;border-color:var(--gold);}
+.sheet-new-group-inp{display:none;margin-top:.5rem;}
+.sheet-check-row{display:flex;align-items:center;gap:.65rem;margin-top:.25rem;}
+.sheet-check-row input{width:16px;height:16px;accent-color:var(--gold);}
+.sheet-check-row label{font-family:Outfit,sans-serif;font-size:.82rem;color:var(--text);}
+.sheet-btns{display:flex;gap:.75rem;margin-top:1.5rem;}
+.sheet-save-btn{flex:1;background:var(--navy);color:#fff;font-family:Outfit,sans-serif;font-size:.82rem;font-weight:600;border:none;border-radius:12px;padding:.8rem;cursor:pointer;-webkit-tap-highlight-color:transparent;transition:background .15s;}
+.sheet-save-btn:hover{background:#1a2f47;}
+.sheet-cancel-btn{background:rgba(13,27,42,.07);color:var(--text-mid);font-family:Outfit,sans-serif;font-size:.82rem;font-weight:600;border:none;border-radius:12px;padding:.8rem 1.25rem;cursor:pointer;-webkit-tap-highlight-color:transparent;transition:background .15s;}
+.sheet-cancel-btn:hover{background:rgba(13,27,42,.12);}
 </style>
 </head>
 <body>
 
+<!-- ── SHARED BOTTOM SHEET (tasks + packing) ── -->
+<div class="sheet-overlay" id="sheetOverlay"></div>
+<div class="bottom-sheet" id="bottomSheet">
+  <div class="sheet-handle"></div>
+  <div class="sheet-title" id="sheetTitle">Nuevo ítem</div>
+
+  <!-- Task fields -->
+  <div id="sheetTaskFields">
+    <div class="sheet-field">
+      <label class="sheet-label">Grupo</label>
+      <select class="sheet-select" id="sheetTaskGroup"></select>
+      <input class="sheet-input sheet-new-group-inp" id="sheetTaskNewGroup" placeholder="Nombre del nuevo grupo…" type="text">
+    </div>
+    <div class="sheet-field">
+      <label class="sheet-label">Tarea</label>
+      <input class="sheet-input" id="sheetTaskLabel" placeholder="Descripción de la tarea…" type="text">
+    </div>
+  </div>
+
+  <!-- Packing fields -->
+  <div id="sheetPackFields" style="display:none">
+    <div class="sheet-field">
+      <label class="sheet-label">Categoría</label>
+      <select class="sheet-select" id="sheetPackCat"></select>
+    </div>
+    <div class="sheet-field">
+      <label class="sheet-label">Descripción</label>
+      <input class="sheet-input" id="sheetPackLabel" placeholder="Descripción del ítem…" type="text">
+    </div>
+    <div class="sheet-field">
+      <label class="sheet-label">Prioridad</label>
+      <div class="sheet-check-row">
+        <input type="checkbox" id="sheetPackMust">
+        <label for="sheetPackMust">¿Imprescindible?</label>
+      </div>
+    </div>
+  </div>
+
+  <div class="sheet-btns">
+    <button class="sheet-save-btn" id="sheetSave">Guardar</button>
+    <button class="sheet-cancel-btn" id="sheetCancel">Cancelar</button>
+  </div>
+</div>
+
 <div class="save-toast" id="saveToast"></div>
+
 <div class="city-header">
   <div style="display:flex;justify-content:space-between;align-items:flex-start">
     <a class="city-back" href="home.html">← Inicio</a>
@@ -46,16 +164,27 @@
 <section style="background:var(--cream);padding:2.5rem 1.25rem;padding-bottom:calc(6rem + env(safe-area-inset-bottom,0))" id="tareas">
 <div style="max-width:700px;margin:0 auto">
 
-  <!-- ── TAREAS (compartidas) ── -->
-  <p class="section-eyebrow" style="color:var(--gold)">Logística</p>
-  <h2 style="font-family:'Cormorant Garamond',serif;font-size:clamp(1.6rem,4vw,2.5rem);font-weight:400;margin-bottom:.35rem">Tareas</h2>
+  <!-- ── TAREAS ── -->
+  <div class="section-header-row" style="margin-bottom:.25rem">
+    <div>
+      <p class="section-eyebrow" style="color:var(--gold);margin-bottom:.2rem">Logística</p>
+      <h2 style="font-family:'Cormorant Garamond',serif;font-size:clamp(1.6rem,4vw,2.5rem);font-weight:400">Tareas</h2>
+    </div>
+    <button class="edit-toggle-btn" id="taskEditToggle">✏️ Editar</button>
+  </div>
   <p id="tasksSummary" style="font-size:.8rem;color:var(--text-mid);margin-bottom:1.5rem"></p>
   <div class="tasks-grid" id="tasksGrid"></div>
-  <button class="tasks-reset" id="tasksReset">↺ Desmarcar tareas</button>
+  <button class="new-group-btn" id="newTaskGroupBtn">＋ Nuevo grupo</button>
+  <button class="tasks-reset" id="tasksReset" style="margin-top:1.5rem">↺ Desmarcar tareas</button>
 
-  <!-- ── EQUIPAJE (por persona) ── -->
-  <h2 style="font-family:'Cormorant Garamond',serif;font-size:clamp(1.6rem,4vw,2.5rem);font-weight:400;margin:3rem 0 .2rem">Equipaje</h2>
-  <p style="color:var(--text-mid);font-size:.8rem;margin-bottom:.2rem">Mochila 30-35L · Carry-on only · Lavado cada 3-4 días</p>
+  <!-- ── EQUIPAJE ── -->
+  <div class="section-header-row" style="margin-top:3rem;margin-bottom:.2rem">
+    <div>
+      <h2 style="font-family:'Cormorant Garamond',serif;font-size:clamp(1.6rem,4vw,2.5rem);font-weight:400">Equipaje</h2>
+      <p style="color:var(--text-mid);font-size:.8rem;margin-top:.15rem">Mochila 30-35L · Carry-on only · Lavado cada 3-4 días</p>
+    </div>
+    <button class="edit-toggle-btn" id="packEditToggle">✏️ Editar cat.</button>
+  </div>
 
   <div class="person-tabs" id="personTabs">
     <button class="person-tab" data-person="tecla">Tecla</button>
@@ -85,163 +214,440 @@
 <footer class="site-footer"><p>Europa 2026 · <span>Septiembre</span> · Madrid · Barcelona · Grecia · Budapest</p></footer>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="shared.js"></script>
 <script>
 (function() {
   var SB_URL = 'https://adzmnnmubbharcprjkhs.supabase.co';
   var SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFkem1ubm11YmJoYXJjcHJqa2hzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg5MzI3MjcsImV4cCI6MjA5NDUwODcyN30.K_TdCUgIo23aqc0wCQBJI7BMWDTT6PND89n7x_MU6-A';
   var sb = supabase.createClient(SB_URL, SB_KEY);
 
-  var tasksState = {};
+  var tasksState   = {};
+  var taskCatalog  = []; // flat [{id, group_name, group_order, label, item_order, deleted}]
+  var sharedPack   = {}; // {itemId: {done, custom_label, cat, deleted}} — person='_shared'
+  var packPersonState = {}; // {personId: {itemId: {done, custom_label}}}
+
+  var taskEditMode = false;
+  var packEditMode = false;
+  var taskCatalogEditable = true;
+
   var PERSONS = [
     {id:'tecla', label:'Tecla'},
     {id:'tano',  label:'Tano'},
     {id:'cubo',  label:'Cubo'}
   ];
   var activePerson = localStorage.getItem('activePerson') || 'tecla';
-  var packPersonState = {}; // {personId: {itemId: {done, custom_label}}}
-  PERSONS.forEach(function(p) { packPersonState[p.id] = {}; });
 
-  var LS_TASKS = 'europa2026_tasks_v1';
-  var LS_PACK  = 'europa2026_packing_v1';
+  var LS_TASKS    = 'europa2026_tasks_v1';
+  var LS_CATALOG  = 'europa2026_task_catalog_v1';
+  var LS_PACK     = 'europa2026_packing_v1';
 
-  function saveTasksLocal() { try { localStorage.setItem(LS_TASKS, JSON.stringify(tasksState)); } catch(e) {} }
-  function loadTasksLocal()  { try { var r=localStorage.getItem(LS_TASKS); if(r) tasksState=JSON.parse(r); } catch(e) {} }
-  function savePackLocal()   { try { localStorage.setItem(LS_PACK, JSON.stringify(packPersonState)); } catch(e) {} }
-  function loadPackLocal()   {
-    try {
-      var r=localStorage.getItem(LS_PACK);
-      if(r) {
-        var parsed=JSON.parse(r);
-        PERSONS.forEach(function(p) { packPersonState[p.id] = parsed[p.id] || {}; });
-      }
-    } catch(e) {}
-  }
-  function showToast(msg, isErr) {
-    var t=document.getElementById('saveToast');
-    if(!t) return;
-    t.textContent=msg;
-    t.className='save-toast '+(isErr?'err':'ok');
-    t.style.opacity='1';
-    clearTimeout(t._tid);
-    t._tid=setTimeout(function(){t.style.opacity='0';}, isErr?3500:1800);
-  }
-
-  // ── TASKS ──────────────────────────────────────────────────
-  var TASKS = [
-    {group:'Logística & Confirmaciones', items:[
-      {id:'g1', t:'Reservar excursión Balos o Elafonisi (Creta)'},
-      {id:'g2', t:'Planear traslados en Santorini (ATV o bus)'},
-      {id:'g3', t:'Confirmar horarios ferrys entre islas'},
-      {id:'r1', t:'Confirmar auto: retiro ATH, devolución SKG'}
+  // ── DEFAULT TASKS ─────────────────────────────────────────
+  var DEFAULT_TASKS = [
+    {group:'Logística & Confirmaciones', order:0, items:[
+      {id:'g1', label:'Reservar excursión Balos o Elafonisi (Creta)', order:0},
+      {id:'g2', label:'Planear traslados en Santorini (ATV o bus)', order:1},
+      {id:'g3', label:'Confirmar horarios ferrys entre islas', order:2},
+      {id:'r1', label:'Confirmar auto: retiro ATH, devolución SKG', order:3}
     ]},
-    {group:'Documentación & Preparación', items:[
-      {id:'d2', t:'Verificar pasaportes vigentes (mín. 6 meses desde vuelta)'},
-      {id:'d3', t:'Descargar Google Maps offline por zona'},
-      {id:'d4', t:'Conseguir SIM europea o eSIM activada antes'},
-      {id:'d5', t:'Confirmar que seguro auto incluye Grecia'}
+    {group:'Documentación & Preparación', order:1, items:[
+      {id:'d2', label:'Verificar pasaportes vigentes (mín. 6 meses desde vuelta)', order:0},
+      {id:'d3', label:'Descargar Google Maps offline por zona', order:1},
+      {id:'d4', label:'Conseguir SIM europea o eSIM activada antes', order:2},
+      {id:'d5', label:'Confirmar que seguro auto incluye Grecia', order:3}
     ]}
   ];
 
+  // ── DEFAULT PACKS ─────────────────────────────────────────
+  var DEFAULT_PACKS = [
+    {cat:'Ropa (7 días, lavado en hostels)', catOrder:0, items:[
+      {id:'pk_p1', t:'5 remeras livianas de secado rápido', must:true, order:0},
+      {id:'pk_p2', t:'2 pantalones/shorts livianos', must:true, order:1},
+      {id:'pk_p3', t:'1 pantalón largo (templos, noches Budapest)', must:true, order:2},
+      {id:'pk_p4', t:'Campera impermeable y liviana', must:true, order:3},
+      {id:'pk_p5', t:'2 trajes de baño (secado rápido)', must:true, order:4},
+      {id:'pk_p6', t:'7 mudas de ropa interior de microfibra', must:true, order:5},
+      {id:'pk_p7', t:'5 pares de medias', order:6}
+    ]},
+    {cat:'Calzado — máximo 2 pares', catOrder:1, items:[
+      {id:'pk_s1', t:'Zapatillas cómodas todo terreno', must:true, order:0},
+      {id:'pk_s2', t:'Ojotas/sandalia plana (playa + Santorini)', must:true, order:1}
+    ]},
+    {cat:'Higiene — líquidos 100ml en bolsa ZIP', catOrder:2, items:[
+      {id:'pk_hy1', t:'Shampoo sólido', must:true, order:0},
+      {id:'pk_hy2', t:'Jabón sólido o pastilla', order:1},
+      {id:'pk_hy3', t:'Desodorante sólido (no aerosol)', order:2},
+      {id:'pk_hy4', t:'Pasta dental + cepillo viaje', order:3},
+      {id:'pk_hy5', t:'Protector solar FPS 50+ (100ml)', must:true, order:4}
+    ]},
+    {cat:'Playa y Sol', catOrder:3, items:[
+      {id:'pk_b1', t:'Gafas de sol', must:true, order:0},
+      {id:'pk_b2', t:'Gorra o sombrero plegable', must:true, order:1},
+      {id:'pk_b3', t:'Toalla de microfibra ultra fina', must:true, order:2},
+      {id:'pk_b4', t:'Bolsa seca impermeable (ferrys)', order:3}
+    ]},
+    {cat:'Tecnología', catOrder:4, items:[
+      {id:'pk_t1', t:'Adaptador europeo tipo F (Schuko)', must:true, order:0},
+      {id:'pk_t2', t:'Cargador multipuerto USB-C', must:true, order:1},
+      {id:'pk_t3', t:'Power bank 10.000mAh (límite cabina)', must:true, order:2},
+      {id:'pk_t4', t:'Auriculares', order:3},
+      {id:'pk_t5', t:'SIM europea o eSIM activada antes', must:true, order:4}
+    ]},
+    {cat:'Farmacia básica', catOrder:5, items:[
+      {id:'pk_h1', t:'Seguro de viaje activo en el celular', must:true, order:0},
+      {id:'pk_h2', t:'Ibuprofeno 400mg x10', order:1},
+      {id:'pk_h3', t:'Antihistamínico', order:2},
+      {id:'pk_h4', t:'Pastillas para mareo (ferrys)', must:true, order:3},
+      {id:'pk_h5', t:'Antidiarreico + suero oral', order:4},
+      {id:'pk_h6', t:'Curitas surtidas', order:5}
+    ]},
+    {cat:'Documentos y dinero', catOrder:6, items:[
+      {id:'pk_d1', t:'Pasaporte vigente (mín. 6 meses desde vuelta)', must:true, order:0},
+      {id:'pk_d2', t:'Foto del pasaporte en la nube + copia física', must:true, order:1},
+      {id:'pk_d3', t:'Tarjeta Wise/Revolut sin comisión', must:true, order:2},
+      {id:'pk_d4', t:'Efectivo: 150 EUR para mercados', order:3},
+      {id:'pk_d5', t:'Reservas descargadas offline', must:true, order:4},
+      {id:'pk_d6', t:'Candado con combinación (hostel)', must:true, order:5}
+    ]},
+    {cat:'La mochila', catOrder:7, items:[
+      {id:'pk_m1', t:'Mochila 30-35L (cabe en cabina)', must:true, order:0},
+      {id:'pk_m2', t:'Organizadores tipo packing cubes', order:1},
+      {id:'pk_m3', t:'Candado TSA exterior', order:2},
+      {id:'pk_m4', t:'Botella de agua colapsable 500ml', must:true, order:3}
+    ]}
+  ];
+
+  // ── LOCAL STORAGE ─────────────────────────────────────────
+  function saveTasksLocal()    { try { localStorage.setItem(LS_TASKS, JSON.stringify(tasksState)); } catch(e) {} }
+  function loadTasksLocal()    { try { var r=localStorage.getItem(LS_TASKS); if(r) tasksState=JSON.parse(r); } catch(e) {} }
+  function saveCatalogLocal()  { try { localStorage.setItem(LS_CATALOG, JSON.stringify(taskCatalog)); } catch(e) {} }
+  function loadCatalogLocal()  {
+    try { var r=localStorage.getItem(LS_CATALOG); if(r) taskCatalog=JSON.parse(r); } catch(e) {}
+    if (!taskCatalog || !taskCatalog.length) taskCatalog = defaultTasksToFlat();
+  }
+  function savePackLocal() {
+    try {
+      var save = {persons: packPersonState, shared: sharedPack};
+      localStorage.setItem(LS_PACK, JSON.stringify(save));
+    } catch(e) {}
+  }
+  function loadPackLocal() {
+    try {
+      var r = localStorage.getItem(LS_PACK);
+      if (r) {
+        var parsed = JSON.parse(r);
+        // Support old format (just person state object)
+        if (parsed.persons) {
+          PERSONS.forEach(function(p) { packPersonState[p.id] = parsed.persons[p.id] || {}; });
+          sharedPack = parsed.shared || {};
+        } else {
+          PERSONS.forEach(function(p) { packPersonState[p.id] = parsed[p.id] || {}; });
+        }
+        return;
+      }
+    } catch(e) {}
+    PERSONS.forEach(function(p) { packPersonState[p.id] = {}; });
+    sharedPack = {};
+  }
+
+  function defaultTasksToFlat() {
+    var flat = [];
+    DEFAULT_TASKS.forEach(function(g) {
+      g.items.forEach(function(it) {
+        flat.push({
+          id:          it.id,
+          group_name:  g.group,
+          group_order: g.order,
+          label:       it.label,
+          item_order:  it.order,
+          deleted:     false
+        });
+      });
+    });
+    return flat;
+  }
+
+  // ── TOAST ─────────────────────────────────────────────────
+  function showToast(msg, isErr) {
+    var t = document.getElementById('saveToast');
+    if (!t) return;
+    t.textContent = msg;
+    t.className = 'save-toast ' + (isErr ? 'err' : 'ok');
+    t.style.opacity = '1';
+    clearTimeout(t._tid);
+    t._tid = setTimeout(function() { t.style.opacity = '0'; }, isErr ? 3500 : 1800);
+  }
+
+  // ── TASK CATALOG UTILS ────────────────────────────────────
+  function getTaskGroups() {
+    var map = {};
+    taskCatalog.filter(function(it) { return !it.deleted; }).forEach(function(it) {
+      if (!map[it.group_name]) {
+        map[it.group_name] = {group_name:it.group_name, group_order:it.group_order, items:[]};
+      }
+      map[it.group_name].items.push(it);
+    });
+    var groups = Object.values(map);
+    groups.sort(function(a,b) { return a.group_order - b.group_order; });
+    groups.forEach(function(g) { g.items.sort(function(a,b) { return a.item_order - b.item_order; }); });
+    return groups;
+  }
+
+  // ── RENDER TASKS ──────────────────────────────────────────
   function renderTasks() {
     var grid = document.getElementById('tasksGrid');
     if (!grid) return;
     grid.innerHTML = '';
+    var groups = getTaskGroups();
     var total = 0, done = 0;
-    TASKS.forEach(function(group) {
+    var container = document.getElementById('tareas').querySelector('div');
+
+    groups.forEach(function(group) {
       var dG = group.items.filter(function(it) { return tasksState[it.id]; }).length;
       total += group.items.length; done += dG;
-      var div = document.createElement('div'); div.className = 'task-group';
-      var title = document.createElement('div'); title.className = 'task-group-title';
-      title.innerHTML = group.group + '<span class="task-progress">' + dG + '/' + group.items.length + '</span>';
-      div.appendChild(title);
+
+      var div = document.createElement('div');
+      div.className = 'task-group';
+      if (taskEditMode) div.classList.add('task-edit-mode');
+
+      var titleRow = document.createElement('div');
+      titleRow.className = 'task-group-title';
+
+      var titleText = document.createElement('span');
+      titleText.textContent = group.group_name;
+      titleRow.appendChild(titleText);
+
+      var prog = document.createElement('span');
+      prog.className = 'task-progress';
+      prog.textContent = dG + '/' + group.items.length;
+      titleRow.appendChild(prog);
+
+      if (taskCatalogEditable) {
+        var addBtn = document.createElement('button');
+        addBtn.className = 'task-group-add-btn';
+        addBtn.textContent = '+ Tarea';
+        (function(gname, gorder) {
+          addBtn.addEventListener('click', function(e) {
+            e.stopPropagation();
+            openTaskSheet(null, gname, gorder);
+          });
+        })(group.group_name, group.group_order);
+        titleRow.appendChild(addBtn);
+      }
+
+      div.appendChild(titleRow);
+
       group.items.forEach(function(it) {
         var d = !!tasksState[it.id];
-        var el = document.createElement('div'); el.className = 'task-item';
-        var cb = document.createElement('div'); cb.className = 'task-cb' + (d ? ' done' : '');
-        var lbl = document.createElement('span'); lbl.className = 'task-label' + (d ? ' done' : ''); lbl.textContent = it.t;
-        el.appendChild(cb); el.appendChild(lbl);
-        el.addEventListener('click', function() {
+        var el = document.createElement('div');
+        el.className = 'task-item';
+
+        var cb = document.createElement('div');
+        cb.className = 'task-cb' + (d ? ' done' : '');
+
+        var lbl = document.createElement('span');
+        lbl.className = 'task-label' + (d ? ' done' : '');
+        lbl.textContent = it.label;
+
+        el.appendChild(cb);
+        el.appendChild(lbl);
+
+        if (taskCatalogEditable) {
+          var editBtns = document.createElement('div');
+          editBtns.className = 'task-edit-btns';
+
+          var editBtn = document.createElement('button');
+          editBtn.className = 'ti-btn';
+          editBtn.textContent = '✏️';
+          editBtn.title = 'Editar';
+          (function(item) {
+            editBtn.addEventListener('click', function(e) {
+              e.stopPropagation();
+              openTaskSheet(item, item.group_name, item.group_order);
+            });
+          })(it);
+          editBtns.appendChild(editBtn);
+
+          var delBtn = document.createElement('button');
+          delBtn.className = 'ti-btn del';
+          delBtn.textContent = '×';
+          delBtn.title = 'Eliminar';
+          (function(item) {
+            delBtn.addEventListener('click', function(e) {
+              e.stopPropagation();
+              if (!confirm('¿Eliminar "' + item.label + '"?')) return;
+              deleteTaskItem(item.id);
+            });
+          })(it);
+          editBtns.appendChild(delBtn);
+
+          el.appendChild(editBtns);
+        }
+
+        el.addEventListener('click', function(e) {
+          if (e.target.closest('.task-edit-btns')) return;
           tasksState[it.id] = !tasksState[it.id];
           saveTasksLocal();
           renderTasks();
           sb.from('tasks').upsert({id:it.id, done:!!tasksState[it.id], updated_at:new Date().toISOString()})
             .then(function(res){ if(res.error) showToast('⚠️ Sin sincronizar ('+res.error.code+')',true); else showToast('✓ Guardado',false); });
         });
+
         div.appendChild(el);
       });
+
       grid.appendChild(div);
     });
+
+    // Apply edit mode class to grid wrapper
+    if (taskEditMode) {
+      var btn = document.getElementById('newTaskGroupBtn');
+      if (btn) btn.classList.add('task-edit-mode');
+    }
+
     var sum = document.getElementById('tasksSummary');
     if (sum) sum.innerHTML = '<strong>' + done + ' de ' + total + '</strong> tareas completadas';
   }
 
+  // ── TASKS RESET ───────────────────────────────────────────
   document.getElementById('tasksReset').addEventListener('click', function() {
     if (!confirm('¿Desmarcar todas las tareas?')) return;
     var rows = [];
-    TASKS.forEach(function(g) { g.items.forEach(function(it) { rows.push({id:it.id, done:false, updated_at:new Date().toISOString()}); }); });
+    getTaskGroups().forEach(function(g) {
+      g.items.forEach(function(it) {
+        rows.push({id:it.id, done:false, updated_at:new Date().toISOString()});
+      });
+    });
     tasksState = {}; saveTasksLocal(); renderTasks();
-    sb.from('tasks').upsert(rows).then(function(res){ if(res.error) showToast('⚠️ Sin sincronizar ('+res.error.code+')',true); });
+    if (rows.length) sb.from('tasks').upsert(rows).then(function(res){ if(res.error) showToast('⚠️ Sin sincronizar ('+res.error.code+')',true); });
   });
 
-  // ── PACKING ────────────────────────────────────────────────
-  var PACKS = [
-    {cat:'Ropa (7 días, lavado en hostels)', items:[
-      {id:'pk_p1', t:'5 remeras livianas de secado rápido', must:true},
-      {id:'pk_p2', t:'2 pantalones/shorts livianos', must:true},
-      {id:'pk_p3', t:'1 pantalón largo (templos, noches Budapest)', must:true},
-      {id:'pk_p4', t:'Campera impermeable y liviana', must:true},
-      {id:'pk_p5', t:'2 trajes de baño (secado rápido)', must:true},
-      {id:'pk_p6', t:'7 mudas de ropa interior de microfibra', must:true},
-      {id:'pk_p7', t:'5 pares de medias'}
-    ]},
-    {cat:'Calzado — máximo 2 pares', items:[
-      {id:'pk_s1', t:'Zapatillas cómodas todo terreno', must:true},
-      {id:'pk_s2', t:'Ojotas/sandalia plana (playa + Santorini)', must:true}
-    ]},
-    {cat:'Higiene — líquidos 100ml en bolsa ZIP', items:[
-      {id:'pk_hy1', t:'Shampoo sólido', must:true},
-      {id:'pk_hy2', t:'Jabón sólido o pastilla'},
-      {id:'pk_hy3', t:'Desodorante sólido (no aerosol)'},
-      {id:'pk_hy4', t:'Pasta dental + cepillo viaje'},
-      {id:'pk_hy5', t:'Protector solar FPS 50+ (100ml)', must:true}
-    ]},
-    {cat:'Playa y Sol', items:[
-      {id:'pk_b1', t:'Gafas de sol', must:true},
-      {id:'pk_b2', t:'Gorra o sombrero plegable', must:true},
-      {id:'pk_b3', t:'Toalla de microfibra ultra fina', must:true},
-      {id:'pk_b4', t:'Bolsa seca impermeable (ferrys)'}
-    ]},
-    {cat:'Tecnología', items:[
-      {id:'pk_t1', t:'Adaptador europeo tipo F (Schuko)', must:true},
-      {id:'pk_t2', t:'Cargador multipuerto USB-C', must:true},
-      {id:'pk_t3', t:'Power bank 10.000mAh (límite cabina)', must:true},
-      {id:'pk_t4', t:'Auriculares'},
-      {id:'pk_t5', t:'SIM europea o eSIM activada antes', must:true}
-    ]},
-    {cat:'Farmacia básica', items:[
-      {id:'pk_h1', t:'Seguro de viaje activo en el celular', must:true},
-      {id:'pk_h2', t:'Ibuprofeno 400mg x10'},
-      {id:'pk_h3', t:'Antihistamínico'},
-      {id:'pk_h4', t:'Pastillas para mareo (ferrys)', must:true},
-      {id:'pk_h5', t:'Antidiarreico + suero oral'},
-      {id:'pk_h6', t:'Curitas surtidas'}
-    ]},
-    {cat:'Documentos y dinero', items:[
-      {id:'pk_d1', t:'Pasaporte vigente (mín. 6 meses desde vuelta)', must:true},
-      {id:'pk_d2', t:'Foto del pasaporte en la nube + copia física', must:true},
-      {id:'pk_d3', t:'Tarjeta Wise/Revolut sin comisión', must:true},
-      {id:'pk_d4', t:'Efectivo: 150 EUR para mercados'},
-      {id:'pk_d5', t:'Reservas descargadas offline', must:true},
-      {id:'pk_d6', t:'Candado con combinación (hostel)', must:true}
-    ]},
-    {cat:'La mochila', items:[
-      {id:'pk_m1', t:'Mochila 30-35L (cabe en cabina)', must:true},
-      {id:'pk_m2', t:'Organizadores tipo packing cubes'},
-      {id:'pk_m3', t:'Candado TSA exterior'},
-      {id:'pk_m4', t:'Botella de agua colapsable 500ml', must:true}
-    ]}
-  ];
+  // ── TASK CATALOG CRUD ──────────────────────────────────────
+  function saveTaskItem(item) {
+    var idx = taskCatalog.findIndex(function(it){ return it.id === item.id; });
+    if (idx >= 0) taskCatalog[idx] = item; else taskCatalog.push(item);
+    saveCatalogLocal();
+    renderTasks();
+
+    sb.from('task_items').upsert({
+      id:          item.id,
+      group_name:  item.group_name,
+      group_order: item.group_order,
+      label:       item.label,
+      item_order:  item.item_order,
+      deleted:     false,
+      updated_at:  new Date().toISOString()
+    }).then(function(res) {
+      if (res.error) showToast('⚠️ Sin sincronizar ('+res.error.code+')', true);
+      else showToast('✓ Guardado', false);
+    }).catch(function() { showToast('⚠️ Sin conexión — guardado local', true); });
+  }
+
+  function deleteTaskItem(id) {
+    var idx = taskCatalog.findIndex(function(it){ return it.id === id; });
+    if (idx >= 0) taskCatalog[idx].deleted = true;
+    saveCatalogLocal();
+    renderTasks();
+
+    sb.from('task_items').upsert({
+      id: id, deleted: true, updated_at: new Date().toISOString()
+    }).then(function(res) {
+      if (res.error) showToast('⚠️ Sin sincronizar ('+res.error.code+')', true);
+      else showToast('✓ Eliminado', false);
+    }).catch(function() { showToast('⚠️ Sin conexión — guardado local', true); });
+  }
+
+  // ── TASK EDIT MODE TOGGLE ─────────────────────────────────
+  document.getElementById('taskEditToggle').addEventListener('click', function() {
+    taskEditMode = !taskEditMode;
+    this.textContent = taskEditMode ? '✓ Listo' : '✏️ Editar';
+    this.classList.toggle('active', taskEditMode);
+    var newGrpBtn = document.getElementById('newTaskGroupBtn');
+    if (taskEditMode) {
+      newGrpBtn.classList.add('task-edit-mode');
+    } else {
+      newGrpBtn.classList.remove('task-edit-mode');
+    }
+    renderTasks();
+  });
+
+  document.getElementById('newTaskGroupBtn').addEventListener('click', function() {
+    openTaskSheet(null, null, null, true);
+  });
+
+  // ── PACKING SHARED CATALOG CRUD ───────────────────────────
+  function saveSharedPackItem(id, label, cat, must) {
+    sharedPack[id] = {custom_label: label, cat: cat, must: must, done: false, deleted: false};
+    savePackLocal();
+    renderPack();
+
+    sb.from('packing_person').upsert({
+      id:           id,
+      person:       '_shared',
+      custom_label: label,
+      cat:          cat,
+      done:         false,
+      deleted:      false,
+      updated_at:   new Date().toISOString()
+    }).then(function(res) {
+      if (res.error) showToast('⚠️ Sin sincronizar ('+res.error.code+')', true);
+      else showToast('✓ Guardado', false);
+    }).catch(function() { showToast('⚠️ Sin conexión — guardado local', true); });
+  }
+
+  function editSharedDefault(defaultId, newLabel, cat) {
+    sharedPack[defaultId] = {custom_label: newLabel, cat: cat, deleted: false};
+    savePackLocal();
+    renderPack();
+
+    sb.from('packing_person').upsert({
+      id:           defaultId,
+      person:       '_shared',
+      custom_label: newLabel,
+      cat:          cat,
+      done:         false,
+      deleted:      false,
+      updated_at:   new Date().toISOString()
+    }).then(function(res) {
+      if (res.error) showToast('⚠️ Sin sincronizar ('+res.error.code+')', true);
+      else showToast('✓ Guardado', false);
+    }).catch(function() { showToast('⚠️ Sin conexión — guardado local', true); });
+  }
+
+  function hideSharedDefault(defaultId) {
+    sharedPack[defaultId] = {deleted: true};
+    savePackLocal();
+    renderPack();
+
+    sb.from('packing_person').upsert({
+      id:         defaultId,
+      person:     '_shared',
+      deleted:    true,
+      done:       false,
+      updated_at: new Date().toISOString()
+    }).then(function(res) {
+      if (res.error) showToast('⚠️ Sin sincronizar ('+res.error.code+')', true);
+      else showToast('✓ Ocultado', false);
+    }).catch(function() { showToast('⚠️ Sin conexión — guardado local', true); });
+  }
+
+  function deleteSharedCustom(id) {
+    delete sharedPack[id];
+    savePackLocal();
+    renderPack();
+
+    sb.from('packing_person').delete().eq('id', id).eq('person', '_shared')
+      .then(function(res) {
+        if (res.error) showToast('⚠️ Sin sincronizar ('+res.error.code+')', true);
+        else showToast('✓ Eliminado', false);
+      }).catch(function() { showToast('⚠️ Sin conexión — guardado local', true); });
+  }
+
+  // ── PACK EDIT MODE TOGGLE ─────────────────────────────────
+  document.getElementById('packEditToggle').addEventListener('click', function() {
+    packEditMode = !packEditMode;
+    this.textContent = packEditMode ? '✓ Listo' : '✏️ Editar cat.';
+    this.classList.toggle('active', packEditMode);
+    renderPack();
+  });
 
   // ── PERSON TABS ───────────────────────────────────────────
   function initPersonTabs() {
@@ -266,23 +672,66 @@
     var personState = packPersonState[activePerson] || {};
     var total = 0, done = 0;
 
-    PACKS.forEach(function(cat) {
-      var div = document.createElement('div'); div.className = 'packing-cat';
-      var title = document.createElement('div'); title.className = 'packing-cat-title'; title.textContent = cat.cat;
-      div.appendChild(title);
+    DEFAULT_PACKS.forEach(function(cat) {
+      var div = document.createElement('div');
+      div.className = 'packing-cat';
+      if (packEditMode) div.classList.add('pack-edit-mode');
+
+      var titleRow = document.createElement('div');
+      titleRow.className = 'packing-cat-title';
+      titleRow.textContent = cat.cat;
+      div.appendChild(titleRow);
 
       cat.items.forEach(function(item) {
+        // Check if hidden by shared
+        var sharedOverride = sharedPack[item.id];
+        if (sharedOverride && sharedOverride.deleted) {
+          // In edit mode, still show dimmed so user can restore
+          if (!packEditMode) return;
+          var hiddenEl = makePackDefaultItem(item, personState, cat, true);
+          div.appendChild(hiddenEl);
+          return;
+        }
+        // Get effective label
+        var effectiveLabel = (sharedOverride && sharedOverride.custom_label) ? sharedOverride.custom_label : item.t;
+        var effectiveItem = {id: item.id, t: effectiveLabel, must: item.must};
+        var el = makePackDefaultItem(effectiveItem, personState, cat, false);
         total++;
         var itemState = personState[item.id] || {};
-        var isDone = !!itemState.done;
-        if (isDone) done++;
-        div.appendChild(makePackItem(item.id, item.t, isDone, item.must, false));
+        if (itemState.done) done++;
+        div.appendChild(el);
       });
+
+      // Shared custom items for this category
+      Object.keys(sharedPack).forEach(function(sid) {
+        var sp = sharedPack[sid];
+        if (sp.deleted || !sp.custom_label || sp.cat !== cat.cat) return;
+        // Skip if it's a default item override (already shown above)
+        var isDefault = cat.items.some(function(di) { return di.id === sid; });
+        if (isDefault) return;
+        total++;
+        var itemState = personState[sid] || {};
+        if (itemState.done) done++;
+        div.appendChild(makePackSharedCustomItem(sid, sp, personState, cat));
+      });
+
+      // Add button for this category (edit mode)
+      if (packEditMode) {
+        var addCatBtn = document.createElement('button');
+        addCatBtn.className = 'pack-cat-add-btn';
+        addCatBtn.textContent = '+ Agregar para todos';
+        (function(catName) {
+          addCatBtn.addEventListener('click', function() {
+            openPackSheet(null, catName);
+          });
+        })(cat.cat);
+        div.appendChild(addCatBtn);
+      }
 
       grid.appendChild(div);
     });
 
-    // Custom items
+    // Personal custom items (not shared)
     var customItems = Object.keys(personState).filter(function(id) {
       return personState[id] && personState[id].custom_label;
     });
@@ -296,40 +745,192 @@
           var st = personState[id];
           total++;
           if (st.done) done++;
-          customList.appendChild(makePackItem(id, st.custom_label, !!st.done, false, true));
+          customList.appendChild(makePersonalCustomItem(id, st, personState));
         });
       } else {
         customSection.style.display = 'none';
       }
     }
 
-    var pLabel = PERSONS.filter(function(p){return p.id===activePerson;})[0].label;
+    var pLabel = PERSONS.filter(function(p){ return p.id===activePerson; })[0].label;
     var prog = document.getElementById('packProgress');
     if (prog) prog.textContent = done + ' de ' + total + ' ítems marcados — ' + pLabel;
   }
 
-  function makePackItem(id, text, isDone, isMust, isCustom) {
-    var el = document.createElement('div'); el.className = 'pack-item';
-    var cb = document.createElement('div'); cb.className = 'pcb' + (isDone ? ' done' : '');
-    var lbl = document.createElement('span'); if (isDone) lbl.className = 'done'; lbl.textContent = text;
-    if (isMust) {
+  function makePackDefaultItem(item, personState, cat, isHidden) {
+    var itemState = personState[item.id] || {};
+    var isDone = !!itemState.done;
+    var sharedOverride = sharedPack[item.id];
+    var isCustomLabel = sharedOverride && sharedOverride.custom_label;
+
+    var el = document.createElement('div');
+    el.className = 'pack-item' + (isHidden ? ' hidden-item' : '');
+
+    var cb = document.createElement('div');
+    cb.className = 'pcb' + (isDone ? ' done' : '');
+
+    var lbl = document.createElement('span');
+    if (isDone) lbl.className = 'done';
+    lbl.textContent = item.t;
+    if (item.must && !isHidden) {
+      var m = document.createElement('span'); m.className = 'must'; m.textContent = 'imprescindible'; lbl.appendChild(m);
+    }
+
+    el.appendChild(cb); el.appendChild(lbl);
+
+    // Edit buttons (pack edit mode)
+    if (packEditMode) {
+      var editBtns = document.createElement('div');
+      editBtns.className = 'pack-edit-btns';
+
+      if (isHidden) {
+        // Restore button
+        var restBtn = document.createElement('button');
+        restBtn.className = 'pi-btn';
+        restBtn.title = 'Restaurar';
+        restBtn.textContent = '↩';
+        (function(itemId, catName) {
+          restBtn.addEventListener('click', function(e) {
+            e.stopPropagation();
+            delete sharedPack[itemId];
+            savePackLocal();
+            // Delete from supabase _shared
+            sb.from('packing_person').delete().eq('id', itemId).eq('person', '_shared');
+            renderPack();
+          });
+        })(item.id, cat.cat);
+        editBtns.appendChild(restBtn);
+      } else {
+        var editBtn = document.createElement('button');
+        editBtn.className = 'pi-btn';
+        editBtn.title = 'Editar para todos';
+        editBtn.textContent = '✏️';
+        (function(it, catName) {
+          editBtn.addEventListener('click', function(e) {
+            e.stopPropagation();
+            openPackSheet(it, catName, true);
+          });
+        })(item, cat.cat);
+        editBtns.appendChild(editBtn);
+
+        var hideBtn = document.createElement('button');
+        hideBtn.className = 'pi-btn del';
+        hideBtn.title = 'Ocultar para todos';
+        hideBtn.textContent = '×';
+        (function(itemId) {
+          hideBtn.addEventListener('click', function(e) {
+            e.stopPropagation();
+            if (!confirm('¿Ocultar este ítem para todos?')) return;
+            hideSharedDefault(itemId);
+          });
+        })(item.id);
+        editBtns.appendChild(hideBtn);
+      }
+
+      el.appendChild(editBtns);
+      el.style.pointerEvents = isHidden ? 'none' : '';
+    }
+
+    if (!isHidden) {
+      el.addEventListener('click', function(e) {
+        if (e.target.closest('.pack-edit-btns')) return;
+        var newDone = !isDone;
+        if (!packPersonState[activePerson]) packPersonState[activePerson] = {};
+        if (!packPersonState[activePerson][item.id]) packPersonState[activePerson][item.id] = {};
+        packPersonState[activePerson][item.id].done = newDone;
+        savePackLocal();
+        sb.from('packing_person').upsert({id:item.id, person:activePerson, done:newDone, updated_at:new Date().toISOString()})
+          .then(function(res){ if(res.error) showToast('⚠️ Sin sincronizar ('+res.error.code+')',true); else showToast('✓ Guardado',false); });
+        renderPack();
+      });
+    }
+
+    return el;
+  }
+
+  function makePackSharedCustomItem(id, sp, personState, cat) {
+    var itemState = personState[id] || {};
+    var isDone = !!itemState.done;
+
+    var el = document.createElement('div');
+    el.className = 'pack-item';
+
+    var cb = document.createElement('div');
+    cb.className = 'pcb' + (isDone ? ' done' : '');
+    var lbl = document.createElement('span');
+    if (isDone) lbl.className = 'done';
+    lbl.textContent = sp.custom_label;
+    if (sp.must) {
       var m = document.createElement('span'); m.className = 'must'; m.textContent = 'imprescindible'; lbl.appendChild(m);
     }
     el.appendChild(cb); el.appendChild(lbl);
 
-    if (isCustom) {
+    if (packEditMode) {
+      var editBtns = document.createElement('div');
+      editBtns.className = 'pack-edit-btns';
+
+      var editBtn = document.createElement('button');
+      editBtn.className = 'pi-btn';
+      editBtn.textContent = '✏️';
+      editBtn.title = 'Editar';
+      (function(sid, catName) {
+        editBtn.addEventListener('click', function(e) {
+          e.stopPropagation();
+          openPackSheet({id:sid, t:sharedPack[sid].custom_label, must:sharedPack[sid].must}, catName, false, sid);
+        });
+      })(id, cat.cat);
+      editBtns.appendChild(editBtn);
+
       var delBtn = document.createElement('button');
-      delBtn.className = 'pack-del'; delBtn.title = 'Eliminar'; delBtn.textContent = '×';
-      el.appendChild(delBtn);
-      delBtn.addEventListener('click', function(e) {
-        e.stopPropagation();
-        if (!confirm('¿Eliminar "' + text + '"?')) return;
-        delete packPersonState[activePerson][id];
-        savePackLocal();
-        sb.from('packing_person').delete().eq('id', id).eq('person', activePerson);
-        renderPack();
-      });
+      delBtn.className = 'pi-btn del';
+      delBtn.textContent = '×';
+      delBtn.title = 'Eliminar';
+      (function(sid) {
+        delBtn.addEventListener('click', function(e) {
+          e.stopPropagation();
+          if (!confirm('¿Eliminar este ítem para todos?')) return;
+          deleteSharedCustom(sid);
+        });
+      })(id);
+      editBtns.appendChild(delBtn);
+
+      el.appendChild(editBtns);
     }
+
+    el.addEventListener('click', function(e) {
+      if (e.target.closest('.pack-edit-btns')) return;
+      var newDone = !isDone;
+      if (!packPersonState[activePerson]) packPersonState[activePerson] = {};
+      if (!packPersonState[activePerson][id]) packPersonState[activePerson][id] = {};
+      packPersonState[activePerson][id].done = newDone;
+      savePackLocal();
+      sb.from('packing_person').upsert({id:id, person:activePerson, done:newDone, updated_at:new Date().toISOString()})
+        .then(function(res){ if(res.error) showToast('⚠️ Sin sincronizar ('+res.error.code+')',true); else showToast('✓ Guardado',false); });
+      renderPack();
+    });
+
+    return el;
+  }
+
+  function makePersonalCustomItem(id, st, personState) {
+    var isDone = !!st.done;
+    var el = document.createElement('div');
+    el.className = 'pack-item';
+    var cb = document.createElement('div'); cb.className = 'pcb' + (isDone ? ' done' : '');
+    var lbl = document.createElement('span'); if (isDone) lbl.className = 'done'; lbl.textContent = st.custom_label;
+    el.appendChild(cb); el.appendChild(lbl);
+
+    var delBtn = document.createElement('button');
+    delBtn.className = 'pack-del'; delBtn.title = 'Eliminar'; delBtn.textContent = '×';
+    el.appendChild(delBtn);
+    delBtn.addEventListener('click', function(e) {
+      e.stopPropagation();
+      if (!confirm('¿Eliminar "' + st.custom_label + '"?')) return;
+      delete packPersonState[activePerson][id];
+      savePackLocal();
+      sb.from('packing_person').delete().eq('id', id).eq('person', activePerson);
+      renderPack();
+    });
 
     el.addEventListener('click', function(e) {
       if (e.target.classList.contains('pack-del')) return;
@@ -338,8 +939,7 @@
       if (!packPersonState[activePerson][id]) packPersonState[activePerson][id] = {};
       packPersonState[activePerson][id].done = newDone;
       savePackLocal();
-      var upsertRow = {id:id, person:activePerson, done:newDone, updated_at:new Date().toISOString()};
-      if (isCustom) upsertRow.custom_label = packPersonState[activePerson][id].custom_label;
+      var upsertRow = {id:id, person:activePerson, done:newDone, custom_label:st.custom_label, updated_at:new Date().toISOString()};
       sb.from('packing_person').upsert(upsertRow)
         .then(function(res){ if(res.error) showToast('⚠️ Sin sincronizar ('+res.error.code+')',true); else showToast('✓ Guardado',false); });
       renderPack();
@@ -348,8 +948,8 @@
     return el;
   }
 
-  // ── AGREGAR ÍTEM CUSTOM ───────────────────────────────────
-  function addCustomItem() {
+  // ── AGREGAR ÍTEM CUSTOM (personal) ───────────────────────
+  function addPersonalItem() {
     var inp = document.getElementById('packAddInp');
     var label = inp.value.trim();
     if (!label) return;
@@ -363,14 +963,14 @@
     renderPack();
   }
 
-  document.getElementById('packAddBtn').addEventListener('click', addCustomItem);
+  document.getElementById('packAddBtn').addEventListener('click', addPersonalItem);
   document.getElementById('packAddInp').addEventListener('keydown', function(e) {
-    if (e.key === 'Enter') addCustomItem();
+    if (e.key === 'Enter') addPersonalItem();
   });
 
   // ── RESET EQUIPAJE ────────────────────────────────────────
   document.getElementById('packReset').addEventListener('click', function() {
-    var pLabel = PERSONS.filter(function(p){return p.id===activePerson;})[0].label;
+    var pLabel = PERSONS.filter(function(p){ return p.id===activePerson; })[0].label;
     if (!confirm('¿Desmarcar todo el equipaje de ' + pLabel + '?')) return;
     var rows = [];
     var personState = packPersonState[activePerson] || {};
@@ -380,51 +980,266 @@
       if (personState[id].custom_label) row.custom_label = personState[id].custom_label;
       rows.push(row);
     });
+    // Also reset all default item entries for this person
+    DEFAULT_PACKS.forEach(function(cat) {
+      cat.items.forEach(function(it) {
+        if (!personState[it.id]) return;
+        personState[it.id].done = false;
+        rows.push({id:it.id, person:activePerson, done:false, updated_at:new Date().toISOString()});
+      });
+    });
     savePackLocal();
     if (rows.length) sb.from('packing_person').upsert(rows)
       .then(function(res){ if(res.error) showToast('⚠️ Sin sincronizar ('+res.error.code+')',true); });
     renderPack();
   });
 
+  // ── BOTTOM SHEET ─────────────────────────────────────────
+  var sheetMode = 'task'; // 'task' or 'pack'
+  var sheetEditingTask = null;
+  var sheetEditingPack = null; // {id, isDefault, catName}
+
+  function openTaskSheet(item, defaultGroup, defaultGroupOrder, forceNewGroup) {
+    sheetMode = 'task';
+    sheetEditingTask = item;
+    document.getElementById('sheetTaskFields').style.display = '';
+    document.getElementById('sheetPackFields').style.display = 'none';
+    document.getElementById('sheetTitle').textContent = item ? 'Editar tarea' : 'Nueva tarea';
+
+    // Populate group select
+    var groupSel = document.getElementById('sheetTaskGroup');
+    groupSel.innerHTML = '';
+    var groups = getTaskGroups();
+    groups.forEach(function(g) {
+      var opt = document.createElement('option');
+      opt.value = g.group_name;
+      opt.textContent = g.group_name;
+      if (defaultGroup && g.group_name === defaultGroup) opt.selected = true;
+      groupSel.appendChild(opt);
+    });
+    var newOpt = document.createElement('option');
+    newOpt.value = '__new__';
+    newOpt.textContent = 'Nuevo grupo…';
+    groupSel.appendChild(newOpt);
+
+    var newGrpInp = document.getElementById('sheetTaskNewGroup');
+    if (forceNewGroup) {
+      groupSel.value = '__new__';
+      newGrpInp.style.display = 'block';
+      newGrpInp.value = '';
+    } else {
+      newGrpInp.style.display = 'none';
+      if (defaultGroup) groupSel.value = defaultGroup;
+    }
+
+    document.getElementById('sheetTaskLabel').value = item ? item.label : '';
+
+    openSheet();
+    setTimeout(function() { document.getElementById('sheetTaskLabel').focus(); }, 350);
+  }
+
+  function openPackSheet(item, catName, isDefault, customId) {
+    sheetMode = 'pack';
+    sheetEditingPack = item ? {id: customId || item.id, isDefault: isDefault, catName: catName} : null;
+    document.getElementById('sheetTaskFields').style.display = 'none';
+    document.getElementById('sheetPackFields').style.display = '';
+    document.getElementById('sheetTitle').textContent = item ? 'Editar ítem' : 'Nuevo ítem compartido';
+
+    // Populate cat select
+    var catSel = document.getElementById('sheetPackCat');
+    catSel.innerHTML = '';
+    DEFAULT_PACKS.forEach(function(c) {
+      var opt = document.createElement('option');
+      opt.value = c.cat;
+      opt.textContent = c.cat;
+      if (catName && c.cat === catName) opt.selected = true;
+      catSel.appendChild(opt);
+    });
+
+    document.getElementById('sheetPackLabel').value = item ? item.t : '';
+    document.getElementById('sheetPackMust').checked = item ? !!item.must : false;
+
+    openSheet();
+    setTimeout(function() { document.getElementById('sheetPackLabel').focus(); }, 350);
+  }
+
+  function openSheet() {
+    document.getElementById('sheetOverlay').classList.add('open');
+    document.getElementById('bottomSheet').classList.add('open');
+  }
+
+  function closeSheet() {
+    document.getElementById('sheetOverlay').classList.remove('open');
+    document.getElementById('bottomSheet').classList.remove('open');
+    sheetEditingTask = null;
+    sheetEditingPack = null;
+  }
+
+  document.getElementById('sheetTaskGroup').addEventListener('change', function() {
+    var newGrpInp = document.getElementById('sheetTaskNewGroup');
+    newGrpInp.style.display = this.value === '__new__' ? 'block' : 'none';
+    if (this.value === '__new__') newGrpInp.focus();
+  });
+
+  document.getElementById('sheetOverlay').addEventListener('click', closeSheet);
+  document.getElementById('sheetCancel').addEventListener('click', closeSheet);
+
+  document.getElementById('sheetSave').addEventListener('click', function() {
+    if (sheetMode === 'task') {
+      saveTaskFromSheet();
+    } else {
+      savePackFromSheet();
+    }
+  });
+
+  function saveTaskFromSheet() {
+    var groupSel   = document.getElementById('sheetTaskGroup');
+    var groupName  = groupSel.value;
+    var groupOrder = 0;
+    var newGrpInp  = document.getElementById('sheetTaskNewGroup');
+    var labelVal   = document.getElementById('sheetTaskLabel').value.trim();
+
+    if (groupName === '__new__') {
+      groupName = newGrpInp.value.trim();
+      if (!groupName) { newGrpInp.focus(); return; }
+      var groups = getTaskGroups();
+      groupOrder = groups.length > 0 ? (groups[groups.length-1].group_order + 1) : 0;
+    } else {
+      var groups = getTaskGroups();
+      var found = groups.find(function(g) { return g.group_name === groupName; });
+      groupOrder = found ? found.group_order : 0;
+    }
+
+    if (!labelVal) { document.getElementById('sheetTaskLabel').focus(); return; }
+
+    var item;
+    if (sheetEditingTask) {
+      item = {
+        id:          sheetEditingTask.id,
+        group_name:  groupName,
+        group_order: groupOrder,
+        label:       labelVal,
+        item_order:  sheetEditingTask.item_order,
+        deleted:     false
+      };
+    } else {
+      var groups = getTaskGroups();
+      var gFound = groups.find(function(g) { return g.group_name === groupName; });
+      var nextOrder = gFound ? gFound.items.length : 0;
+      item = {
+        id:          'ti_' + Date.now(),
+        group_name:  groupName,
+        group_order: groupOrder,
+        label:       labelVal,
+        item_order:  nextOrder,
+        deleted:     false
+      };
+    }
+
+    saveTaskItem(item);
+    closeSheet();
+  }
+
+  function savePackFromSheet() {
+    var catVal   = document.getElementById('sheetPackCat').value;
+    var labelVal = document.getElementById('sheetPackLabel').value.trim();
+    var mustVal  = document.getElementById('sheetPackMust').checked;
+
+    if (!labelVal) { document.getElementById('sheetPackLabel').focus(); return; }
+
+    if (sheetEditingPack) {
+      if (sheetEditingPack.isDefault) {
+        // Edit label of a default item for all
+        editSharedDefault(sheetEditingPack.id, labelVal, catVal);
+      } else {
+        // Edit shared custom item
+        saveSharedPackItem(sheetEditingPack.id, labelVal, catVal, mustVal);
+      }
+    } else {
+      // New shared item
+      var newId = 'shared_' + Date.now();
+      saveSharedPackItem(newId, labelVal, catVal, mustVal);
+    }
+
+    closeSheet();
+  }
+
   // ── REAL-TIME ─────────────────────────────────────────────
   sb.channel('tareas_sync')
     .on('postgres_changes', {event:'*', schema:'public', table:'tasks'}, function(p) {
       if (p.new) { tasksState[p.new.id] = p.new.done; saveTasksLocal(); renderTasks(); }
     })
-    .on('postgres_changes', {event:'INSERT', schema:'public', table:'packing_person'}, function(p) {
+    .on('postgres_changes', {event:'*', schema:'public', table:'task_items'}, function(p) {
       if (!p.new) return;
       var r = p.new;
-      if (!packPersonState[r.person]) packPersonState[r.person] = {};
-      packPersonState[r.person][r.id] = {done:r.done, custom_label:r.custom_label};
-      savePackLocal();
-      if (r.person === activePerson) renderPack();
+      var idx = taskCatalog.findIndex(function(it) { return it.id === r.id; });
+      var item = {
+        id: r.id, group_name: r.group_name, group_order: r.group_order,
+        label: r.label, item_order: r.item_order, deleted: r.deleted
+      };
+      if (idx >= 0) { taskCatalog[idx] = item; } else { taskCatalog.push(item); }
+      saveCatalogLocal();
+      renderTasks();
     })
-    .on('postgres_changes', {event:'UPDATE', schema:'public', table:'packing_person'}, function(p) {
+    .on('postgres_changes', {event:'*', schema:'public', table:'packing_person'}, function(p) {
       if (!p.new) return;
       var r = p.new;
+      if (r.person === '_shared') {
+        sharedPack[r.id] = {custom_label: r.custom_label, cat: r.cat, done: r.done, deleted: r.deleted};
+        savePackLocal();
+        renderPack();
+        return;
+      }
       if (!packPersonState[r.person]) packPersonState[r.person] = {};
-      packPersonState[r.person][r.id] = {done:r.done, custom_label:r.custom_label};
+      packPersonState[r.person][r.id] = {done: r.done, custom_label: r.custom_label};
       savePackLocal();
       if (r.person === activePerson) renderPack();
     })
     .on('postgres_changes', {event:'DELETE', schema:'public', table:'packing_person'}, function(p) {
       if (!p.old) return;
       var r = p.old;
+      if (r.person === '_shared') {
+        delete sharedPack[r.id];
+        savePackLocal();
+        renderPack();
+        return;
+      }
       if (packPersonState[r.person]) delete packPersonState[r.person][r.id];
       savePackLocal();
       if (r.person === activePerson) renderPack();
     })
     .subscribe();
 
-  // ── INIT ─────────────────────────────────────────────────
-  // 1) Mostrar datos locales de inmediato
+  // ── SEED task_items ────────────────────────────────────────
+  function seedTaskItems() {
+    var rows = defaultTasksToFlat().map(function(it) {
+      return {
+        id:          it.id,
+        group_name:  it.group_name,
+        group_order: it.group_order,
+        label:       it.label,
+        item_order:  it.item_order,
+        deleted:     false,
+        updated_at:  new Date().toISOString()
+      };
+    });
+    sb.from('task_items').upsert(rows).then(function(res) {
+      if (res.error) console.error('Seed task_items error:', res.error);
+    });
+  }
+
+  // ── INIT ──────────────────────────────────────────────────
+  // 1) Load local data immediately
   loadTasksLocal();
+  loadCatalogLocal();
   loadPackLocal();
+  PERSONS.forEach(function(p) { if (!packPersonState[p.id]) packPersonState[p.id] = {}; });
+
   initPersonTabs();
   renderTasks();
   renderPack();
 
-  // 2) Sincronizar con Supabase en segundo plano
+  // 2) Sync from Supabase in background
   sb.from('tasks').select('*').then(function(r) {
     if (r.error) { console.error('tasks:', r.error); return; }
     (r.data || []).forEach(function(row) { tasksState[row.id] = row.done; });
@@ -432,15 +1247,54 @@
     renderTasks();
   });
 
+  sb.from('task_items').select('*').then(function(r) {
+    if (r.error) {
+      console.warn('task_items table error:', r.error.message);
+      taskCatalogEditable = false;
+      var editBtn = document.getElementById('taskEditToggle');
+      if (editBtn) editBtn.style.display = 'none';
+      return;
+    }
+    var rows = r.data || [];
+    if (rows.length === 0) {
+      taskCatalog = defaultTasksToFlat();
+      saveCatalogLocal();
+      seedTaskItems();
+    } else {
+      taskCatalog = rows.map(function(row) {
+        return {
+          id:          row.id,
+          group_name:  row.group_name,
+          group_order: row.group_order,
+          label:       row.label,
+          item_order:  row.item_order,
+          deleted:     row.deleted
+        };
+      });
+      saveCatalogLocal();
+    }
+    renderTasks();
+  }).catch(function(err) {
+    console.error('Red error task_items:', err);
+    taskCatalogEditable = false;
+    var editBtn = document.getElementById('taskEditToggle');
+    if (editBtn) editBtn.style.display = 'none';
+  });
+
   sb.from('packing_person').select('*').then(function(r) {
     if (r.error) { console.error('packing_person:', r.error); return; }
     (r.data || []).forEach(function(row) {
+      if (row.person === '_shared') {
+        sharedPack[row.id] = {custom_label: row.custom_label, cat: row.cat, done: row.done, deleted: row.deleted};
+        return;
+      }
       if (!packPersonState[row.person]) packPersonState[row.person] = {};
-      packPersonState[row.person][row.id] = {done:row.done, custom_label:row.custom_label};
+      packPersonState[row.person][row.id] = {done: row.done, custom_label: row.custom_label};
     });
     savePackLocal();
     renderPack();
   });
+
 })();
 </script>
 </body>
