@@ -107,7 +107,14 @@
 .save-toast{position:fixed;bottom:calc(5rem + env(safe-area-inset-bottom,0));left:50%;transform:translateX(-50%);font-family:Outfit,sans-serif;font-size:.75rem;font-weight:600;padding:.45rem 1.2rem;border-radius:20px;opacity:0;transition:opacity .25s;z-index:9999;pointer-events:none;white-space:nowrap;}
 .save-toast.ok{background:rgba(74,222,128,.92);color:#14532d;}
 .save-toast.err{background:rgba(239,68,68,.92);color:#fff;}
+.bi-date-inp{flex:1;min-width:88px;border:1px solid rgba(13,27,42,.12);border-radius:8px;padding:.22rem .4rem;font-family:Outfit,sans-serif;font-size:.68rem;color:var(--navy);background:white;}
+.bi-date-inp:focus{outline:none;border-color:var(--gold);}
+.chart-section{margin-top:1.75rem;}
+.chart-eyebrow{font-family:Outfit,sans-serif;font-size:.62rem;letter-spacing:.18em;text-transform:uppercase;color:rgba(255,255,255,.38);margin-bottom:.75rem;}
+.chart-wrap{position:relative;height:190px;}
+.chart-empty{font-family:Outfit,sans-serif;font-size:.78rem;color:rgba(255,255,255,.3);text-align:center;padding-top:3.5rem;}
 </style>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
 </head>
 <body>
 
@@ -187,6 +194,13 @@
       <div class="res-val gold" id="res-total">~$0</div>
       <div class="res-lbl">Total estimado</div>
       <div class="res-sub">p/p · round trip incl.</div>
+    </div>
+  </div>
+  <div class="chart-section" id="chartSection">
+    <p class="chart-eyebrow">Cronograma de pagos</p>
+    <div class="chart-wrap">
+      <canvas id="paymentChart"></canvas>
+      <div class="chart-empty" id="chartEmpty">Agregá fechas a los ítems reservados para ver el cronograma</div>
     </div>
   </div>
 </div>
@@ -519,14 +533,22 @@
       var ai = document.createElement('input');
       ai.className = 'bi-adv-inp'; ai.type = 'number'; ai.min = '0'; ai.value = adelanto;
       ai.dataset.id = item.id; ai.dataset.field = 'adelanto';
-      r1.appendChild(l1); r1.appendChild(s1); r1.appendChild(ai);
+      var d1 = document.createElement('input');
+      d1.className = 'bi-date-inp'; d1.type = 'date'; d1.title = 'Fecha de adelanto';
+      d1.value = s.fecha_adelanto || ''; d1.min = '2025-01-01'; d1.max = '2026-12-31';
+      d1.dataset.id = item.id; d1.dataset.field = 'fecha_adelanto';
+      r1.appendChild(l1); r1.appendChild(s1); r1.appendChild(ai); r1.appendChild(d1);
 
       var r2 = document.createElement('div');
       r2.className = 'bi-split-row';
       var l2 = document.createElement('span'); l2.className = 'bi-split-lbl'; l2.textContent = 'A pagar en destino';
       var s2 = document.createElement('span'); s2.className = 'bi-price-sym'; s2.textContent = '$';
       var dv = document.createElement('span'); dv.className = 'bi-dest-val'; dv.id = 'dest-' + item.id; dv.textContent = destino;
-      r2.appendChild(l2); r2.appendChild(s2); r2.appendChild(dv);
+      var d2 = document.createElement('input');
+      d2.className = 'bi-date-inp'; d2.type = 'date'; d2.title = 'Fecha de pago en destino';
+      d2.value = s.fecha_destino || ''; d2.min = '2025-01-01'; d2.max = '2026-12-31';
+      d2.dataset.id = item.id; d2.dataset.field = 'fecha_destino';
+      r2.appendChild(l2); r2.appendChild(s2); r2.appendChild(dv); r2.appendChild(d2);
 
       splitWrap.appendChild(r1); splitWrap.appendChild(r2);
       detail.appendChild(splitWrap);
@@ -580,17 +602,19 @@
   // ── TRACKER UPSERT ─────────────────────────────────────────
   function trkUpsert(id) {
     saveTrackerLocal();
-    var s = trackerState[id] || {status:'proyectado',precio:0,adelanto:0,note:'',file_url:'',file_name:''};
+    var s = trackerState[id] || {status:'proyectado',precio:0,adelanto:0,note:'',file_url:'',file_name:'',fecha_adelanto:'',fecha_destino:''};
     return sb.from('tracker').upsert({
-      id:         id,
-      status:     normalizeStatus(s.status),
-      precio:     s.precio   || 0,
-      adelanto:   s.adelanto || 0,
-      note:       s.note     || '',
-      file_url:   s.file_url  || '',
-      file_name:  s.file_name || '',
-      date:       '',
-      updated_at: new Date().toISOString()
+      id:             id,
+      status:         normalizeStatus(s.status),
+      precio:         s.precio         || 0,
+      adelanto:       s.adelanto       || 0,
+      note:           s.note           || '',
+      file_url:       s.file_url       || '',
+      file_name:      s.file_name      || '',
+      fecha_adelanto: s.fecha_adelanto || '',
+      fecha_destino:  s.fecha_destino  || '',
+      date:           '',
+      updated_at:     new Date().toISOString()
     }).then(function(res) {
       if (res.error) {
         showToast('⚠️ Sin sincronizar (' + (res.error.code || res.error.message) + ')', true);
@@ -789,6 +813,138 @@
     closeSheet();
   });
 
+  // ── PAYMENT CHART ─────────────────────────────────────────
+  var paymentChart = null;
+
+  function renderChart() {
+    var adelantosByMonth = {}, destinoByMonth = {};
+
+    catalogItems.filter(function(it) { return !it.deleted; }).forEach(function(item) {
+      var s = trackerState[item.id];
+      if (!s || normalizeStatus(s.status) !== 'reservado') return;
+      var precio   = s.precio   || item.est;
+      var adelanto = s.adelanto || 0;
+      var enDest   = Math.max(0, precio - adelanto);
+
+      if (adelanto > 0 && s.fecha_adelanto) {
+        var m = s.fecha_adelanto.substring(0, 7);
+        adelantosByMonth[m] = (adelantosByMonth[m] || 0) + adelanto;
+      }
+      // en destino (including full price when adelanto=0)
+      if (s.fecha_destino) {
+        var md = s.fecha_destino.substring(0, 7);
+        var amount = adelanto === 0 ? precio : enDest;
+        if (amount > 0) destinoByMonth[md] = (destinoByMonth[md] || 0) + amount;
+      }
+    });
+
+    var allKeys = {};
+    Object.keys(adelantosByMonth).forEach(function(k) { allKeys[k] = true; });
+    Object.keys(destinoByMonth).forEach(function(k) { allKeys[k] = true; });
+    var months = Object.keys(allKeys).sort();
+
+    var emptyEl  = document.getElementById('chartEmpty');
+    var chartWrapEl = document.getElementById('chartSection');
+    var canvasEl = document.getElementById('paymentChart');
+
+    if (!canvasEl) return;
+
+    if (months.length === 0) {
+      if (emptyEl) emptyEl.style.display = '';
+      canvasEl.style.display = 'none';
+      return;
+    }
+    if (emptyEl) emptyEl.style.display = 'none';
+    canvasEl.style.display = '';
+
+    var MES = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+    var labels = months.map(function(m) {
+      var parts = m.split('-');
+      return MES[parseInt(parts[1], 10) - 1] + " '" + parts[0].substring(2);
+    });
+    var dataAd = months.map(function(m) { return Math.round(adelantosByMonth[m] || 0); });
+    var dataDe = months.map(function(m) { return Math.round(destinoByMonth[m]  || 0); });
+
+    if (paymentChart) {
+      paymentChart.data.labels = labels;
+      paymentChart.data.datasets[0].data = dataAd;
+      paymentChart.data.datasets[1].data = dataDe;
+      paymentChart.update('none');
+      return;
+    }
+
+    paymentChart = new Chart(canvasEl.getContext('2d'), {
+      type: 'bar',
+      data: {
+        labels: labels,
+        datasets: [
+          {
+            label: 'Adelanto pagado',
+            data: dataAd,
+            backgroundColor: '#c9973a',
+            borderRadius: 5,
+            stack: 'pay'
+          },
+          {
+            label: 'A pagar en destino',
+            data: dataDe,
+            backgroundColor: 'rgba(255,255,255,0.18)',
+            borderColor: 'rgba(255,255,255,0.35)',
+            borderWidth: 1,
+            borderRadius: 5,
+            stack: 'pay'
+          }
+        ]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            position: 'top',
+            align: 'end',
+            labels: {
+              color: 'rgba(255,255,255,0.65)',
+              font: {family:'Outfit', size:11},
+              boxWidth: 11,
+              padding: 14,
+              usePointStyle: true,
+              pointStyle: 'rect'
+            }
+          },
+          tooltip: {
+            callbacks: {
+              label: function(ctx) {
+                return ' ' + ctx.dataset.label + ':  $' + ctx.parsed.y.toLocaleString('es-AR');
+              },
+              footer: function(items) {
+                var total = items.reduce(function(a, b) { return a + b.parsed.y; }, 0);
+                return 'Total mes:  $' + Math.round(total).toLocaleString('es-AR');
+              }
+            }
+          }
+        },
+        scales: {
+          x: {
+            stacked: true,
+            grid: {color:'rgba(255,255,255,0.06)'},
+            ticks: {color:'rgba(255,255,255,0.55)', font:{family:'Outfit', size:11}}
+          },
+          y: {
+            stacked: true,
+            beginAtZero: true,
+            grid: {color:'rgba(255,255,255,0.06)'},
+            ticks: {
+              color: 'rgba(255,255,255,0.55)',
+              font: {family:'Outfit', size:11},
+              callback: function(v) { return '$' + v.toLocaleString('es-AR'); }
+            }
+          }
+        }
+      }
+    });
+  }
+
   // ── BLUR / INPUT EVENTS ────────────────────────────────────
   document.addEventListener('blur', function(e) {
     var field = e.target.dataset.field;
@@ -811,6 +967,12 @@
     } else if (field === 'note') {
       trackerState[id].note = e.target.value;
       trkUpsert(id);
+    } else if (field === 'fecha_adelanto') {
+      trackerState[id].fecha_adelanto = e.target.value;
+      renderChart(); trkUpsert(id);
+    } else if (field === 'fecha_destino') {
+      trackerState[id].fecha_destino = e.target.value;
+      renderChart(); trkUpsert(id);
     }
   }, true);
 
@@ -821,8 +983,8 @@
         var r = p.new;
         var focused = document.activeElement;
         if (focused && focused.dataset && (focused.dataset.field === 'precio' || focused.dataset.field === 'adelanto' || focused.dataset.field === 'note')) return;
-        trackerState[r.id] = {status:r.status||'proyectado', precio:r.precio||0, adelanto:r.adelanto||0, note:r.note||'', file_url:r.file_url||'', file_name:r.file_name||''};
-        renderBudget(); renderResumen();
+        trackerState[r.id] = {status:r.status||'proyectado', precio:r.precio||0, adelanto:r.adelanto||0, note:r.note||'', file_url:r.file_url||'', file_name:r.file_name||'', fecha_adelanto:r.fecha_adelanto||'', fecha_destino:r.fecha_destino||''};
+        renderBudget(); renderResumen(); renderChart();
       }
     })
     .on('postgres_changes', {event:'*', schema:'public', table:'budget_items'}, function(p) {
@@ -881,17 +1043,20 @@
     }
     (r.data || []).forEach(function(row) {
       trackerState[row.id] = {
-        status:    normalizeStatus(row.status),
-        precio:    row.precio    || 0,
-        adelanto:  row.adelanto  || 0,
-        note:      row.note      || '',
-        file_url:  row.file_url  || '',
-        file_name: row.file_name || ''
+        status:         normalizeStatus(row.status),
+        precio:         row.precio         || 0,
+        adelanto:       row.adelanto       || 0,
+        note:           row.note           || '',
+        file_url:       row.file_url       || '',
+        file_name:      row.file_name      || '',
+        fecha_adelanto: row.fecha_adelanto || '',
+        fecha_destino:  row.fecha_destino  || ''
       };
     });
     saveTrackerLocal();
     renderBudget();
     renderResumen();
+    renderChart();
   }).catch(function(err) { console.error('Red error tracker:', err); });
 
   // 3) Sync budget_items catalog from Supabase
