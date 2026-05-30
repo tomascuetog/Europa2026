@@ -47,6 +47,24 @@
   @media(min-width:600px){
     .itin-body{padding:2rem 1.75rem;}
   }
+
+  /* ── CALENDARIO ─────────────────────────────── */
+  .cal-wrap{margin:0 0 2rem;}
+  .cal-month-label{font-family:'Cormorant Garamond',serif;font-size:1.05rem;font-weight:600;color:var(--navy);margin-bottom:.7rem;letter-spacing:.01em;}
+  .cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;}
+  .cal-head{font-family:Outfit,sans-serif;font-size:.6rem;font-weight:700;letter-spacing:.05em;color:var(--text-mid);text-align:center;padding:.3rem 0 .5rem;}
+  .cal-cell{aspect-ratio:1;border-radius:7px;display:flex;flex-direction:column;align-items:center;justify-content:center;position:relative;overflow:hidden;user-select:none;}
+  .cal-cell.empty{background:rgba(13,27,42,.04);}
+  .cal-cell.post{background:rgba(13,27,42,.04);}
+  .cal-cell.trip{box-shadow:0 1px 3px rgba(0,0,0,.18);}
+  .cal-num{font-family:Outfit,sans-serif;font-size:.72rem;font-weight:700;color:white;line-height:1;}
+  .cal-cell.empty .cal-num,.cal-cell.post .cal-num{color:rgba(13,27,42,.18);font-weight:400;}
+  .cal-lbl{font-family:Outfit,sans-serif;font-size:.4rem;font-weight:600;color:rgba(255,255,255,.78);line-height:1;margin-top:1px;letter-spacing:-.01em;text-align:center;}
+  .cal-dot{position:absolute;top:3px;right:3px;width:4px;height:4px;background:rgba(255,255,255,.9);border-radius:50%;}
+  .cal-legend{display:flex;flex-wrap:wrap;gap:.45rem .9rem;margin-top:1rem;}
+  .cal-leg{display:inline-flex;align-items:center;gap:.35rem;font-family:Outfit,sans-serif;font-size:.69rem;color:var(--text-mid);}
+  .cal-leg-sq{width:9px;height:9px;border-radius:3px;flex-shrink:0;}
+  .cal-note{font-family:Outfit,sans-serif;font-size:.63rem;color:var(--text-mid);opacity:.55;margin-top:.6rem;}
 </style>
 </head>
 <body>
@@ -65,6 +83,8 @@
     <div class="itin-stat"><div class="itin-stat-val">18</div><div class="itin-stat-label">Noches</div></div>
     <div class="itin-stat"><div class="itin-stat-val">~3k</div><div class="itin-stat-label">USD p/p</div></div>
   </div>
+
+  <div class="cal-wrap" id="calWrap"></div>
 
   <div class="itin-section-label">Ciudades y fechas</div>
 
@@ -178,6 +198,97 @@
 
 <script>
 if('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(function(){});
+
+(function buildCalendar() {
+  var wrap = document.getElementById('calWrap');
+  if (!wrap) return;
+
+  // Paleta por destino
+  var D = {
+    mad: {label:'Madrid',          short:'MAD', color:'#0d1b2a'},
+    bcn: {label:'Barcelona',       short:'BCN', color:'#b91c1c'},
+    ath: {label:'Atenas',          short:'ATH', color:'#1d4ed8'},
+    jtr: {label:'Santorini',       short:'JTR', color:'#0284c7'},
+    nax: {label:'Naxos',           short:'NAX', color:'#0891b2'},
+    her: {label:'Creta',           short:'HER', color:'#059669'},
+    rd:  {label:'Road Trip',       short:'◉RT', color:'#d97706'},
+    bud: {label:'Budapest',        short:'BUD', color:'#7c3aed'}
+  };
+
+  // Día → {dest, travel?}  (Sep 2026, por noche que se duerme ahí)
+  // Sep 1 = martes. Sep 1-3 = Madrid I; 4-6 = Barcelona; 7 = Atenas;
+  // 8-9 = Santorini; 10-11 = Naxos; 12-14 = Creta;
+  // 15-18 = Road Trip; 19-21 = Budapest; 22-25 = Madrid II
+  var DAYS = {
+     1:{d:'mad'},  2:{d:'mad'},  3:{d:'mad'},
+     4:{d:'bcn',t:1},  5:{d:'bcn'},  6:{d:'bcn'},
+     7:{d:'ath',t:1},
+     8:{d:'jtr',t:1},  9:{d:'jtr'},
+    10:{d:'nax',t:1}, 11:{d:'nax'},
+    12:{d:'her',t:1}, 13:{d:'her'}, 14:{d:'her'},
+    15:{d:'rd', t:1}, 16:{d:'rd'}, 17:{d:'rd'}, 18:{d:'rd'},
+    19:{d:'bud',t:1}, 20:{d:'bud'}, 21:{d:'bud'},
+    22:{d:'mad',t:1}, 23:{d:'mad'}, 24:{d:'mad'}, 25:{d:'mad',t:1}
+  };
+
+  var MES_NOMBRES = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+  var HEADS = ['L','M','X','J','V','S','D'];
+
+  // Sep 2026 comienza el martes → offset 1 (0=lun, 1=mar…)
+  var startOffset = 1;
+  var totalDays   = 30;
+
+  var html = '<div class="cal-month-label">Septiembre 2026</div><div class="cal-grid">';
+
+  // Cabeceras
+  HEADS.forEach(function(h) { html += '<div class="cal-head">' + h + '</div>'; });
+
+  // Celdas vacías antes del día 1
+  for (var i = 0; i < startOffset; i++) {
+    html += '<div class="cal-cell empty"></div>';
+  }
+
+  // Días del mes
+  for (var day = 1; day <= totalDays; day++) {
+    var info = DAYS[day];
+    if (info) {
+      var dest = D[info.d];
+      html += '<div class="cal-cell trip" style="background:' + dest.color + '" title="' + dest.label + (info.t ? ' · traslado' : '') + '">' +
+              '<span class="cal-num">' + day + '</span>' +
+              '<span class="cal-lbl">' + dest.short + '</span>' +
+              (info.t ? '<span class="cal-dot"></span>' : '') +
+              '</div>';
+    } else {
+      html += '<div class="cal-cell post"><span class="cal-num">' + day + '</span></div>';
+    }
+  }
+
+  // Rellenar última fila
+  var totalCells = startOffset + totalDays;
+  var rem = totalCells % 7 === 0 ? 0 : 7 - (totalCells % 7);
+  for (var i = 0; i < rem; i++) {
+    html += '<div class="cal-cell empty"></div>';
+  }
+
+  html += '</div>';
+
+  // Leyenda
+  html += '<div class="cal-legend">';
+  var seen = {};
+  for (var day = 1; day <= 25; day++) {
+    if (DAYS[day]) {
+      var dk = DAYS[day].d;
+      if (!seen[dk]) {
+        seen[dk] = true;
+        html += '<span class="cal-leg"><span class="cal-leg-sq" style="background:' + D[dk].color + '"></span>' + D[dk].label + '</span>';
+      }
+    }
+  }
+  html += '</div>';
+  html += '<p class="cal-note">· Punto blanco = día de traslado</p>';
+
+  wrap.innerHTML = html;
+})();
 </script>
 </body>
 </html>
