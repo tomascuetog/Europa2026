@@ -483,6 +483,15 @@
     pw.appendChild(sym); pw.appendChild(pi);
     mainRow.appendChild(pw);
 
+    // ─ mes estimado para proyectados ─
+    if (!isRes) {
+      var dp = document.createElement('input');
+      dp.className = 'bi-date-inp'; dp.type = 'month'; dp.title = 'Mes estimado de pago';
+      dp.value = s.fecha_destino || ''; dp.min = '2025-01'; dp.max = '2026-12';
+      dp.dataset.id = item.id; dp.dataset.field = 'fecha_destino';
+      mainRow.appendChild(dp);
+    }
+
     // ─ edit buttons (shown only in edit mode) ─
     if (catalogEditable) {
       var editBtns = document.createElement('div');
@@ -534,8 +543,8 @@
       ai.className = 'bi-adv-inp'; ai.type = 'number'; ai.min = '0'; ai.value = adelanto;
       ai.dataset.id = item.id; ai.dataset.field = 'adelanto';
       var d1 = document.createElement('input');
-      d1.className = 'bi-date-inp'; d1.type = 'date'; d1.title = 'Fecha de adelanto';
-      d1.value = s.fecha_adelanto || ''; d1.min = '2025-01-01'; d1.max = '2026-12-31';
+      d1.className = 'bi-date-inp'; d1.type = 'month'; d1.title = 'Mes de adelanto';
+      d1.value = s.fecha_adelanto || ''; d1.min = '2025-01'; d1.max = '2026-12';
       d1.dataset.id = item.id; d1.dataset.field = 'fecha_adelanto';
       r1.appendChild(l1); r1.appendChild(s1); r1.appendChild(ai); r1.appendChild(d1);
 
@@ -545,8 +554,8 @@
       var s2 = document.createElement('span'); s2.className = 'bi-price-sym'; s2.textContent = '$';
       var dv = document.createElement('span'); dv.className = 'bi-dest-val'; dv.id = 'dest-' + item.id; dv.textContent = destino;
       var d2 = document.createElement('input');
-      d2.className = 'bi-date-inp'; d2.type = 'date'; d2.title = 'Fecha de pago en destino';
-      d2.value = s.fecha_destino || ''; d2.min = '2025-01-01'; d2.max = '2026-12-31';
+      d2.className = 'bi-date-inp'; d2.type = 'month'; d2.title = 'Mes de pago en destino';
+      d2.value = s.fecha_destino || ''; d2.min = '2025-01'; d2.max = '2026-12';
       d2.dataset.id = item.id; d2.dataset.field = 'fecha_destino';
       r2.appendChild(l2); r2.appendChild(s2); r2.appendChild(dv); r2.appendChild(d2);
 
@@ -817,30 +826,37 @@
   var paymentChart = null;
 
   function renderChart() {
-    var adelantosByMonth = {}, destinoByMonth = {};
+    var adelantosByMonth = {}, destinoByMonth = {}, proyectadosByMonth = {};
 
     catalogItems.filter(function(it) { return !it.deleted; }).forEach(function(item) {
       var s = trackerState[item.id];
-      if (!s || normalizeStatus(s.status) !== 'reservado') return;
-      var precio   = s.precio   || item.est;
-      var adelanto = s.adelanto || 0;
-      var enDest   = Math.max(0, precio - adelanto);
-
-      if (adelanto > 0 && s.fecha_adelanto) {
-        var m = s.fecha_adelanto.substring(0, 7);
-        adelantosByMonth[m] = (adelantosByMonth[m] || 0) + adelanto;
-      }
-      // en destino (including full price when adelanto=0)
-      if (s.fecha_destino) {
-        var md = s.fecha_destino.substring(0, 7);
-        var amount = adelanto === 0 ? precio : enDest;
-        if (amount > 0) destinoByMonth[md] = (destinoByMonth[md] || 0) + amount;
+      var est = (s && s.precio > 0) ? s.precio : item.est;
+      if (s && normalizeStatus(s.status) === 'reservado') {
+        var precio   = s.precio   || item.est;
+        var adelanto = s.adelanto || 0;
+        var enDest   = Math.max(0, precio - adelanto);
+        if (adelanto > 0 && s.fecha_adelanto) {
+          var m = s.fecha_adelanto.substring(0, 7);
+          adelantosByMonth[m] = (adelantosByMonth[m] || 0) + adelanto;
+        }
+        if (s.fecha_destino) {
+          var md = s.fecha_destino.substring(0, 7);
+          var amount = adelanto === 0 ? precio : enDest;
+          if (amount > 0) destinoByMonth[md] = (destinoByMonth[md] || 0) + amount;
+        }
+      } else {
+        // proyectado: mes estimado en fecha_destino
+        if (s && s.fecha_destino) {
+          var mp = s.fecha_destino.substring(0, 7);
+          proyectadosByMonth[mp] = (proyectadosByMonth[mp] || 0) + est;
+        }
       }
     });
 
     var allKeys = {};
     Object.keys(adelantosByMonth).forEach(function(k) { allKeys[k] = true; });
     Object.keys(destinoByMonth).forEach(function(k) { allKeys[k] = true; });
+    Object.keys(proyectadosByMonth).forEach(function(k) { allKeys[k] = true; });
     var months = Object.keys(allKeys).sort();
 
     var emptyEl  = document.getElementById('chartEmpty');
@@ -862,13 +878,15 @@
       var parts = m.split('-');
       return MES[parseInt(parts[1], 10) - 1] + " '" + parts[0].substring(2);
     });
-    var dataAd = months.map(function(m) { return Math.round(adelantosByMonth[m] || 0); });
-    var dataDe = months.map(function(m) { return Math.round(destinoByMonth[m]  || 0); });
+    var dataAd = months.map(function(m) { return Math.round(adelantosByMonth[m]   || 0); });
+    var dataDe = months.map(function(m) { return Math.round(destinoByMonth[m]     || 0); });
+    var dataPr = months.map(function(m) { return Math.round(proyectadosByMonth[m] || 0); });
 
     if (paymentChart) {
       paymentChart.data.labels = labels;
       paymentChart.data.datasets[0].data = dataAd;
       paymentChart.data.datasets[1].data = dataDe;
+      paymentChart.data.datasets[2].data = dataPr;
       paymentChart.update('none');
       return;
     }
@@ -888,10 +906,20 @@
           {
             label: 'A pagar en destino',
             data: dataDe,
-            backgroundColor: 'rgba(255,255,255,0.18)',
-            borderColor: 'rgba(255,255,255,0.35)',
+            backgroundColor: 'rgba(255,255,255,0.20)',
+            borderColor: 'rgba(255,255,255,0.38)',
             borderWidth: 1,
             borderRadius: 5,
+            stack: 'pay'
+          },
+          {
+            label: 'Proyectado (estimado)',
+            data: dataPr,
+            backgroundColor: 'rgba(148,163,184,0.28)',
+            borderColor: 'rgba(148,163,184,0.5)',
+            borderWidth: 1,
+            borderRadius: 5,
+            borderDash: [4, 3],
             stack: 'pay'
           }
         ]
