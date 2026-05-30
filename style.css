@@ -292,3 +292,46 @@ body{font-family:'Outfit',sans-serif;background:var(--cream);color:var(--text);l
 .city-header-sub{font-family:Outfit,sans-serif;font-size:.75rem;letter-spacing:.06em;color:rgba(255,255,255,.4);margin-top:.4rem;}
 .city-climate{display:flex;flex-wrap:wrap;gap:.5rem;margin-top:1rem;}
 .climate-pill{font-family:Outfit,sans-serif;font-size:.68rem;font-weight:500;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.15);border-radius:20px;padding:.28rem .75rem;color:rgba(255,255,255,.75);white-space:nowrap;}
+
+/* ── ITINERARIO DINÁMICO ─────────────────────────────── */
+.city-item-editor{display:flex;align-items:center;background:#fff;border-radius:16px;padding:1.1rem;text-decoration:none;color:var(--navy);box-shadow:0 2px 10px rgba(13,27,42,.07);border:1px solid rgba(13,27,42,.05);transition:transform .15s;-webkit-tap-highlight-color:transparent;width:100%;}
+.city-item-editor:active{transform:scale(.98);}
+.city-dates-editor{display:flex;align-items:center;gap:.5rem;}
+.nights-input{width:50px;border:1px solid var(--gold);border-radius:8px;padding:.35rem .5rem;font-family:Outfit,sans-serif;font-size:.8rem;text-align:center;color:var(--navy);background:#fffbf0;}
+.nights-input:focus{outline:none;border-color:var(--gold);box-shadow:0 0 0 2px rgba(201,151,58,.2);}
+.nights-label{font-size:.75rem;color:var(--text-mid);font-weight:500;}
+
+/* ALERTAS */
+.alert{border-radius:12px;padding:1rem 1.25rem;margin-bottom:1rem;display:flex;gap:1rem;align-items:flex-start;}
+.alert-icon{font-size:1.3rem;flex-shrink:0;}
+.alert-content{flex:1;}
+.alert-content strong{display:block;font-size:.85rem;margin-bottom:.25rem;}
+.alert-content p{font-size:.8rem;line-height:1.4;}
+.alert.alert-warning{background:rgba(249,115,22,.1);border:1px solid rgba(249,115,22,.3);color:#92400e;}
+.alert.alert-critical{background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.3);color:#7f1d1d;}
+
+/* CONFLICT MODAL */
+.conflict-modal{position:fixed;inset:0;z-index:2000;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,.5);padding:1.5rem;}
+.conflict-modal.open{display:flex;}
+.conflict-modal-content{background:white;border-radius:16px;max-width:500px;width:100%;padding:1.75rem;box-shadow:0 20px 60px rgba(0,0,0,.3);}
+.conflict-modal-content h2{font-family:'Cormorant Garamond',serif;font-size:1.5rem;font-weight:400;color:var(--navy);margin-bottom:1.25rem;}
+.conflict-alerts-list{margin-bottom:1.5rem;}
+.conflict-alert{background:#fef3c7;border-left:4px solid #d97706;padding:1rem;margin-bottom:.75rem;border-radius:8px;font-size:.85rem;line-height:1.5;color:#78350f;}
+.conflict-alert.critical{background:#fee2e2;border-left-color:#dc2626;color:#7f1d1d;}
+.conflict-severity{font-weight:700;margin-bottom:.25rem;font-size:.8rem;}
+.conflict-message{font-size:.8rem;}
+.conflict-modal-actions{display:flex;gap:.75rem;}
+.btn-primary,.btn-secondary{flex:1;padding:.75rem 1rem;border:none;border-radius:10px;font-family:Outfit,sans-serif;font-weight:600;cursor:pointer;font-size:.82rem;transition:all .2s;-webkit-tap-highlight-color:transparent;}
+.btn-primary{background:var(--navy);color:white;}
+.btn-primary:hover{background:#1a2f47;}
+.btn-secondary{background:rgba(13,27,42,.08);color:var(--text-mid);}
+.btn-secondary:hover{background:rgba(13,27,42,.15);}
+
+/* EDIT TOGGLE BUTTON */
+.edit-toggle-btn{font-family:Outfit,sans-serif;font-size:.75rem;font-weight:600;color:rgba(255,255,255,.6);background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);border-radius:20px;padding:.4rem 1rem;cursor:pointer;transition:all .2s;-webkit-tap-highlight-color:transparent;text-transform:uppercase;letter-spacing:.08em;}
+.edit-toggle-btn:hover{border-color:rgba(255,255,255,.4);color:rgba(255,255,255,.8);}
+.edit-toggle-btn.active{background:var(--gold);color:var(--navy);border-color:var(--gold);}
+
+/* NOTIFICATION TOAST */
+@keyframes slideUp{from{opacity:0;transform:translateX(-50%) translateY(20px);}to{opacity:1;transform:translateX(-50%) translateY(0);}}
+@keyframes slideDown{from{opacity:1;transform:translateX(-50%) translateY(0);}to{opacity:0;transform:translateX(-50%) translateY(20px);}}
