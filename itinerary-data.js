@@ -394,9 +394,10 @@ function getCalendarDayMap() {
   const dayMap = {};
   itineraryState.destinations.forEach(dest => {
     const startDate = new Date(dest.startDate + 'T00:00:00Z');
-    const endDate = new Date(dest.endDate + 'T00:00:00Z');
+    const endDateStr = dest.endDate || calculateEndDate(dest.startDate, dest.nights);
+    const endDate = new Date(endDateStr + 'T00:00:00Z');
 
-    for (let d = new Date(startDate); d <= endDate; d.setUTCDate(d.getUTCDate() + 1)) {
+    for (let d = new Date(startDate); d < endDate; d.setUTCDate(d.getUTCDate() + 1)) {
       const dayKey = d.toISOString().split('T')[0];
       dayMap[dayKey] = dest;
     }

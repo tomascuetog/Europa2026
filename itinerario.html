@@ -21,17 +21,17 @@
   .itin-sub{font-family:Outfit,sans-serif;font-size:.75rem;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,.4);margin-top:.4rem;}
   .itin-body{max-width:680px;margin:0 auto;padding:1.5rem 1.25rem;}
   .itin-section-label{font-family:Outfit,sans-serif;font-size:.63rem;letter-spacing:.18em;text-transform:uppercase;color:var(--text-mid);margin-bottom:.9rem;padding-left:.2rem;}
-  .city-list{display:flex;flex-direction:column;gap:.7rem;margin-bottom:2rem;}
-  .city-item{display:flex;align-items:center;background:#fff;border-radius:16px;padding:1.1rem 1.1rem 1.1rem 1.1rem;text-decoration:none;color:var(--navy);box-shadow:0 2px 10px rgba(13,27,42,.07);border:1px solid rgba(13,27,42,.05);transition:transform .15s;-webkit-tap-highlight-color:transparent;}
+  .city-list{display:flex;flex-direction:column;gap:.5rem;margin-bottom:1.5rem;}
+  .city-item{display:flex;align-items:center;background:#fff;border-radius:14px;padding:.85rem 1rem;text-decoration:none;color:var(--navy);box-shadow:0 2px 8px rgba(13,27,42,.06);border:1px solid rgba(13,27,42,.05);transition:transform .15s;-webkit-tap-highlight-color:transparent;}
   .city-item:active{transform:scale(.98);}
-  .city-num{width:34px;height:34px;background:var(--navy);color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:Outfit,sans-serif;font-size:.78rem;font-weight:700;flex-shrink:0;margin-right:1rem;}
+  .city-num{width:28px;height:28px;background:var(--navy);color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:Outfit,sans-serif;font-size:.7rem;font-weight:700;flex-shrink:0;margin-right:.85rem;}
   .city-info{flex:1;min-width:0;}
-  .city-name{font-family:'Cormorant Garamond',serif;font-size:1.2rem;font-weight:600;line-height:1.1;}
-  .city-dates{font-family:Outfit,sans-serif;font-size:.7rem;color:var(--text-mid);margin-top:.15rem;}
-  .city-right{text-align:right;flex-shrink:0;margin-left:.75rem;}
-  .city-temp{font-family:Outfit,sans-serif;font-size:.8rem;font-weight:600;color:var(--gold);}
-  .city-rain{font-family:Outfit,sans-serif;font-size:.65rem;color:var(--text-mid);margin-top:.1rem;}
-  .city-arrow{color:rgba(13,27,42,.2);font-size:.85rem;margin-left:.6rem;flex-shrink:0;}
+  .city-name{font-family:'Cormorant Garamond',serif;font-size:1.05rem;font-weight:600;line-height:1.1;}
+  .city-dates{font-family:Outfit,sans-serif;font-size:.65rem;color:var(--text-mid);margin-top:.1rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .city-right{text-align:right;flex-shrink:0;margin-left:.6rem;}
+  .city-temp{font-family:Outfit,sans-serif;font-size:.75rem;font-weight:600;color:var(--gold);}
+  .city-rain{font-family:Outfit,sans-serif;font-size:.6rem;color:var(--text-mid);margin-top:.05rem;}
+  .city-arrow{color:rgba(13,27,42,.2);font-size:.8rem;margin-left:.5rem;flex-shrink:0;}
 
   /* Linea de ruta vertical */
   .city-list{position:relative;}
@@ -39,7 +39,7 @@
   .city-item{position:relative;z-index:1;}
 
   /* Info total */
-  .itin-total{background:var(--navy);border-radius:16px;padding:1.25rem 1.5rem;display:flex;justify-content:space-around;gap:1rem;margin-bottom:2rem;}
+  .itin-total{background:var(--navy);border-radius:14px;padding:1rem 1.25rem;display:flex;justify-content:space-around;gap:.75rem;margin-bottom:1.25rem;}
   .itin-stat{text-align:center;}
   .itin-stat-val{font-family:'Cormorant Garamond',serif;font-size:1.8rem;font-weight:300;color:#fff;line-height:1;}
   .itin-stat-label{font-family:Outfit,sans-serif;font-size:.65rem;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.4);margin-top:.2rem;}
@@ -49,22 +49,22 @@
   }
 
   /* ── CALENDARIO ─────────────────────────────── */
-  .cal-wrap{margin:0 0 2rem;}
-  .cal-month-label{font-family:'Cormorant Garamond',serif;font-size:1.05rem;font-weight:600;color:var(--navy);margin-bottom:.7rem;letter-spacing:.01em;}
-  .cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;}
-  .cal-head{font-family:Outfit,sans-serif;font-size:.6rem;font-weight:700;letter-spacing:.05em;color:var(--text-mid);text-align:center;padding:.3rem 0 .5rem;}
-  .cal-cell{aspect-ratio:1;border-radius:7px;display:flex;flex-direction:column;align-items:center;justify-content:center;position:relative;overflow:hidden;user-select:none;}
+  .cal-wrap{margin:0 0 1.5rem;}
+  .cal-month-label{font-family:'Cormorant Garamond',serif;font-size:.95rem;font-weight:600;color:var(--navy);margin-bottom:.5rem;letter-spacing:.01em;}
+  .cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;}
+  .cal-head{font-family:Outfit,sans-serif;font-size:.55rem;font-weight:700;letter-spacing:.04em;color:var(--text-mid);text-align:center;padding:.25rem 0 .4rem;}
+  .cal-cell{aspect-ratio:1;border-radius:5px;display:flex;flex-direction:column;align-items:center;justify-content:center;position:relative;overflow:hidden;user-select:none;}
   .cal-cell.empty{background:rgba(13,27,42,.04);}
   .cal-cell.post{background:rgba(13,27,42,.04);}
-  .cal-cell.trip{box-shadow:0 1px 3px rgba(0,0,0,.18);}
-  .cal-num{font-family:Outfit,sans-serif;font-size:.72rem;font-weight:700;color:white;line-height:1;}
+  .cal-cell.trip{box-shadow:0 1px 3px rgba(0,0,0,.15);}
+  .cal-num{font-family:Outfit,sans-serif;font-size:.62rem;font-weight:700;color:white;line-height:1;}
   .cal-cell.empty .cal-num,.cal-cell.post .cal-num{color:rgba(13,27,42,.18);font-weight:400;}
-  .cal-lbl{font-family:Outfit,sans-serif;font-size:.4rem;font-weight:600;color:rgba(255,255,255,.78);line-height:1;margin-top:1px;letter-spacing:-.01em;text-align:center;}
-  .cal-dot{position:absolute;top:3px;right:3px;width:4px;height:4px;background:rgba(255,255,255,.9);border-radius:50%;}
-  .cal-legend{display:flex;flex-wrap:wrap;gap:.45rem .9rem;margin-top:1rem;}
-  .cal-leg{display:inline-flex;align-items:center;gap:.35rem;font-family:Outfit,sans-serif;font-size:.69rem;color:var(--text-mid);}
-  .cal-leg-sq{width:9px;height:9px;border-radius:3px;flex-shrink:0;}
-  .cal-note{font-family:Outfit,sans-serif;font-size:.63rem;color:var(--text-mid);opacity:.55;margin-top:.6rem;}
+  .cal-lbl{font-family:Outfit,sans-serif;font-size:.36rem;font-weight:600;color:rgba(255,255,255,.75);line-height:1;margin-top:1px;letter-spacing:-.01em;text-align:center;}
+  .cal-dot{position:absolute;top:2px;right:2px;width:3px;height:3px;background:rgba(255,255,255,.9);border-radius:50%;}
+  .cal-legend{display:flex;flex-wrap:wrap;gap:.35rem .75rem;margin-top:.75rem;}
+  .cal-leg{display:inline-flex;align-items:center;gap:.3rem;font-family:Outfit,sans-serif;font-size:.62rem;color:var(--text-mid);}
+  .cal-leg-sq{width:8px;height:8px;border-radius:2px;flex-shrink:0;}
+  .cal-note{font-family:Outfit,sans-serif;font-size:.6rem;color:var(--text-mid);opacity:.5;margin-top:.5rem;}
 </style>
 </head>
 <body>
