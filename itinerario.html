@@ -73,8 +73,9 @@
   .city-editor-row{display:flex;align-items:center;gap:.6rem;flex-wrap:wrap;}
   .date-field{display:flex;flex-direction:column;gap:.18rem;}
   .date-field label{font-family:Outfit,sans-serif;font-size:.55rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--text-mid);}
-  .date-field input[type="date"]{font-family:Outfit,sans-serif;font-size:.75rem;color:var(--navy);background:var(--cream);border:1px solid var(--cream-dark);border-radius:8px;padding:.35rem .6rem;outline:none;-webkit-appearance:none;}
-  .date-field input[type="date"]:focus{border-color:var(--gold);}
+  .date-field input[type="date"],.date-field input[type="text"]{font-family:Outfit,sans-serif;font-size:.75rem;color:var(--navy);background:var(--cream);border:1px solid var(--cream-dark);border-radius:8px;padding:.35rem .6rem;outline:none;-webkit-appearance:none;}
+  .date-field input[type="date"]:focus,.date-field input[type="text"]:focus{border-color:var(--gold);}
+  .editor-name-row{margin-bottom:.1rem;}
   .editor-sep{color:var(--text-mid);font-size:.8rem;margin-top:.9rem;}
   .editor-nights{font-family:Outfit,sans-serif;font-size:.72rem;font-weight:600;color:var(--gold);margin-top:.9rem;white-space:nowrap;}
 
@@ -118,12 +119,18 @@
 <script>
 // ── DATOS ────────────────────────────────────────────────────────────────────
 const DESTS = [
-  { id:'mad', name:'Madrid',            start:'2026-09-01', end:'2026-09-04', color:'#0d1b2a', temp:'22°C', rain:'5d lluvia',  desc:'Punto de entrada y cierre',        url:'madrid.html'       },
-  { id:'bcn', name:'Barcelona',         start:'2026-09-04', end:'2026-09-07', color:'#b91c1c', temp:'24°C', rain:'Mar 23°C',   desc:'Gaudí, playa, tapas',               url:'barcelona.html'    },
-  { id:'ath', name:'Atenas',            start:'2026-09-07', end:'2026-09-08', color:'#1d4ed8', temp:'28°C', rain:'2d lluvia',  desc:'Acrópolis, Monastiraki',            url:'atenas.html'       },
-  { id:'isl', name:'Grecia — Islas',   start:'2026-09-08', end:'2026-09-15', color:'#0891b2', temp:'26°C', rain:'Mar 24°C',   desc:'Santorini · Naxos · Creta',         url:'grecia-islas.html' },
-  { id:'con', name:'Grecia Continental',start:'2026-09-15', end:'2026-09-19', color:'#d97706', temp:'26°C', rain:'3d lluvia',  desc:'Road trip en auto',                 url:'continental.html'  },
-  { id:'bud', name:'Budapest',          start:'2026-09-19', end:'2026-09-22', color:'#7c3aed', temp:'19°C', rain:'8d lluvia',  desc:'Baños, Parlamento, ruin bars',      url:'budapest.html'     },
+  { id:'mad',  name:'Madrid',          start:'2026-09-01', end:'2026-09-04', color:'#0d1b2a', temp:'22°C', rain:'5d lluvia',  desc:'Punto de entrada',              url:'madrid.html'                  },
+  { id:'bcn',  name:'Barcelona',       start:'2026-09-04', end:'2026-09-07', color:'#b91c1c', temp:'24°C', rain:'Mar 23°C',   desc:'Gaudí, playa, tapas',           url:'barcelona.html'               },
+  { id:'ath',  name:'Atenas',          start:'2026-09-07', end:'2026-09-08', color:'#1d4ed8', temp:'28°C', rain:'2d lluvia',  desc:'Acrópolis, Monastiraki',        url:'atenas.html'                  },
+  { id:'san',  name:'Santorini',       start:'2026-09-08', end:'2026-09-10', color:'#0891b2', temp:'26°C', rain:'Mar 24°C',   desc:'Caldera, Oia, volcán',          url:'grecia-islas.html#santorini'  },
+  { id:'nax',  name:'Naxos',           start:'2026-09-10', end:'2026-09-12', color:'#0ea5e9', temp:'26°C', rain:'Mar 24°C',   desc:'Playas, Portara, montaña',      url:'grecia-islas.html#naxos'      },
+  { id:'crt',  name:'Creta',           start:'2026-09-12', end:'2026-09-15', color:'#0284c7', temp:'26°C', rain:'Mar 24°C',   desc:'Heraklion, Chania, Samaria',    url:'grecia-islas.html#creta'      },
+  { id:'ath2', name:'Atenas II',       start:'2026-09-15', end:'2026-09-16', color:'#3b82f6', temp:'28°C', rain:'2d lluvia',  desc:'Base de road trip',             url:'continental.html'             },
+  { id:'nau',  name:'Nauplia',         start:'2026-09-16', end:'2026-09-17', color:'#d97706', temp:'24°C', rain:'3d lluvia',  desc:'Casco histórico, castillo',     url:'continental.html'             },
+  { id:'met',  name:'Meteora',         start:'2026-09-17', end:'2026-09-18', color:'#b45309', temp:'22°C', rain:'3d lluvia',  desc:'Monasterios en las rocas',      url:'continental.html'             },
+  { id:'sal',  name:'Salónica',        start:'2026-09-18', end:'2026-09-19', color:'#92400e', temp:'22°C', rain:'4d lluvia',  desc:'Ciudad costera, gastronomía',   url:'continental.html'             },
+  { id:'bud',  name:'Budapest',        start:'2026-09-19', end:'2026-09-22', color:'#7c3aed', temp:'19°C', rain:'8d lluvia',  desc:'Baños, Parlamento, ruin bars',  url:'budapest.html'                },
+  { id:'mad2', name:'Madrid',          start:'2026-09-22', end:'2026-09-26', color:'#374151', temp:'22°C', rain:'5d lluvia',  desc:'Cierre del viaje',              url:'madrid.html'                  },
 ];
 
 const MONTHS = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
@@ -141,13 +148,13 @@ function sorted(){ return [...DESTS].sort((a,b)=>a.start.localeCompare(b.start))
 // ── PERSISTENCIA ──────────────────────────────────────────────────────────────
 (function load(){
   try {
-    const s = localStorage.getItem('itin-dates');
-    if(s){ JSON.parse(s).forEach(p=>{ const d=DESTS.find(x=>x.id===p.id); if(d){d.start=p.start;d.end=p.end;} }); }
+    const s = localStorage.getItem('itin-dates-v2');
+    if(s){ JSON.parse(s).forEach(p=>{ const d=DESTS.find(x=>x.id===p.id); if(d){ d.start=p.start; d.end=p.end; if(p.name) d.name=p.name; } }); }
   } catch(e){}
 })();
 
 function save(){
-  try { localStorage.setItem('itin-dates', JSON.stringify(DESTS.map(d=>({id:d.id,start:d.start,end:d.end})))); } catch(e){}
+  try { localStorage.setItem('itin-dates-v2', JSON.stringify(DESTS.map(d=>({id:d.id,name:d.name,start:d.start,end:d.end})))); } catch(e){}
 }
 
 // ── CALENDARIO ────────────────────────────────────────────────────────────────
@@ -239,7 +246,10 @@ function renderCities(){
         <button class="city-edit-btn" id="ebtn-${d.id}" title="Editar fechas">✎</button>
       </a>
       <div class="city-editor" id="editor-${d.id}" style="display:none">
-        <div class="city-editor-row">
+        <div class="editor-name-row">
+          <div class="date-field" style="flex:1"><label>Ubicación</label><input type="text" id="name-${d.id}" value="${d.name}" placeholder="Nombre" style="width:100%"></div>
+        </div>
+        <div class="city-editor-row" style="margin-top:.6rem">
           <div class="date-field"><label>Inicio</label><input type="date" id="start-${d.id}" value="${d.start}"></div>
           <span class="editor-sep">→</span>
           <div class="date-field"><label>Fin</label><input type="date" id="end-${d.id}" value="${d.end}"></div>
@@ -260,6 +270,18 @@ function renderCities(){
       editBtn.classList.toggle('active', !open);
     });
 
+    // Name change handler
+    const nameIn = row.querySelector(`#name-${d.id}`);
+    nameIn.addEventListener('change', ()=>{
+      const v = nameIn.value.trim();
+      if(!v) return;
+      d.name = v;
+      const nameEl = row.querySelector('.city-name');
+      if(nameEl) nameEl.textContent = v;
+      save();
+      renderCalendar(); // actualiza leyenda
+    });
+
     // Date change handlers
     const sIn = row.querySelector(`#start-${d.id}`);
     const eIn = row.querySelector(`#end-${d.id}`);
@@ -276,7 +298,6 @@ function renderCities(){
       save();
       renderCalendar();
       renderStats();
-      // Re-render cities only if order changed
       const newSorted = sorted();
       const idxNow = newSorted.findIndex(x=>x.id===d.id);
       if(idxNow !== i) renderCities();
