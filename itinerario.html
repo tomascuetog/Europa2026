@@ -14,57 +14,75 @@
 <link rel="stylesheet" href="style.css">
 <style>
   body{background:var(--cream);padding-bottom:calc(4.5rem + env(safe-area-inset-bottom,0));}
+
+  /* HEADER */
   .itin-header{background:var(--navy);padding:calc(env(safe-area-inset-top,0) + 1.25rem) 1.5rem 1.75rem;}
   .itin-back{display:inline-flex;align-items:center;gap:.35rem;font-family:Outfit,sans-serif;font-size:.75rem;font-weight:500;letter-spacing:.08em;color:rgba(255,255,255,.5);text-decoration:none;margin-bottom:1rem;-webkit-tap-highlight-color:transparent;}
   .itin-back:hover{color:var(--gold);}
   .itin-title{font-family:'Cormorant Garamond',serif;font-size:clamp(2rem,6vw,3rem);font-weight:300;color:#fff;line-height:1;}
-  .itin-sub{font-family:Outfit,sans-serif;font-size:.75rem;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,.4);margin-top:.4rem;}
+  .itin-sub{font-family:Outfit,sans-serif;font-size:.72rem;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,.35);margin-top:.35rem;}
+
+  /* BODY */
   .itin-body{max-width:680px;margin:0 auto;padding:1.5rem 1.25rem;}
-  .itin-section-label{font-family:Outfit,sans-serif;font-size:.63rem;letter-spacing:.18em;text-transform:uppercase;color:var(--text-mid);margin-bottom:.9rem;padding-left:.2rem;}
-  .city-list{display:flex;flex-direction:column;gap:.5rem;margin-bottom:1.5rem;}
-  .city-item{display:flex;align-items:center;background:#fff;border-radius:14px;padding:.85rem 1rem;text-decoration:none;color:var(--navy);box-shadow:0 2px 8px rgba(13,27,42,.06);border:1px solid rgba(13,27,42,.05);transition:transform .15s;-webkit-tap-highlight-color:transparent;}
-  .city-item:active{transform:scale(.98);}
-  .city-num{width:28px;height:28px;background:var(--navy);color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:Outfit,sans-serif;font-size:.7rem;font-weight:700;flex-shrink:0;margin-right:.85rem;}
-  .city-info{flex:1;min-width:0;}
-  .city-name{font-family:'Cormorant Garamond',serif;font-size:1.05rem;font-weight:600;line-height:1.1;}
-  .city-dates{font-family:Outfit,sans-serif;font-size:.65rem;color:var(--text-mid);margin-top:.1rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-  .city-right{text-align:right;flex-shrink:0;margin-left:.6rem;}
-  .city-temp{font-family:Outfit,sans-serif;font-size:.75rem;font-weight:600;color:var(--gold);}
-  .city-rain{font-family:Outfit,sans-serif;font-size:.6rem;color:var(--text-mid);margin-top:.05rem;}
-  .city-arrow{color:rgba(13,27,42,.2);font-size:.8rem;margin-left:.5rem;flex-shrink:0;}
+  @media(min-width:600px){.itin-body{padding:2rem 1.75rem;}}
 
-  /* Linea de ruta vertical */
-  .city-list{position:relative;}
-  .route-line{position:absolute;left:calc(1.25rem + 17px);top:34px;bottom:34px;width:2px;background:linear-gradient(to bottom,rgba(13,27,42,.12),rgba(13,27,42,.06));z-index:0;pointer-events:none;}
-  .city-item{position:relative;z-index:1;}
-
-  /* Info total */
-  .itin-total{background:var(--navy);border-radius:14px;padding:1rem 1.25rem;display:flex;justify-content:space-around;gap:.75rem;margin-bottom:1.25rem;}
+  /* STATS */
+  .itin-total{background:var(--navy);border-radius:14px;padding:.9rem 1rem;display:flex;justify-content:space-around;gap:.5rem;margin-bottom:1.25rem;}
   .itin-stat{text-align:center;}
-  .itin-stat-val{font-family:'Cormorant Garamond',serif;font-size:1.8rem;font-weight:300;color:#fff;line-height:1;}
-  .itin-stat-label{font-family:Outfit,sans-serif;font-size:.65rem;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.4);margin-top:.2rem;}
+  .itin-stat-val{font-family:'Cormorant Garamond',serif;font-size:1.65rem;font-weight:300;color:#fff;line-height:1;}
+  .itin-stat-label{font-family:Outfit,sans-serif;font-size:.58rem;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.38);margin-top:.15rem;}
 
-  @media(min-width:600px){
-    .itin-body{padding:2rem 1.75rem;}
-  }
+  /* SECTION LABEL */
+  .itin-section-label{font-family:Outfit,sans-serif;font-size:.6rem;letter-spacing:.18em;text-transform:uppercase;color:var(--text-mid);margin-bottom:.75rem;padding-left:.15rem;}
 
-  /* ── CALENDARIO ─────────────────────────────── */
-  .cal-wrap{margin:0 0 1.5rem;}
-  .cal-month-label{font-family:'Cormorant Garamond',serif;font-size:.95rem;font-weight:600;color:var(--navy);margin-bottom:.5rem;letter-spacing:.01em;}
+  /* CALENDAR */
+  .cal-wrap{margin:0 0 1.25rem;}
+  .cal-month-label{font-family:'Cormorant Garamond',serif;font-size:.9rem;font-weight:600;color:var(--navy);margin-bottom:.45rem;}
   .cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;}
-  .cal-head{font-family:Outfit,sans-serif;font-size:.55rem;font-weight:700;letter-spacing:.04em;color:var(--text-mid);text-align:center;padding:.25rem 0 .4rem;}
-  .cal-cell{aspect-ratio:1;border-radius:5px;display:flex;flex-direction:column;align-items:center;justify-content:center;position:relative;overflow:hidden;user-select:none;}
+  .cal-head{font-family:Outfit,sans-serif;font-size:.52rem;font-weight:700;letter-spacing:.03em;color:var(--text-mid);text-align:center;padding:.2rem 0 .35rem;}
+  .cal-cell{aspect-ratio:1;border-radius:5px;display:flex;align-items:center;justify-content:center;}
   .cal-cell.empty{background:rgba(13,27,42,.04);}
   .cal-cell.post{background:rgba(13,27,42,.04);}
   .cal-cell.trip{box-shadow:0 1px 3px rgba(0,0,0,.15);}
-  .cal-num{font-family:Outfit,sans-serif;font-size:.62rem;font-weight:700;color:white;line-height:1;}
-  .cal-cell.empty .cal-num,.cal-cell.post .cal-num{color:rgba(13,27,42,.18);font-weight:400;}
-  .cal-lbl{font-family:Outfit,sans-serif;font-size:.36rem;font-weight:600;color:rgba(255,255,255,.75);line-height:1;margin-top:1px;letter-spacing:-.01em;text-align:center;}
-  .cal-dot{position:absolute;top:2px;right:2px;width:3px;height:3px;background:rgba(255,255,255,.9);border-radius:50%;}
-  .cal-legend{display:flex;flex-wrap:wrap;gap:.35rem .75rem;margin-top:.75rem;}
-  .cal-leg{display:inline-flex;align-items:center;gap:.3rem;font-family:Outfit,sans-serif;font-size:.62rem;color:var(--text-mid);}
+  .cal-num{font-family:Outfit,sans-serif;font-size:.6rem;font-weight:700;color:white;line-height:1;}
+  .cal-cell.empty .cal-num,.cal-cell.post .cal-num{color:rgba(13,27,42,.2);font-weight:400;}
+  .cal-legend{display:flex;flex-wrap:wrap;gap:.3rem .7rem;margin-top:.6rem;}
+  .cal-leg{display:inline-flex;align-items:center;gap:.28rem;font-family:Outfit,sans-serif;font-size:.6rem;color:var(--text-mid);}
   .cal-leg-sq{width:8px;height:8px;border-radius:2px;flex-shrink:0;}
-  .cal-note{font-family:Outfit,sans-serif;font-size:.6rem;color:var(--text-mid);opacity:.5;margin-top:.5rem;}
+
+  /* CITY LIST */
+  .city-list{display:flex;flex-direction:column;gap:.45rem;margin-bottom:1.5rem;position:relative;}
+  .route-line{position:absolute;left:calc(1rem + 14px);top:28px;bottom:28px;width:2px;background:linear-gradient(to bottom,rgba(13,27,42,.12),rgba(13,27,42,.04));z-index:0;pointer-events:none;}
+  .city-row{position:relative;z-index:1;}
+
+  .city-item{display:flex;align-items:center;background:#fff;border-radius:13px;padding:.75rem .9rem;text-decoration:none;color:var(--navy);box-shadow:0 2px 8px rgba(13,27,42,.06);border:1px solid rgba(13,27,42,.05);transition:transform .15s;-webkit-tap-highlight-color:transparent;}
+  .city-item:active{transform:scale(.985);}
+  .city-num{width:26px;height:26px;background:var(--navy);color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:Outfit,sans-serif;font-size:.65rem;font-weight:700;flex-shrink:0;margin-right:.8rem;}
+  .city-info{flex:1;min-width:0;}
+  .city-name{font-family:'Cormorant Garamond',serif;font-size:1rem;font-weight:600;line-height:1.15;}
+  .city-dates{font-family:Outfit,sans-serif;font-size:.62rem;color:var(--text-mid);margin-top:.08rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .city-right{text-align:right;flex-shrink:0;margin-left:.5rem;}
+  .city-temp{font-family:Outfit,sans-serif;font-size:.72rem;font-weight:600;color:var(--gold);}
+  .city-rain{font-family:Outfit,sans-serif;font-size:.58rem;color:var(--text-mid);margin-top:.04rem;}
+  .city-edit-btn{display:flex;align-items:center;justify-content:center;width:26px;height:26px;border-radius:8px;background:rgba(13,27,42,.05);border:none;cursor:pointer;margin-left:.5rem;flex-shrink:0;color:var(--text-mid);font-size:.75rem;-webkit-tap-highlight-color:transparent;transition:background .15s;}
+  .city-edit-btn:active{background:rgba(13,27,42,.12);}
+  .city-edit-btn.active{background:var(--gold-light);color:var(--gold);}
+
+  /* DATE EDITOR */
+  .city-editor{background:#fff;border-radius:0 0 13px 13px;margin-top:-8px;padding:.85rem 1rem .85rem calc(1rem + 26px + .8rem);border:1px solid rgba(13,27,42,.07);border-top:none;box-shadow:0 4px 10px rgba(13,27,42,.06);}
+  .city-editor-row{display:flex;align-items:center;gap:.6rem;flex-wrap:wrap;}
+  .date-field{display:flex;flex-direction:column;gap:.18rem;}
+  .date-field label{font-family:Outfit,sans-serif;font-size:.55rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--text-mid);}
+  .date-field input[type="date"]{font-family:Outfit,sans-serif;font-size:.75rem;color:var(--navy);background:var(--cream);border:1px solid var(--cream-dark);border-radius:8px;padding:.35rem .6rem;outline:none;-webkit-appearance:none;}
+  .date-field input[type="date"]:focus{border-color:var(--gold);}
+  .editor-sep{color:var(--text-mid);font-size:.8rem;margin-top:.9rem;}
+  .editor-nights{font-family:Outfit,sans-serif;font-size:.72rem;font-weight:600;color:var(--gold);margin-top:.9rem;white-space:nowrap;}
+
+  /* FLIGHTS BOX */
+  .flights-box{background:#fff;border-radius:14px;padding:1.1rem 1.25rem;box-shadow:0 2px 8px rgba(13,27,42,.06);border:1px solid rgba(13,27,42,.05);}
+  .flight-row{display:flex;justify-content:space-between;align-items:center;font-family:Outfit,sans-serif;font-size:.8rem;}
+  .flight-sep{height:1px;background:rgba(13,27,42,.07);margin:.75rem 0;}
+  .flight-note{margin-top:.8rem;padding-top:.75rem;border-top:1px solid rgba(13,27,42,.07);font-family:Outfit,sans-serif;font-size:.68rem;color:var(--text-mid);}
 </style>
 </head>
 <body>
@@ -76,130 +94,203 @@
 </div>
 
 <div class="itin-body">
-
-  <div class="itin-total">
+  <div class="itin-total" id="itinTotal">
     <div class="itin-stat"><div class="itin-stat-val">24</div><div class="itin-stat-label">Días</div></div>
     <div class="itin-stat"><div class="itin-stat-val">6</div><div class="itin-stat-label">Destinos</div></div>
-    <div class="itin-stat"><div class="itin-stat-val">18</div><div class="itin-stat-label">Noches</div></div>
+    <div class="itin-stat"><div class="itin-stat-val">21</div><div class="itin-stat-label">Noches</div></div>
     <div class="itin-stat"><div class="itin-stat-val">~3k</div><div class="itin-stat-label">USD p/p</div></div>
   </div>
 
   <div class="cal-wrap" id="calWrap"></div>
 
   <div class="itin-section-label">Ciudades y fechas</div>
-
-  <div class="city-list">
-    <div class="route-line"></div>
-
-    <a class="city-item" href="madrid.html">
-      <div class="city-num">1</div>
-      <div class="city-info">
-        <div class="city-name">Madrid</div>
-        <div class="city-dates">1–4 Sep · 3 noches · Punto de entrada y cierre</div>
-      </div>
-      <div class="city-right">
-        <div class="city-temp">22°C</div>
-        <div class="city-rain">5d lluvia</div>
-      </div>
-      <div class="city-arrow">›</div>
-    </a>
-
-    <a class="city-item" href="barcelona.html">
-      <div class="city-num">2</div>
-      <div class="city-info">
-        <div class="city-name">Barcelona</div>
-        <div class="city-dates">4–7 Sep · 3 noches · Gaudí, playa, tapas</div>
-      </div>
-      <div class="city-right">
-        <div class="city-temp">24°C</div>
-        <div class="city-rain">Mar 23°C</div>
-      </div>
-      <div class="city-arrow">›</div>
-    </a>
-
-    <a class="city-item" href="atenas.html">
-      <div class="city-num">3</div>
-      <div class="city-info">
-        <div class="city-name">Atenas</div>
-        <div class="city-dates">7–8 Sep · 1 noche · Acrópolis, Monastiraki</div>
-      </div>
-      <div class="city-right">
-        <div class="city-temp">28°C</div>
-        <div class="city-rain">2d lluvia</div>
-      </div>
-      <div class="city-arrow">›</div>
-    </a>
-
-    <a class="city-item" href="grecia-islas.html">
-      <div class="city-num">4</div>
-      <div class="city-info">
-        <div class="city-name">Grecia — Islas</div>
-        <div class="city-dates">8–15 Sep · 7 noches · Santorini · Naxos · Creta</div>
-      </div>
-      <div class="city-right">
-        <div class="city-temp">26°C</div>
-        <div class="city-rain">Mar 24°C</div>
-      </div>
-      <div class="city-arrow">›</div>
-    </a>
-
-    <a class="city-item" href="continental.html">
-      <div class="city-num">5</div>
-      <div class="city-info">
-        <div class="city-name">Grecia Continental</div>
-        <div class="city-dates">15–19 Sep · 3 noches · Road trip en auto</div>
-      </div>
-      <div class="city-right">
-        <div class="city-temp">26°C</div>
-        <div class="city-rain">3d lluvia</div>
-      </div>
-      <div class="city-arrow">›</div>
-    </a>
-
-    <a class="city-item" href="budapest.html">
-      <div class="city-num">6</div>
-      <div class="city-info">
-        <div class="city-name">Budapest</div>
-        <div class="city-dates">19–22 Sep · 3 noches · Baños, Parlamento, ruin bars</div>
-      </div>
-      <div class="city-right">
-        <div class="city-temp">19°C</div>
-        <div class="city-rain">8d lluvia</div>
-      </div>
-      <div class="city-arrow">›</div>
-    </a>
-
-  </div>
+  <div class="city-list" id="cityList"><div class="route-line"></div></div>
 
   <div class="itin-section-label">Vuelos internacionales</div>
-  <div style="background:#fff;border-radius:16px;padding:1.25rem 1.5rem;box-shadow:0 2px 10px rgba(13,27,42,.07);border:1px solid rgba(13,27,42,.05);">
-    <div style="display:flex;flex-direction:column;gap:.9rem;">
-      <div style="display:flex;justify-content:space-between;align-items:center;font-family:Outfit,sans-serif;font-size:.82rem;">
-        <span>✈️ &nbsp;Bs. As. → Madrid</span>
-        <span style="color:var(--text-mid)">1 Sep</span>
-      </div>
-      <div style="height:1px;background:rgba(13,27,42,.07)"></div>
-      <div style="display:flex;justify-content:space-between;align-items:center;font-family:Outfit,sans-serif;font-size:.82rem;">
-        <span>✈️ &nbsp;Madrid → Bs. As.</span>
-        <span style="color:var(--text-mid)">25 Sep</span>
-      </div>
-    </div>
-    <div style="margin-top:1rem;padding-top:.9rem;border-top:1px solid rgba(13,27,42,.07);font-family:Outfit,sans-serif;font-size:.72rem;color:var(--text-mid);">Aerolíneas / LATAM · ~USD 1.000 round trip</div>
+  <div class="flights-box">
+    <div class="flight-row"><span>✈️ &nbsp;Bs. As. → Madrid</span><span style="color:var(--text-mid)">1 Sep</span></div>
+    <div class="flight-sep"></div>
+    <div class="flight-row"><span>✈️ &nbsp;Madrid → Bs. As.</span><span style="color:var(--text-mid)">26 Sep</span></div>
+    <div class="flight-note">Aerolíneas / LATAM · ~USD 1.000 round trip</div>
   </div>
-
 </div>
 
-<nav class="bottom-nav">
-  <a href="home.html"><span class="bnav-icon">🏠</span><span class="bnav-label">Inicio</span></a>
-  <a href="itinerario.html" class="active"><span class="bnav-icon">🗺️</span><span class="bnav-label">Ruta</span></a>
-  <a href="gastos.html"><span class="bnav-icon">💰</span><span class="bnav-label">Gastos</span></a>
-  <a href="tareas.html"><span class="bnav-icon">🎒</span><span class="bnav-label">Equipaje</span></a>
-</nav>
-
-<script src="itinerary-data.js"></script>
-<script src="itinerary-editor.js"></script>
 <script>
-if('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(function(){});
+// ── DATOS ────────────────────────────────────────────────────────────────────
+const DESTS = [
+  { id:'mad', name:'Madrid',            start:'2026-09-01', end:'2026-09-04', color:'#0d1b2a', temp:'22°C', rain:'5d lluvia',  desc:'Punto de entrada y cierre',        url:'madrid.html'       },
+  { id:'bcn', name:'Barcelona',         start:'2026-09-04', end:'2026-09-07', color:'#b91c1c', temp:'24°C', rain:'Mar 23°C',   desc:'Gaudí, playa, tapas',               url:'barcelona.html'    },
+  { id:'ath', name:'Atenas',            start:'2026-09-07', end:'2026-09-08', color:'#1d4ed8', temp:'28°C', rain:'2d lluvia',  desc:'Acrópolis, Monastiraki',            url:'atenas.html'       },
+  { id:'isl', name:'Grecia — Islas',   start:'2026-09-08', end:'2026-09-15', color:'#0891b2', temp:'26°C', rain:'Mar 24°C',   desc:'Santorini · Naxos · Creta',         url:'grecia-islas.html' },
+  { id:'con', name:'Grecia Continental',start:'2026-09-15', end:'2026-09-19', color:'#d97706', temp:'26°C', rain:'3d lluvia',  desc:'Road trip en auto',                 url:'continental.html'  },
+  { id:'bud', name:'Budapest',          start:'2026-09-19', end:'2026-09-22', color:'#7c3aed', temp:'19°C', rain:'8d lluvia',  desc:'Baños, Parlamento, ruin bars',      url:'budapest.html'     },
+];
+
+const MONTHS = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+
+// ── UTILIDADES ────────────────────────────────────────────────────────────────
+function nights(d){ return Math.round((new Date(d.end)-new Date(d.start))/864e5); }
+
+function fmtDate(s){
+  const d = new Date(s+'T00:00:00Z');
+  return d.getUTCDate()+' '+MONTHS[d.getUTCMonth()];
+}
+
+function sorted(){ return [...DESTS].sort((a,b)=>a.start.localeCompare(b.start)); }
+
+// ── PERSISTENCIA ──────────────────────────────────────────────────────────────
+(function load(){
+  try {
+    const s = localStorage.getItem('itin-dates');
+    if(s){ JSON.parse(s).forEach(p=>{ const d=DESTS.find(x=>x.id===p.id); if(d){d.start=p.start;d.end=p.end;} }); }
+  } catch(e){}
+})();
+
+function save(){
+  try { localStorage.setItem('itin-dates', JSON.stringify(DESTS.map(d=>({id:d.id,start:d.start,end:d.end})))); } catch(e){}
+}
+
+// ── CALENDARIO ────────────────────────────────────────────────────────────────
+function renderCalendar(){
+  const wrap = document.getElementById('calWrap');
+  if(!wrap) return;
+
+  // Mapa de días a destino
+  const dayMap = {};
+  DESTS.forEach(d=>{
+    const s = new Date(d.start+'T00:00:00Z');
+    const e = new Date(d.end+'T00:00:00Z');
+    for(let t=new Date(s); t<e; t.setUTCDate(t.getUTCDate()+1)){
+      dayMap[t.toISOString().slice(0,10)] = d;
+    }
+  });
+
+  // Cabecera
+  let h = '<div class="cal-month-label">Septiembre 2026</div><div class="cal-grid">';
+  ['L','M','X','J','V','S','D'].forEach(x=>h+=`<div class="cal-head">${x}</div>`);
+
+  // Sep 2026 empieza martes → 1 celda vacía (Lunes)
+  h += '<div class="cal-cell empty"><span class="cal-num"></span></div>';
+
+  for(let day=1; day<=30; day++){
+    const key = `2026-09-${String(day).padStart(2,'0')}`;
+    const d = dayMap[key];
+    if(d){
+      h += `<div class="cal-cell trip" style="background:${d.color}"><span class="cal-num">${day}</span></div>`;
+    } else {
+      h += `<div class="cal-cell post"><span class="cal-num">${day}</span></div>`;
+    }
+  }
+
+  // Rellenar última fila (1 offset + 30 días = 31 celdas → 31%7=3 → 4 restantes)
+  const total = 1 + 30;
+  const rem = total%7===0 ? 0 : 7-total%7;
+  for(let i=0;i<rem;i++) h+='<div class="cal-cell empty"></div>';
+  h += '</div>';
+
+  // Leyenda
+  h += '<div class="cal-legend">';
+  sorted().forEach(d=>{
+    h += `<span class="cal-leg"><span class="cal-leg-sq" style="background:${d.color}"></span>${d.name}</span>`;
+  });
+  h += '</div>';
+
+  wrap.innerHTML = h;
+}
+
+// ── STATS ─────────────────────────────────────────────────────────────────────
+function renderStats(){
+  const el = document.getElementById('itinTotal');
+  if(!el) return;
+  const dests = sorted();
+  const totalN = dests.reduce((s,d)=>s+nights(d),0);
+  const first = dests[0], last = dests[dests.length-1];
+  const days = dests.length ? Math.round((new Date(last.end)-new Date(first.start))/864e5) : 0;
+  el.innerHTML = `
+    <div class="itin-stat"><div class="itin-stat-val">${days}</div><div class="itin-stat-label">Días</div></div>
+    <div class="itin-stat"><div class="itin-stat-val">${dests.length}</div><div class="itin-stat-label">Destinos</div></div>
+    <div class="itin-stat"><div class="itin-stat-val">${totalN}</div><div class="itin-stat-label">Noches</div></div>
+    <div class="itin-stat"><div class="itin-stat-val">~3k</div><div class="itin-stat-label">USD p/p</div></div>
+  `;
+}
+
+// ── CIUDAD LIST ───────────────────────────────────────────────────────────────
+function renderCities(){
+  const list = document.getElementById('cityList');
+  if(!list) return;
+  list.innerHTML = '<div class="route-line"></div>';
+
+  sorted().forEach((d, i)=>{
+    const n = nights(d);
+    const nTxt = n===1?'noche':'noches';
+    const row = document.createElement('div');
+    row.className = 'city-row';
+    row.innerHTML = `
+      <a class="city-item" href="${d.url}">
+        <div class="city-num">${i+1}</div>
+        <div class="city-info">
+          <div class="city-name">${d.name}</div>
+          <div class="city-dates" id="cdates-${d.id}">${fmtDate(d.start)} — ${fmtDate(d.end)} · ${n} ${nTxt} · ${d.desc}</div>
+        </div>
+        <div class="city-right">
+          <div class="city-temp">${d.temp}</div>
+          <div class="city-rain">${d.rain}</div>
+        </div>
+        <button class="city-edit-btn" id="ebtn-${d.id}" title="Editar fechas">✎</button>
+      </a>
+      <div class="city-editor" id="editor-${d.id}" style="display:none">
+        <div class="city-editor-row">
+          <div class="date-field"><label>Inicio</label><input type="date" id="start-${d.id}" value="${d.start}"></div>
+          <span class="editor-sep">→</span>
+          <div class="date-field"><label>Fin</label><input type="date" id="end-${d.id}" value="${d.end}"></div>
+          <span class="editor-nights" id="en-${d.id}">${n}N</span>
+        </div>
+      </div>
+    `;
+    list.appendChild(row);
+
+    // Toggle editor
+    const editBtn = row.querySelector(`#ebtn-${d.id}`);
+    const editor = row.querySelector(`#editor-${d.id}`);
+    editBtn.addEventListener('click', e=>{
+      e.preventDefault();
+      e.stopPropagation();
+      const open = editor.style.display !== 'none';
+      editor.style.display = open ? 'none' : 'block';
+      editBtn.classList.toggle('active', !open);
+    });
+
+    // Date change handlers
+    const sIn = row.querySelector(`#start-${d.id}`);
+    const eIn = row.querySelector(`#end-${d.id}`);
+    const eNights = row.querySelector(`#en-${d.id}`);
+
+    function updateFromInputs(){
+      const newStart = sIn.value, newEnd = eIn.value;
+      if(!newStart || !newEnd || newEnd <= newStart) return;
+      d.start = newStart; d.end = newEnd;
+      const n2 = nights(d);
+      eNights.textContent = n2+'N';
+      const datesEl = document.getElementById(`cdates-${d.id}`);
+      if(datesEl) datesEl.textContent = `${fmtDate(d.start)} — ${fmtDate(d.end)} · ${n2} ${n2===1?'noche':'noches'} · ${d.desc}`;
+      save();
+      renderCalendar();
+      renderStats();
+      // Re-render cities only if order changed
+      const newSorted = sorted();
+      const idxNow = newSorted.findIndex(x=>x.id===d.id);
+      if(idxNow !== i) renderCities();
+    }
+    sIn.addEventListener('change', updateFromInputs);
+    eIn.addEventListener('change', updateFromInputs);
+  });
+}
+
+// ── INIT ─────────────────────────────────────────────────────────────────────
+renderCalendar();
+renderStats();
+renderCities();
 </script>
+<script src="shared.js"></script>
 </body>
 </html>
