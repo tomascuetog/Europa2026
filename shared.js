@@ -171,5 +171,15 @@ document.querySelectorAll('[id]').forEach(s=>obs.observe(s));
   document.body.appendChild(nav);
 })();
 
+// ACCORDION SECTIONS
+(function(){
+  document.querySelectorAll('.acc-header').forEach(function(header){
+    header.addEventListener('click',function(){
+      var section=header.closest('.acc-section');
+      if(section) section.classList.toggle('open');
+    });
+  });
+})();
+
 // Service Worker
 if('serviceWorker' in navigator){navigator.serviceWorker.register('sw.js').catch(function(){});}
