@@ -22,8 +22,11 @@
 .res-sub{font-family:Outfit,sans-serif;font-size:.65rem;color:rgba(255,255,255,.25);margin-top:.15rem;}
 
 /* ── BUDGET ITEMS ────────────────────────── */
-.bg-group-header{display:flex;align-items:center;justify-content:space-between;margin:1.75rem 0 .6rem;border-bottom:1px solid rgba(201,151,58,.2);padding-bottom:.4rem;}
+.bg-group-header{display:flex;align-items:center;justify-content:space-between;margin:1.75rem 0 .6rem;border-bottom:1px solid rgba(201,151,58,.2);padding-bottom:.4rem;gap:.5rem;}
 .bg-group-header:first-child{margin-top:0;}
+.bg-group-header.deleted-group{border-bottom-color:rgba(239,68,68,.2);margin-top:2.5rem;}
+.bg-deleted-badge{font-family:Outfit,sans-serif;font-size:.6rem;font-weight:600;letter-spacing:.06em;text-transform:uppercase;background:rgba(239,68,68,.1);color:#b91c1c;border:1px solid rgba(239,68,68,.25);border-radius:20px;padding:.18rem .6rem;white-space:nowrap;flex-shrink:0;}
+.bg-group-empty{font-family:Outfit,sans-serif;font-size:.75rem;color:var(--text-mid);background:rgba(13,27,42,.03);border:1.5px dashed rgba(13,27,42,.1);border-radius:12px;padding:.9rem 1rem;margin-bottom:.5rem;text-align:center;}
 .bg-group-title{font-family:Outfit,sans-serif;font-size:.62rem;letter-spacing:.2em;text-transform:uppercase;color:var(--gold);}
 .bg-group-add-btn{display:none;font-family:Outfit,sans-serif;font-size:.65rem;font-weight:600;color:var(--gold);background:none;border:1px dashed rgba(201,151,58,.5);border-radius:20px;padding:.2rem .65rem;cursor:pointer;-webkit-tap-highlight-color:transparent;transition:all .15s;}
 .bg-group-add-btn:hover{background:rgba(201,151,58,.08);}
@@ -240,57 +243,76 @@
   var LS_CATALOG = 'europa2026_budget_catalog_v1';
 
   // ── DEFAULT GROUPS ─────────────────────────────────────────
+  // dest_id vincula con itin-dates-v2; null = grupo manual (transporte, fijo)
+  // sort_key: dest groups usan pos itin (pos+0.5); manuales usan valor explícito
   var DEFAULT_GROUPS = [
-    {group:'Internacionales', order:0, items:[
-      {id:'tr1',  label:'Vuelo Bs. As. → Madrid (ida)',       est:500, tag:'transporte', order:0},
-      {id:'tr2',  label:'Vuelo Madrid → Bs. As. (vuelta)',    est:500, tag:'transporte', order:1},
-      {id:'tr26', label:'Seguro de viaje internacional',      est:80,  tag:'otro',       order:2}
+    {dest_id:null,  sort_key:-1,   group:'Internacionales',      order:0,  items:[
+      {id:'tr1',  label:'Vuelo Bs. As. → Madrid (ida)',      est:500, tag:'transporte', order:0},
+      {id:'tr2',  label:'Vuelo Madrid → Bs. As. (vuelta)',   est:500, tag:'transporte', order:1},
+      {id:'tr26', label:'Seguro de viaje internacional',     est:80,  tag:'otro',       order:2}
     ]},
-    {group:'Madrid → Barcelona', order:1, items:[
-      {id:'tr3',  label:'Tren AVE Madrid → Barcelona',        est:53,  tag:'transporte', order:0}
+    {dest_id:'mad', sort_key:0.5,  group:'Madrid',               order:1,  items:[]},
+    {dest_id:null,  sort_key:0.9,  group:'Madrid → Barcelona',   order:2,  items:[
+      {id:'tr3',  label:'Tren AVE Madrid → Barcelona',       est:53,  tag:'transporte', order:0}
     ]},
-    {group:'Barcelona · 4–7 Sep', order:2, items:[
-      {id:'tr12', label:'BCN Sports Hostel (3 noches)',       est:102, tag:'hospedaje',  order:0},
-      {id:'tr22', label:'Sagrada Família',                    est:30,  tag:'actividad',  order:1},
-      {id:'tr23', label:'Park Güell (zona monumental)',       est:13,  tag:'actividad',  order:2}
+    {dest_id:'bcn', sort_key:1.5,  group:'Barcelona',            order:3,  items:[
+      {id:'tr12', label:'BCN Sports Hostel (3 noches)',      est:102, tag:'hospedaje',  order:0},
+      {id:'tr22', label:'Sagrada Família',                   est:30,  tag:'actividad',  order:1},
+      {id:'tr23', label:'Park Güell (zona monumental)',      est:13,  tag:'actividad',  order:2}
     ]},
-    {group:'Barcelona → Atenas', order:3, items:[
-      {id:'tr4',  label:'Vuelo Barcelona → Atenas',           est:76,  tag:'transporte', order:0}
+    {dest_id:null,  sort_key:2.0,  group:'Barcelona → Atenas',  order:4,  items:[
+      {id:'tr4',  label:'Vuelo Barcelona → Atenas',          est:76,  tag:'transporte', order:0}
     ]},
-    {group:'Atenas I · 7–8 Sep', order:4, items:[
-      {id:'tr13', label:'Safestay Monastiraki (1 noche)',     est:23,  tag:'hospedaje',  order:0},
-      {id:'tr21', label:'Acrópolis de Atenas',                est:20,  tag:'actividad',  order:1}
+    {dest_id:'ath', sort_key:2.5,  group:'Atenas',               order:5,  items:[
+      {id:'tr13', label:'Safestay Monastiraki (1 noche)',    est:23,  tag:'hospedaje',  order:0},
+      {id:'tr21', label:'Acrópolis de Atenas',               est:20,  tag:'actividad',  order:1}
     ]},
-    {group:'Santorini · 8–10 Sep', order:5, items:[
-      {id:'tr5',  label:'Ferry Pireo → Santorini',            est:45,  tag:'transporte', order:0},
-      {id:'tr14', label:'Santorini Camping (2 noches)',       est:52,  tag:'hospedaje',  order:1}
+    {dest_id:null,  sort_key:3.0,  group:'Atenas → Santorini',  order:6,  items:[
+      {id:'tr5',  label:'Ferry Pireo → Santorini',           est:45,  tag:'transporte', order:0}
     ]},
-    {group:'Naxos · 10–12 Sep', order:6, items:[
-      {id:'tr6',  label:'Ferry Santorini → Naxos',            est:37,  tag:'transporte', order:0},
-      {id:'tr15', label:'Katerina Roza Studios (2 noches)',   est:49,  tag:'hospedaje',  order:1}
+    {dest_id:'san', sort_key:3.5,  group:'Santorini',            order:7,  items:[
+      {id:'tr14', label:'Santorini Camping (2 noches)',      est:52,  tag:'hospedaje',  order:0}
     ]},
-    {group:'Creta · 12–15 Sep', order:7, items:[
-      {id:'tr7',  label:'Vuelo Naxos → Creta',                est:56,  tag:'transporte', order:0},
-      {id:'tr16', label:'Cocoon City Hostel (3 noches)',      est:87,  tag:'hospedaje',  order:1},
-      {id:'tr24', label:'Palacio de Cnosos',                  est:16,  tag:'actividad',  order:2}
+    {dest_id:null,  sort_key:4.0,  group:'Santorini → Naxos',   order:8,  items:[
+      {id:'tr6',  label:'Ferry Santorini → Naxos',           est:37,  tag:'transporte', order:0}
     ]},
-    {group:'Road Trip · 15–19 Sep', order:8, items:[
-      {id:'tr8',  label:'Vuelo Creta → Atenas',               est:76,  tag:'transporte', order:0},
-      {id:'tr17', label:'Safestay Monastiraki II (1 noche)',  est:23,  tag:'hospedaje',  order:1},
-      {id:'tr11', label:'Auto alquiler (4 días)',              est:120, tag:'transporte', order:2},
-      {id:'tr11b',label:'Gasolina road trip (~600 km)',        est:40,  tag:'transporte', order:3},
-      {id:'tr18', label:'Nauplia — hostel (1 noche)',          est:25,  tag:'hospedaje',  order:4},
-      {id:'tr19', label:'Meteora — hostel (1 noche)',          est:25,  tag:'hospedaje',  order:5}
+    {dest_id:'nax', sort_key:4.5,  group:'Naxos',                order:9,  items:[
+      {id:'tr15', label:'Katerina Roza Studios (2 noches)',  est:49,  tag:'hospedaje',  order:0}
     ]},
-    {group:'Budapest · 19–22 Sep', order:9, items:[
-      {id:'tr9',  label:'Vuelo Salónica → Budapest',          est:68,  tag:'transporte', order:0},
-      {id:'tr20', label:'The Hive (3 noches)',                est:57,  tag:'hospedaje',  order:1},
-      {id:'tr25', label:'Baños Széchenyi',                    est:20,  tag:'actividad',  order:2},
-      {id:'tr25b',label:'Tour Parlamento Budapest',           est:20,  tag:'actividad',  order:3}
+    {dest_id:null,  sort_key:5.0,  group:'Naxos → Creta',        order:10, items:[
+      {id:'tr7',  label:'Vuelo Naxos → Creta',               est:56,  tag:'transporte', order:0}
     ]},
-    {group:'Budapest → Madrid', order:10, items:[
-      {id:'tr10', label:'Vuelo Budapest → Madrid',            est:100, tag:'transporte', order:0}
-    ]}
+    {dest_id:'crt', sort_key:5.5,  group:'Creta',                order:11, items:[
+      {id:'tr16', label:'Cocoon City Hostel (3 noches)',     est:87,  tag:'hospedaje',  order:0},
+      {id:'tr24', label:'Palacio de Cnosos',                 est:16,  tag:'actividad',  order:1}
+    ]},
+    {dest_id:null,  sort_key:6.0,  group:'Creta → Atenas',       order:12, items:[
+      {id:'tr8',  label:'Vuelo Creta → Atenas',              est:76,  tag:'transporte', order:0},
+      {id:'tr11', label:'Auto alquiler (4 días)',             est:120, tag:'transporte', order:1},
+      {id:'tr11b',label:'Gasolina road trip (~600 km)',       est:40,  tag:'transporte', order:2}
+    ]},
+    {dest_id:'ath2',sort_key:6.5,  group:'Atenas II',            order:13, items:[
+      {id:'tr17', label:'Safestay Monastiraki II (1 noche)', est:23,  tag:'hospedaje',  order:0}
+    ]},
+    {dest_id:'nau', sort_key:7.5,  group:'Nauplia',              order:14, items:[
+      {id:'tr18', label:'Nauplia — hostel (1 noche)',         est:25,  tag:'hospedaje',  order:0}
+    ]},
+    {dest_id:'met', sort_key:8.5,  group:'Meteora',              order:15, items:[
+      {id:'tr19', label:'Meteora — hostel (1 noche)',         est:25,  tag:'hospedaje',  order:0}
+    ]},
+    {dest_id:'sal', sort_key:9.5,  group:'Salónica',             order:16, items:[]},
+    {dest_id:null,  sort_key:10.0, group:'Salónica → Budapest',  order:17, items:[
+      {id:'tr9',  label:'Vuelo Salónica → Budapest',         est:68,  tag:'transporte', order:0}
+    ]},
+    {dest_id:'bud', sort_key:10.5, group:'Budapest',             order:18, items:[
+      {id:'tr20', label:'The Hive (3 noches)',               est:57,  tag:'hospedaje',  order:0},
+      {id:'tr25', label:'Baños Széchenyi',                   est:20,  tag:'actividad',  order:1},
+      {id:'tr25b',label:'Tour Parlamento Budapest',          est:20,  tag:'actividad',  order:2}
+    ]},
+    {dest_id:null,  sort_key:11.0, group:'Budapest → Madrid',    order:19, items:[
+      {id:'tr10', label:'Vuelo Budapest → Madrid',           est:100, tag:'transporte', order:0}
+    ]},
+    {dest_id:'mad2',sort_key:11.5, group:'Madrid (cierre)',       order:20, items:[]}
   ];
 
   // ── LOCAL STORAGE ─────────────────────────────────────────
@@ -313,18 +335,41 @@
     DEFAULT_GROUPS.forEach(function(g) {
       g.items.forEach(function(it) {
         flat.push({
-          id: it.id,
-          group_name: g.group,
+          id:          it.id,
+          dest_id:     g.dest_id || null,
+          sort_key:    g.sort_key,
+          group_name:  g.group,
           group_order: g.order,
-          label: it.label,
-          est: it.est,
-          tag: it.tag,
-          item_order: it.order,
-          deleted: false
+          label:       it.label,
+          est:         it.est,
+          tag:         it.tag,
+          item_order:  it.order,
+          deleted:     false
         });
       });
     });
     return flat;
+  }
+
+  // ── ITINERARY SYNC ─────────────────────────────────────────
+  var MESES = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+  function fmtDay(s) {
+    var d = new Date(s + 'T00:00:00Z');
+    return d.getUTCDate() + ' ' + MESES[d.getUTCMonth()];
+  }
+  function fmtRange(start, end) {
+    // show first night to last night (end is departure day)
+    var e = new Date(end + 'T00:00:00Z');
+    e.setUTCDate(e.getUTCDate() - 1);
+    var eStr = e.toISOString().slice(0, 10);
+    return fmtDay(start) + ' — ' + fmtDay(eStr);
+  }
+  function readItin() {
+    try {
+      var s = localStorage.getItem('itin-dates-v2');
+      if (!s) return [];
+      return JSON.parse(s).sort(function(a, b) { return a.start.localeCompare(b.start); });
+    } catch(e) { return []; }
   }
 
   // ── TOAST ─────────────────────────────────────────────────
@@ -340,20 +385,93 @@
 
   // ── CATALOG UTILS ─────────────────────────────────────────
   function getGroups() {
-    // Returns [{group_name, group_order, items:[...]}] sorted
+    var itin = readItin();
+    var itinIds = itin.map(function(d) { return d.id; });
+
+    // Build catalog group map (keyed by dest_id if present, else group_name)
     var map = {};
     catalogItems.filter(function(it) { return !it.deleted; }).forEach(function(it) {
-      if (!map[it.group_name]) {
-        map[it.group_name] = {group_name: it.group_name, group_order: it.group_order, items: []};
+      var key = it.dest_id || it.group_name;
+      if (!map[key]) {
+        map[key] = {
+          dest_id:    it.dest_id || null,
+          group_name: it.group_name,
+          group_order:it.group_order,
+          sort_key:   it.sort_key !== undefined ? it.sort_key : it.group_order,
+          items:      []
+        };
       }
-      map[it.group_name].items.push(it);
+      map[key].items.push(it);
     });
-    var groups = Object.values(map);
-    groups.sort(function(a, b) { return a.group_order - b.group_order; });
-    groups.forEach(function(g) {
+
+    // Also include DEFAULT_GROUPS that have no items yet (empty dest groups)
+    DEFAULT_GROUPS.forEach(function(g) {
+      var key = g.dest_id || g.group;
+      if (!map[key]) {
+        map[key] = {
+          dest_id:    g.dest_id || null,
+          group_name: g.group,
+          group_order:g.order,
+          sort_key:   g.sort_key,
+          items:      []
+        };
+      }
+    });
+
+    var manualGroups = [], destGroups = [], deletedGroups = [];
+
+    Object.keys(map).forEach(function(key) {
+      var g = map[key];
       g.items.sort(function(a, b) { return a.item_order - b.item_order; });
+
+      if (!g.dest_id) {
+        // Manual group (transport, fixed) — show with its stored sort_key
+        g.display_name = g.group_name;
+        g.effective_sort = g.sort_key;
+        manualGroups.push(g);
+      } else {
+        var itinIdx = itinIds.indexOf(g.dest_id);
+        if (itinIdx !== -1) {
+          // Active destination — update name + dates from itin
+          var dest = itin[itinIdx];
+          g.display_name = dest.name + ' · ' + fmtRange(dest.start, dest.end);
+          g.effective_sort = itinIdx + 0.5;
+          destGroups.push(g);
+        } else {
+          // Destination removed from itinerary
+          g.display_name = g.group_name;
+          g.effective_sort = 9999;
+          g.is_deleted = true;
+          deletedGroups.push(g);
+        }
+      }
     });
-    return groups;
+
+    // New destinations in itin that have no catalog group yet
+    itin.forEach(function(dest, idx) {
+      if (!map[dest.id]) {
+        destGroups.push({
+          dest_id:      dest.id,
+          group_name:   dest.name,
+          display_name: dest.name + ' · ' + fmtRange(dest.start, dest.end),
+          group_order:  999,
+          sort_key:     idx + 0.5,
+          effective_sort: idx + 0.5,
+          items:        [],
+          is_new:       true
+        });
+      }
+    });
+
+    // Sort each section, then concatenate
+    manualGroups.sort(function(a, b) { return a.effective_sort - b.effective_sort; });
+    destGroups.sort(function(a, b) { return a.effective_sort - b.effective_sort; });
+
+    // Interleave manual + dest groups by effective_sort, then deleted at end
+    var active = manualGroups.concat(destGroups);
+    active.sort(function(a, b) { return a.effective_sort - b.effective_sort; });
+
+    return active.concat(deletedGroups);
   }
 
   function normalizeStatus(s) {
@@ -402,30 +520,42 @@
     groups.forEach(function(group) {
       // Group header
       var gh = document.createElement('div');
-      gh.className = 'bg-group-header';
+      gh.className = 'bg-group-header' + (group.is_deleted ? ' deleted-group' : '');
 
       var gt = document.createElement('div');
       gt.className = 'bg-group-title';
-      gt.textContent = group.group_name;
+      gt.textContent = group.display_name || group.group_name;
       gh.appendChild(gt);
 
-      if (catalogEditable) {
+      if (group.is_deleted) {
+        var badge = document.createElement('span');
+        badge.className = 'bg-deleted-badge';
+        badge.textContent = 'Destino eliminado';
+        gh.appendChild(badge);
+      } else if (catalogEditable) {
         var addBtn = document.createElement('button');
         addBtn.className = 'bg-group-add-btn';
         addBtn.textContent = '+ Ítem';
-        (function(gname, gorder) {
+        (function(g) {
           addBtn.addEventListener('click', function() {
-            openSheet(null, gname, gorder);
+            openSheet(null, g.group_name, g.group_order, false, g.dest_id);
           });
-        })(group.group_name, group.group_order);
+        })(group);
         gh.appendChild(addBtn);
       }
 
       container.appendChild(gh);
 
-      group.items.forEach(function(item) {
-        container.appendChild(buildItem(item));
-      });
+      if (group.is_new && group.items.length === 0) {
+        var empty = document.createElement('div');
+        empty.className = 'bg-group-empty';
+        empty.textContent = 'Sin gastos registrados aún — tocá + Ítem para agregar';
+        container.appendChild(empty);
+      } else {
+        group.items.forEach(function(item) {
+          container.appendChild(buildItem(item));
+        });
+      }
     });
   }
 
@@ -706,20 +836,23 @@
   // ── BOTTOM SHEET ───────────────────────────────────────────
   var sheetEditingItem = null;
 
-  function openSheet(item, defaultGroup, defaultGroupOrder, forceNewGroup) {
+  function openSheet(item, defaultGroup, defaultGroupOrder, forceNewGroup, defaultDestId) {
     sheetEditingItem = item;
     var title = document.getElementById('sheetTitle');
     title.textContent = item ? 'Editar ítem' : 'Nuevo ítem';
 
-    // Populate group select
+    // Populate group select (exclude deleted groups)
     var groupSel = document.getElementById('sheetGroup');
     groupSel.innerHTML = '';
-    var groups = getGroups();
+    var groups = getGroups().filter(function(g) { return !g.is_deleted; });
     groups.forEach(function(g) {
       var opt = document.createElement('option');
       opt.value = g.group_name;
-      opt.textContent = g.group_name;
-      if (defaultGroup && g.group_name === defaultGroup) opt.selected = true;
+      opt.dataset.destId = g.dest_id || '';
+      opt.textContent = g.display_name || g.group_name;
+      var matchById = defaultDestId && g.dest_id === defaultDestId;
+      var matchByName = !defaultDestId && defaultGroup && g.group_name === defaultGroup;
+      if (matchById || matchByName) opt.selected = true;
       groupSel.appendChild(opt);
     });
     var newOpt = document.createElement('option');
@@ -789,10 +922,19 @@
     if (!labelVal) { document.getElementById('sheetLabel').focus(); return; }
 
     var item;
+    // Get dest_id from the selected option
+    var selOpt = groupSel.options[groupSel.selectedIndex];
+    var destId = selOpt ? (selOpt.dataset.destId || null) : null;
+    var sortKey = null;
+    var groups2 = getGroups();
+    var gSel = groups2.find(function(g) { return g.group_name === groupName; });
+    if (gSel) { sortKey = gSel.sort_key; groupOrder = gSel.group_order; }
+
     if (sheetEditingItem) {
-      // Edit existing
       item = {
         id:          sheetEditingItem.id,
+        dest_id:     destId,
+        sort_key:    sortKey !== null ? sortKey : sheetEditingItem.sort_key,
         group_name:  groupName,
         group_order: groupOrder,
         label:       labelVal,
@@ -802,12 +944,12 @@
         deleted:     false
       };
     } else {
-      // New item — compute item_order within group
-      var groups = getGroups();
-      var gFound = groups.find(function(g) { return g.group_name === groupName; });
+      var gFound = groups2.find(function(g) { return g.group_name === groupName; });
       var nextOrder = gFound ? gFound.items.length : 0;
       item = {
         id:          'ci_' + Date.now(),
+        dest_id:     destId,
+        sort_key:    sortKey !== null ? sortKey : groupOrder,
         group_name:  groupName,
         group_order: groupOrder,
         label:       labelVal,
