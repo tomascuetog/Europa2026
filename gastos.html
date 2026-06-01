@@ -240,7 +240,7 @@
   var catalogEditable = true; // becomes false if budget_items table missing
 
   var LS_TRACKER = 'europa2026_tracker_v1';
-  var LS_CATALOG = 'europa2026_budget_catalog_v1';
+  var LS_CATALOG = 'europa2026_budget_catalog_v2'; // v2: dest_id schema
 
   // ── DEFAULT GROUPS ─────────────────────────────────────────
   // dest_id vincula con itin-dates-v2; null = grupo manual (transporte, fijo)
@@ -414,7 +414,11 @@
     var itin = readItin();
     var itinIds = itin.map(function(d) { return d.id; });
 
-    // Build catalog group map (keyed by dest_id if present, else group_name)
+    // Mapa de nombre de destino (lower) → posición en itin (para calcular posición de transportes)
+    var nameToPos = {};
+    itin.forEach(function(d, i) { nameToPos[d.name.toLowerCase()] = i; });
+
+    // Construir map de grupos desde catalogItems (dest_id > group_name como clave)
     var map = {};
     catalogItems.filter(function(it) { return !it.deleted; }).forEach(function(it) {
       var key = it.dest_id || it.group_name;
@@ -430,7 +434,7 @@
       map[key].items.push(it);
     });
 
-    // Also include DEFAULT_GROUPS that have no items yet (empty dest groups)
+    // Agregar DEFAULT_GROUPS que aún no tienen items en el catálogo
     DEFAULT_GROUPS.forEach(function(g) {
       var key = g.dest_id || g.group;
       if (!map[key]) {
@@ -444,6 +448,22 @@
       }
     });
 
+    // Calcular effective_sort para grupos de transporte manual basado en las ciudades que conectan
+    function transportSortKey(groupName, fallbackSortKey) {
+      // Formato esperado: "Ciudad A → Ciudad B" o "Ciudad A → Ciudad B → Ciudad C"
+      var arrow = ' → ';
+      if (groupName.indexOf(arrow) === -1) return fallbackSortKey;
+      var parts = groupName.split(arrow);
+      var fromName = parts[0].trim().toLowerCase();
+      var toName   = parts[parts.length - 1].trim().toLowerCase();
+      var fromPos  = nameToPos[fromName];
+      var toPos    = nameToPos[toName];
+      if (fromPos !== undefined && toPos !== undefined) return (fromPos + toPos) / 2;
+      if (fromPos !== undefined) return fromPos + 0.3;
+      if (toPos   !== undefined) return toPos   - 0.3;
+      return fallbackSortKey;
+    }
+
     var manualGroups = [], destGroups = [], deletedGroups = [];
 
     Object.keys(map).forEach(function(key) {
@@ -451,52 +471,44 @@
       g.items.sort(function(a, b) { return a.item_order - b.item_order; });
 
       if (!g.dest_id) {
-        // Manual group (transport, fixed) — show with its stored sort_key
-        g.display_name = g.group_name;
-        g.effective_sort = g.sort_key;
+        g.display_name  = g.group_name;
+        g.effective_sort = transportSortKey(g.group_name, g.sort_key);
         manualGroups.push(g);
       } else {
         var itinIdx = itinIds.indexOf(g.dest_id);
         if (itinIdx !== -1) {
-          // Active destination — update name + dates from itin
           var dest = itin[itinIdx];
-          g.display_name = dest.name + ' · ' + fmtRange(dest.start, dest.end);
-          g.effective_sort = itinIdx + 0.5;
+          g.display_name   = dest.name + ' · ' + fmtRange(dest.start, dest.end);
+          g.effective_sort = itinIdx;
           destGroups.push(g);
         } else {
-          // Destination removed from itinerary
-          g.display_name = g.group_name;
+          g.display_name  = g.group_name;
           g.effective_sort = 9999;
-          g.is_deleted = true;
+          g.is_deleted    = true;
           deletedGroups.push(g);
         }
       }
     });
 
-    // New destinations in itin that have no catalog group yet
+    // Nuevos destinos del itin sin grupo en catálogo
     itin.forEach(function(dest, idx) {
       if (!map[dest.id]) {
         destGroups.push({
-          dest_id:      dest.id,
-          group_name:   dest.name,
-          display_name: dest.name + ' · ' + fmtRange(dest.start, dest.end),
-          group_order:  999,
-          sort_key:     idx + 0.5,
-          effective_sort: idx + 0.5,
-          items:        [],
-          is_new:       true
+          dest_id:       dest.id,
+          group_name:    dest.name,
+          display_name:  dest.name + ' · ' + fmtRange(dest.start, dest.end),
+          group_order:   999,
+          sort_key:      idx,
+          effective_sort:idx,
+          items:         [],
+          is_new:        true
         });
       }
     });
 
-    // Sort each section, then concatenate
-    manualGroups.sort(function(a, b) { return a.effective_sort - b.effective_sort; });
-    destGroups.sort(function(a, b) { return a.effective_sort - b.effective_sort; });
-
-    // Interleave manual + dest groups by effective_sort, then deleted at end
+    // Mezclar grupos manuales + destinos por effective_sort; eliminados al fondo
     var active = manualGroups.concat(destGroups);
     active.sort(function(a, b) { return a.effective_sort - b.effective_sort; });
-
     return active.concat(deletedGroups);
   }
 
