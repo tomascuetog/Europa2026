@@ -327,7 +327,36 @@
   }
   function loadCatalogLocal() {
     try { var r = localStorage.getItem(LS_CATALOG); if (r) catalogItems = JSON.parse(r); } catch(e) {}
-    if (!catalogItems || !catalogItems.length) catalogItems = defaultsToFlat();
+    if (!catalogItems || !catalogItems.length) { catalogItems = defaultsToFlat(); return; }
+    migrateLegacyItems();
+  }
+
+  // Asigna dest_id a items guardados antes del esquema de vinculación
+  function migrateLegacyItems() {
+    // Mapa de nombre de grupo → {dest_id, sort_key, group_order}
+    // Ordenar por longitud desc para que "Atenas II" matchee antes que "Atenas"
+    var nameToDest = DEFAULT_GROUPS
+      .filter(function(g) { return g.dest_id; })
+      .sort(function(a, b) { return b.group.length - a.group.length; })
+      .map(function(g) { return { prefix: g.group.toLowerCase(), dest_id: g.dest_id, sort_key: g.sort_key, order: g.order }; });
+
+    var changed = false;
+    catalogItems.forEach(function(it) {
+      if (it.dest_id) return; // ya migrado
+      var lc = (it.group_name || '').toLowerCase();
+      for (var i = 0; i < nameToDest.length; i++) {
+        var nd = nameToDest[i];
+        // Matchea si el nombre viejo empieza con el nuevo + espacio, punto, guion o es igual
+        if (lc === nd.prefix || lc.indexOf(nd.prefix + ' ') === 0 || lc.indexOf(nd.prefix + ' ·') === 0) {
+          it.dest_id    = nd.dest_id;
+          it.sort_key   = nd.sort_key;
+          it.group_order = nd.order;
+          changed = true;
+          break;
+        }
+      }
+    });
+    if (changed) saveCatalogLocal();
   }
 
   function defaultsToFlat() {
@@ -358,11 +387,8 @@
     return d.getUTCDate() + ' ' + MESES[d.getUTCMonth()];
   }
   function fmtRange(start, end) {
-    // show first night to last night (end is departure day)
-    var e = new Date(end + 'T00:00:00Z');
-    e.setUTCDate(e.getUTCDate() - 1);
-    var eStr = e.toISOString().slice(0, 10);
-    return fmtDay(start) + ' — ' + fmtDay(eStr);
+    // Mostrar "4 Sep — 6 Sep" (fecha de llegada — fecha de salida, sin restar 1)
+    return fmtDay(start) + ' — ' + fmtDay(end);
   }
   function readItin() {
     try {
