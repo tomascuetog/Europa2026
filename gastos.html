@@ -27,6 +27,11 @@
 .bg-group-header.deleted-group{border-bottom-color:rgba(239,68,68,.2);margin-top:2.5rem;}
 .bg-deleted-badge{font-family:Outfit,sans-serif;font-size:.6rem;font-weight:600;letter-spacing:.06em;text-transform:uppercase;background:rgba(239,68,68,.1);color:#b91c1c;border:1px solid rgba(239,68,68,.25);border-radius:20px;padding:.18rem .6rem;white-space:nowrap;flex-shrink:0;}
 .bg-group-empty{font-family:Outfit,sans-serif;font-size:.75rem;color:var(--text-mid);background:rgba(13,27,42,.03);border:1.5px dashed rgba(13,27,42,.1);border-radius:12px;padding:.9rem 1rem;margin-bottom:.5rem;text-align:center;}
+.bg-group-title-inp{font-family:Outfit,sans-serif;font-size:.62rem;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:var(--gold);background:transparent;border:none;border-bottom:1.5px dashed rgba(201,151,58,.4);outline:none;padding:0 0 .1rem;min-width:0;flex:1;}
+.bg-group-title-inp:focus{border-bottom-color:var(--gold);}
+.bg-group-del-btn{display:none;font-family:Outfit,sans-serif;font-size:.72rem;font-weight:700;color:#b91c1c;background:rgba(239,68,68,.07);border:1px solid rgba(239,68,68,.2);border-radius:20px;padding:.18rem .6rem;cursor:pointer;-webkit-tap-highlight-color:transparent;transition:all .15s;white-space:nowrap;}
+.bg-group-del-btn:hover{background:rgba(239,68,68,.15);border-color:rgba(239,68,68,.4);}
+.edit-mode .bg-group-del-btn{display:inline-flex;}
 .bg-group-title{font-family:Outfit,sans-serif;font-size:.62rem;letter-spacing:.2em;text-transform:uppercase;color:var(--gold);}
 .bg-group-add-btn{display:none;font-family:Outfit,sans-serif;font-size:.65rem;font-weight:600;color:var(--gold);background:none;border:1px dashed rgba(201,151,58,.5);border-radius:20px;padding:.2rem .65rem;cursor:pointer;-webkit-tap-highlight-color:transparent;transition:all .15s;}
 .bg-group-add-btn:hover{background:rgba(201,151,58,.08);}
@@ -239,8 +244,9 @@
   var editMode = false;
   var catalogEditable = true; // becomes false if budget_items table missing
 
-  var LS_TRACKER = 'europa2026_tracker_v1';
-  var LS_CATALOG = 'europa2026_budget_catalog_v2'; // v2: dest_id schema
+  var LS_TRACKER        = 'europa2026_tracker_v1';
+  var LS_CATALOG        = 'europa2026_budget_catalog_v2'; // v2: dest_id schema
+  var LS_DELETED_GROUPS = 'europa2026_deleted_groups_v1';
 
   // ── DEFAULT GROUPS ─────────────────────────────────────────
   // dest_id vincula con itin-dates-v2; null = grupo manual (transporte, fijo)
@@ -316,6 +322,8 @@
   ];
 
   // ── LOCAL STORAGE ─────────────────────────────────────────
+  var deletedGroupKeys = {};  // { groupKey: true }
+
   function saveTrackerLocal() {
     try { localStorage.setItem(LS_TRACKER, JSON.stringify(trackerState)); } catch(e) {}
   }
@@ -329,6 +337,12 @@
     try { var r = localStorage.getItem(LS_CATALOG); if (r) catalogItems = JSON.parse(r); } catch(e) {}
     if (!catalogItems || !catalogItems.length) { catalogItems = defaultsToFlat(); return; }
     migrateLegacyItems();
+  }
+  function saveDeletedGroups() {
+    try { localStorage.setItem(LS_DELETED_GROUPS, JSON.stringify(Object.keys(deletedGroupKeys))); } catch(e) {}
+  }
+  function loadDeletedGroups() {
+    try { var r = localStorage.getItem(LS_DELETED_GROUPS); if (r) JSON.parse(r).forEach(function(k){ deletedGroupKeys[k] = true; }); } catch(e) {}
   }
 
   // Asigna dest_id a items guardados antes del esquema de vinculación
@@ -434,10 +448,10 @@
       map[key].items.push(it);
     });
 
-    // Agregar DEFAULT_GROUPS que aún no tienen items en el catálogo
+    // Agregar DEFAULT_GROUPS que aún no tienen items (respetando grupos borrados)
     DEFAULT_GROUPS.forEach(function(g) {
       var key = g.dest_id || g.group;
-      if (!map[key]) {
+      if (!map[key] && !deletedGroupKeys[key]) {
         map[key] = {
           dest_id:    g.dest_id || null,
           group_name: g.group,
@@ -560,9 +574,22 @@
       var gh = document.createElement('div');
       gh.className = 'bg-group-header' + (group.is_deleted ? ' deleted-group' : '');
 
-      var gt = document.createElement('div');
-      gt.className = 'bg-group-title';
-      gt.textContent = group.display_name || group.group_name;
+      var isManual = !group.dest_id && !group.is_deleted;
+
+      // Título: input editable para tramos manuales en edit mode, texto para el resto
+      if (isManual && catalogEditable) {
+        var gt = document.createElement('input');
+        gt.className = 'bg-group-title bg-group-title-inp';
+        gt.value = group.display_name || group.group_name;
+        gt.placeholder = 'Nombre del tramo…';
+        (function(g) {
+          gt.addEventListener('change', function() { renameGroup(g.group_name, this.value); });
+        })(group);
+      } else {
+        var gt = document.createElement('div');
+        gt.className = 'bg-group-title';
+        gt.textContent = group.display_name || group.group_name;
+      }
       gh.appendChild(gt);
 
       if (group.is_deleted) {
@@ -571,6 +598,9 @@
         badge.textContent = 'Destino eliminado';
         gh.appendChild(badge);
       } else if (catalogEditable) {
+        var rightBtns = document.createElement('div');
+        rightBtns.style.cssText = 'display:flex;align-items:center;gap:.35rem;flex-shrink:0;';
+
         var addBtn = document.createElement('button');
         addBtn.className = 'bg-group-add-btn';
         addBtn.textContent = '+ Ítem';
@@ -579,7 +609,25 @@
             openSheet(null, g.group_name, g.group_order, false, g.dest_id);
           });
         })(group);
-        gh.appendChild(addBtn);
+        rightBtns.appendChild(addBtn);
+
+        // Botón eliminar tramo (solo para grupos manuales)
+        if (isManual) {
+          var delGroupBtn = document.createElement('button');
+          delGroupBtn.className = 'bg-group-del-btn';
+          delGroupBtn.textContent = '✕';
+          delGroupBtn.title = 'Eliminar tramo';
+          (function(gKey) {
+            delGroupBtn.addEventListener('click', function() {
+              if (confirm('¿Eliminar el tramo "' + gKey + '" y todos sus ítems?')) {
+                deleteGroup(gKey);
+              }
+            });
+          })(group.group_name);
+          rightBtns.appendChild(delGroupBtn);
+        }
+
+        gh.appendChild(rightBtns);
       }
 
       container.appendChild(gh);
@@ -852,6 +900,45 @@
     }).catch(function() {
       showToast('⚠️ Sin conexión — guardado local', true);
     });
+  }
+
+  // ── GROUP CRUD ─────────────────────────────────────────────
+  function deleteGroup(groupKey) {
+    // Marca todos los items del grupo como borrados
+    catalogItems.forEach(function(it) {
+      var key = it.dest_id || it.group_name;
+      if (key === groupKey && !it.deleted) {
+        it.deleted = true;
+        sb.from('budget_items').upsert({ id: it.id, deleted: true, updated_at: new Date().toISOString() }).catch(function(){});
+      }
+    });
+    // Persiste que el grupo fue borrado para que DEFAULT_GROUPS no lo resurja
+    deletedGroupKeys[groupKey] = true;
+    saveCatalogLocal();
+    saveDeletedGroups();
+    renderBudget();
+    renderResumen();
+    showToast('Tramo eliminado', false);
+  }
+
+  function renameGroup(groupKey, newName) {
+    newName = (newName || '').trim();
+    if (!newName) return;
+    // Actualiza group_name en todos los items del grupo (solo manuales sin dest_id)
+    catalogItems.forEach(function(it) {
+      if (!it.dest_id && it.group_name === groupKey && !it.deleted) {
+        it.group_name = newName;
+      }
+    });
+    // Si había un deletedGroupKey con el nombre viejo, moverlo al nuevo
+    if (deletedGroupKeys[groupKey]) {
+      deletedGroupKeys[newName] = true;
+      delete deletedGroupKeys[groupKey];
+      saveDeletedGroups();
+    }
+    saveCatalogLocal();
+    renderBudget();
+    renderResumen();
   }
 
   // ── EDIT MODE TOGGLE ───────────────────────────────────────
@@ -1239,6 +1326,7 @@
   // ── INIT ──────────────────────────────────────────────────
   // 1) Load from localStorage immediately
   loadTrackerLocal();
+  loadDeletedGroups();
   loadCatalogLocal();
   renderBudget();
   renderResumen();
