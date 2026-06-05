@@ -106,6 +106,7 @@
 
   <div class="itin-section-label">Ciudades y fechas</div>
   <div class="city-list" id="cityList"><div class="route-line"></div></div>
+  <button onclick="addDest()" style="display:block;width:100%;font-family:Outfit,sans-serif;font-size:.75rem;font-weight:600;color:var(--gold);background:none;border:1.5px dashed rgba(201,151,58,.5);border-radius:12px;padding:.6rem 1.2rem;cursor:pointer;margin-bottom:1.5rem;-webkit-tap-highlight-color:transparent">＋ Agregar destino</button>
 
   <div class="itin-section-label">Vuelos internacionales</div>
   <div class="flights-box">
@@ -149,12 +150,58 @@ function sorted(){ return [...DESTS].sort((a,b)=>a.start.localeCompare(b.start))
 (function load(){
   try {
     const s = localStorage.getItem('itin-dates-v2');
-    if(s){ JSON.parse(s).forEach(p=>{ const d=DESTS.find(x=>x.id===p.id); if(d){ d.start=p.start; d.end=p.end; if(p.name) d.name=p.name; } }); }
+    if(s){
+      const saved = JSON.parse(s);
+      if(saved.length && saved[0].url !== undefined){
+        // Formato completo: reemplazar array entero
+        DESTS.length = 0;
+        saved.forEach(p => DESTS.push(p));
+      } else {
+        // Formato viejo: parchear por id
+        saved.forEach(p=>{ const d=DESTS.find(x=>x.id===p.id); if(d){ d.start=p.start; d.end=p.end; if(p.name) d.name=p.name; } });
+      }
+    }
   } catch(e){}
 })();
 
 function save(){
-  try { localStorage.setItem('itin-dates-v2', JSON.stringify(DESTS.map(d=>({id:d.id,name:d.name,start:d.start,end:d.end})))); } catch(e){}
+  try {
+    localStorage.setItem('itin-dates-v2', JSON.stringify(DESTS.map(d=>({
+      id:d.id, name:d.name, start:d.start, end:d.end,
+      color:d.color||'#374151', temp:d.temp||'', rain:d.rain||'', desc:d.desc||'', url:d.url||'#'
+    }))));
+  } catch(e){}
+}
+
+// ── AGREGAR / ELIMINAR DESTINOS ───────────────────────────────────────────────
+const PALETTE=['#059669','#e11d48','#0891b2','#b45309','#6d28d9','#be185d','#0f766e','#c2410c'];
+
+function addDest(){
+  const color = PALETTE[DESTS.length % PALETTE.length];
+  const s = sorted();
+  const lastEnd = s.length ? s[s.length-1].end : '2026-09-01';
+  const newId = 'd' + Date.now();
+  DESTS.push({id:newId, name:'Nuevo destino', start:lastEnd, end:lastEnd, color, temp:'', rain:'', desc:'', url:'#'});
+  save();
+  renderCities();
+  renderCalendar();
+  renderStats();
+  setTimeout(()=>{
+    const b = document.getElementById('ebtn-'+newId);
+    if(b) b.click();
+    const n = document.getElementById('name-'+newId);
+    if(n){ n.select(); n.focus(); }
+  }, 50);
+}
+
+function deleteDest(id){
+  if(!confirm('¿Eliminar este destino?')) return;
+  const idx = DESTS.findIndex(d => d.id === id);
+  if(idx >= 0) DESTS.splice(idx, 1);
+  save();
+  renderCities();
+  renderCalendar();
+  renderStats();
 }
 
 // ── CALENDARIO ────────────────────────────────────────────────────────────────
@@ -254,6 +301,9 @@ function renderCities(){
           <span class="editor-sep">→</span>
           <div class="date-field"><label>Fin</label><input type="date" id="end-${d.id}" value="${d.end}"></div>
           <span class="editor-nights" id="en-${d.id}">${n}N</span>
+        </div>
+        <div style="margin-top:.65rem;padding-top:.55rem;border-top:1px solid rgba(13,27,42,.07);text-align:right">
+          <button onclick="deleteDest('${d.id}')" style="font-family:Outfit,sans-serif;font-size:.65rem;font-weight:600;color:#b91c1c;background:rgba(239,68,68,.07);border:1px solid rgba(239,68,68,.2);border-radius:8px;padding:.3rem .7rem;cursor:pointer;-webkit-tap-highlight-color:transparent">✕ Eliminar destino</button>
         </div>
       </div>
     `;
