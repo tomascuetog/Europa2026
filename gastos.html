@@ -356,28 +356,43 @@
     try { var r = localStorage.getItem(LS_GROUP_META); if (r) groupMeta = JSON.parse(r); } catch(e) {}
   }
 
-  // Asigna dest_id a items guardados antes del esquema de vinculación
+  // Asigna dest_id/sort_key a items según su group_name
   function migrateLegacyItems() {
-    // Mapa de nombre de grupo → {dest_id, sort_key, group_order}
-    // Ordenar por longitud desc para que "Atenas II" matchee antes que "Atenas"
+    // Mapa dest groups: grupo con dest_id (Atenas II antes que Atenas por longitud)
     var nameToDest = DEFAULT_GROUPS
       .filter(function(g) { return g.dest_id; })
       .sort(function(a, b) { return b.group.length - a.group.length; })
       .map(function(g) { return { prefix: g.group.toLowerCase(), dest_id: g.dest_id, sort_key: g.sort_key, order: g.order }; });
 
+    // Mapa manual groups: grupos sin dest_id (transporte, internacionales)
+    var nameToManual = {};
+    DEFAULT_GROUPS.forEach(function(g) {
+      if (!g.dest_id) nameToManual[g.group.toLowerCase()] = { sort_key: g.sort_key, order: g.order };
+    });
+
     var changed = false;
     catalogItems.forEach(function(it) {
-      if (it.dest_id) return; // ya migrado
       var lc = (it.group_name || '').toLowerCase();
-      for (var i = 0; i < nameToDest.length; i++) {
-        var nd = nameToDest[i];
-        // Matchea si el nombre viejo empieza con el nuevo + espacio, punto, guion o es igual
-        if (lc === nd.prefix || lc.indexOf(nd.prefix + ' ') === 0 || lc.indexOf(nd.prefix + ' ·') === 0) {
-          it.dest_id    = nd.dest_id;
-          it.sort_key   = nd.sort_key;
-          it.group_order = nd.order;
+      // Asignar dest_id para grupos de destino
+      if (!it.dest_id) {
+        for (var i = 0; i < nameToDest.length; i++) {
+          var nd = nameToDest[i];
+          if (lc === nd.prefix || lc.indexOf(nd.prefix + ' ') === 0 || lc.indexOf(nd.prefix + ' ·') === 0) {
+            it.dest_id     = nd.dest_id;
+            it.sort_key    = nd.sort_key;
+            it.group_order = nd.order;
+            changed = true;
+            break;
+          }
+        }
+      }
+      // Asignar sort_key a grupos manuales que aún no lo tienen
+      if (it.sort_key === undefined || it.sort_key === null) {
+        var manual = nameToManual[lc];
+        if (manual) {
+          it.sort_key    = manual.sort_key;
+          it.group_order = manual.order;
           changed = true;
-          break;
         }
       }
     });
@@ -1285,17 +1300,21 @@
       if (!p.new) return;
       var r = p.new;
       var idx = catalogItems.findIndex(function(it) { return it.id === r.id; });
-      var item = {
-        id:          r.id,
-        group_name:  r.group_name,
-        group_order: r.group_order,
-        label:       r.label,
-        est:         r.est,
-        tag:         r.tag,
-        item_order:  r.item_order,
-        deleted:     r.deleted
-      };
-      if (idx >= 0) { catalogItems[idx] = item; } else { catalogItems.push(item); }
+      if (idx >= 0) {
+        // Merge: preservar dest_id/sort_key/group_order locales
+        catalogItems[idx].label      = r.label;
+        catalogItems[idx].est        = r.est;
+        catalogItems[idx].tag        = r.tag;
+        catalogItems[idx].item_order = r.item_order;
+        catalogItems[idx].deleted    = r.deleted;
+      } else {
+        catalogItems.push({
+          id: r.id, group_name: r.group_name, group_order: r.group_order,
+          label: r.label, est: r.est, tag: r.tag,
+          item_order: r.item_order, deleted: r.deleted
+        });
+        migrateLegacyItems();
+      }
       saveCatalogLocal();
       renderBudget();
       renderResumen();
@@ -1372,19 +1391,35 @@
       saveCatalogLocal();
       seedBudgetItems();
     } else {
-      // Map all rows (including deleted) for proper state
-      catalogItems = (r.data || []).map(function(row) {
-        return {
-          id:          row.id,
-          group_name:  row.group_name,
-          group_order: row.group_order,
-          label:       row.label,
-          est:         row.est,
-          tag:         row.tag,
-          item_order:  row.item_order,
-          deleted:     row.deleted
-        };
+      // MERGE: preservar metadata local (dest_id, sort_key, group_order)
+      // Solo actualizar contenido (label, est, tag, deleted, item_order)
+      var sbMap = {};
+      (r.data || []).forEach(function(row) { sbMap[row.id] = row; });
+
+      // Actualizar items existentes en localStorage
+      catalogItems.forEach(function(it) {
+        var row = sbMap[it.id];
+        if (!row) return;
+        it.label      = row.label;
+        it.est        = row.est;
+        it.tag        = row.tag;
+        it.deleted    = row.deleted;
+        it.item_order = row.item_order;
       });
+
+      // Agregar items nuevos (de otro dispositivo) que no están en localStorage
+      (r.data || []).forEach(function(row) {
+        var exists = catalogItems.some(function(it) { return it.id === row.id; });
+        if (!exists) {
+          catalogItems.push({
+            id: row.id, group_name: row.group_name, group_order: row.group_order,
+            label: row.label, est: row.est, tag: row.tag,
+            item_order: row.item_order, deleted: row.deleted
+          });
+        }
+      });
+
+      migrateLegacyItems(); // asignar dest_id/sort_key a cualquier item nuevo
       saveCatalogLocal();
     }
     renderBudget();
