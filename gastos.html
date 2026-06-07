@@ -32,6 +32,9 @@
 .bg-group-del-btn{display:none;font-family:Outfit,sans-serif;font-size:.72rem;font-weight:700;color:#b91c1c;background:rgba(239,68,68,.07);border:1px solid rgba(239,68,68,.2);border-radius:20px;padding:.18rem .6rem;cursor:pointer;-webkit-tap-highlight-color:transparent;transition:all .15s;white-space:nowrap;}
 .bg-group-del-btn:hover{background:rgba(239,68,68,.15);border-color:rgba(239,68,68,.4);}
 .edit-mode .bg-group-del-btn{display:inline-flex;}
+.bg-group-move-btn{display:none;font-size:.78rem;color:var(--text-mid);background:rgba(13,27,42,.06);border:1px solid rgba(13,27,42,.12);border-radius:8px;width:26px;height:26px;cursor:pointer;-webkit-tap-highlight-color:transparent;transition:all .15s;align-items:center;justify-content:center;padding:0;}
+.bg-group-move-btn:hover{border-color:var(--gold);color:var(--gold);}
+.edit-mode .bg-group-move-btn{display:flex;}
 .bg-group-title{font-family:Outfit,sans-serif;font-size:.62rem;letter-spacing:.2em;text-transform:uppercase;color:var(--gold);}
 .bg-group-add-btn{display:none;font-family:Outfit,sans-serif;font-size:.65rem;font-weight:600;color:var(--gold);background:none;border:1px dashed rgba(201,151,58,.5);border-radius:20px;padding:.2rem .65rem;cursor:pointer;-webkit-tap-highlight-color:transparent;transition:all .15s;}
 .bg-group-add-btn:hover{background:rgba(201,151,58,.08);}
@@ -247,6 +250,7 @@
   var LS_TRACKER        = 'europa2026_tracker_v1';
   var LS_CATALOG        = 'europa2026_budget_catalog_v2'; // v2: dest_id schema
   var LS_DELETED_GROUPS = 'europa2026_deleted_groups_v1';
+  var LS_GROUP_META     = 'europa2026_group_meta_v1';    // nombre y orden por grupo
 
   // ── DEFAULT GROUPS ─────────────────────────────────────────
   // dest_id vincula con itin-dates-v2; null = grupo manual (transporte, fijo)
@@ -323,6 +327,7 @@
 
   // ── LOCAL STORAGE ─────────────────────────────────────────
   var deletedGroupKeys = {};  // { groupKey: true }
+  var groupMeta = {};         // { groupKey: { name, sort_key } }
 
   function saveTrackerLocal() {
     try { localStorage.setItem(LS_TRACKER, JSON.stringify(trackerState)); } catch(e) {}
@@ -343,6 +348,12 @@
   }
   function loadDeletedGroups() {
     try { var r = localStorage.getItem(LS_DELETED_GROUPS); if (r) JSON.parse(r).forEach(function(k){ deletedGroupKeys[k] = true; }); } catch(e) {}
+  }
+  function saveGroupMeta() {
+    try { localStorage.setItem(LS_GROUP_META, JSON.stringify(groupMeta)); } catch(e) {}
+  }
+  function loadGroupMeta() {
+    try { var r = localStorage.getItem(LS_GROUP_META); if (r) groupMeta = JSON.parse(r); } catch(e) {}
   }
 
   // Asigna dest_id a items guardados antes del esquema de vinculación
@@ -438,6 +449,11 @@
     var groups = Object.keys(map).map(function(key) {
       var g = map[key];
       g.items.sort(function(a, b) { return a.item_order - b.item_order; });
+      // Aplicar overrides de groupMeta (nombre y orden persistidos)
+      if (groupMeta[key]) {
+        if (groupMeta[key].name !== undefined)     g.group_name = groupMeta[key].name;
+        if (groupMeta[key].sort_key !== undefined) g.sort_key   = groupMeta[key].sort_key;
+      }
       g.display_name = g.group_name;
       return g;
     });
@@ -513,6 +529,20 @@
       if (catalogEditable) {
         var rightBtns = document.createElement('div');
         rightBtns.style.cssText = 'display:flex;align-items:center;gap:.35rem;flex-shrink:0;';
+
+        var upBtn = document.createElement('button');
+        upBtn.className = 'bg-group-move-btn';
+        upBtn.textContent = '↑';
+        upBtn.title = 'Mover arriba';
+        (function(gk) { upBtn.addEventListener('click', function() { moveGroup(gk, 'up'); }); })(groupKey);
+        rightBtns.appendChild(upBtn);
+
+        var downBtn = document.createElement('button');
+        downBtn.className = 'bg-group-move-btn';
+        downBtn.textContent = '↓';
+        downBtn.title = 'Mover abajo';
+        (function(gk) { downBtn.addEventListener('click', function() { moveGroup(gk, 'down'); }); })(groupKey);
+        rightBtns.appendChild(downBtn);
 
         var addBtn = document.createElement('button');
         addBtn.className = 'bg-group-add-btn';
@@ -823,8 +853,10 @@
     });
     // Persiste que el grupo fue borrado para que DEFAULT_GROUPS no lo resurja
     deletedGroupKeys[groupKey] = true;
+    delete groupMeta[groupKey];
     saveCatalogLocal();
     saveDeletedGroups();
+    saveGroupMeta();
     renderBudget();
     renderResumen();
     showToast('Tramo eliminado', false);
@@ -833,11 +865,14 @@
   function renameGroup(groupKey, newName) {
     newName = (newName || '').trim();
     if (!newName) return;
+    // Persistir en groupMeta para que sobreviva aunque el grupo esté vacío
+    if (!groupMeta[groupKey]) groupMeta[groupKey] = {};
+    groupMeta[groupKey].name = newName;
+    saveGroupMeta();
+    // También actualizar catalogItems para consistencia
     catalogItems.forEach(function(it) {
       var key = it.dest_id || it.group_name;
-      if (key === groupKey && !it.deleted) {
-        it.group_name = newName;
-      }
+      if (key === groupKey && !it.deleted) it.group_name = newName;
     });
     if (deletedGroupKeys[groupKey]) {
       deletedGroupKeys[newName] = true;
@@ -847,6 +882,25 @@
     saveCatalogLocal();
     renderBudget();
     renderResumen();
+  }
+
+  function moveGroup(groupKey, direction) {
+    var groups = getGroups();
+    var idx = groups.findIndex(function(g) { return (g.dest_id || g.group_name) === groupKey; });
+    if (idx === -1) return;
+    var swapIdx = direction === 'up' ? idx - 1 : idx + 1;
+    if (swapIdx < 0 || swapIdx >= groups.length) return;
+    // Intercambiar posiciones y re-asignar sort_keys enteros para todos los grupos
+    var tmp = groups[idx];
+    groups[idx] = groups[swapIdx];
+    groups[swapIdx] = tmp;
+    groups.forEach(function(g, i) {
+      var gk = g.dest_id || g.group_name;
+      if (!groupMeta[gk]) groupMeta[gk] = {};
+      groupMeta[gk].sort_key = i;
+    });
+    saveGroupMeta();
+    renderBudget();
   }
 
   // ── EDIT MODE TOGGLE ───────────────────────────────────────
@@ -1235,6 +1289,7 @@
   // 1) Load from localStorage immediately
   loadTrackerLocal();
   loadDeletedGroups();
+  loadGroupMeta();
   loadCatalogLocal();
   renderBudget();
   renderResumen();
