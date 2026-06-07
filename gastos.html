@@ -652,6 +652,24 @@
       var editBtns = document.createElement('div');
       editBtns.className = 'bi-edit-btns';
 
+      var upItemBtn = document.createElement('button');
+      upItemBtn.className = 'bi-btn-icon';
+      upItemBtn.title = 'Mover arriba';
+      upItemBtn.textContent = '↑';
+      (function(id) {
+        upItemBtn.addEventListener('click', function(e) { e.stopPropagation(); moveItem(id, 'up'); });
+      })(item.id);
+      editBtns.appendChild(upItemBtn);
+
+      var downItemBtn = document.createElement('button');
+      downItemBtn.className = 'bi-btn-icon';
+      downItemBtn.title = 'Mover abajo';
+      downItemBtn.textContent = '↓';
+      (function(id) {
+        downItemBtn.addEventListener('click', function(e) { e.stopPropagation(); moveItem(id, 'down'); });
+      })(item.id);
+      editBtns.appendChild(downItemBtn);
+
       var editBtn = document.createElement('button');
       editBtn.className = 'bi-btn-icon';
       editBtn.title = 'Editar';
@@ -882,6 +900,25 @@
     saveCatalogLocal();
     renderBudget();
     renderResumen();
+  }
+
+  function moveItem(itemId, direction) {
+    var item = catalogItems.find(function(it) { return it.id === itemId && !it.deleted; });
+    if (!item) return;
+    var groupKey = item.dest_id || item.group_name;
+    var groupItems = catalogItems
+      .filter(function(it) { return !it.deleted && (it.dest_id || it.group_name) === groupKey; })
+      .sort(function(a, b) { return a.item_order - b.item_order; });
+    var idx = groupItems.findIndex(function(it) { return it.id === itemId; });
+    if (idx === -1) return;
+    var swapIdx = direction === 'up' ? idx - 1 : idx + 1;
+    if (swapIdx < 0 || swapIdx >= groupItems.length) return;
+    var tmp = groupItems[idx];
+    groupItems[idx] = groupItems[swapIdx];
+    groupItems[swapIdx] = tmp;
+    groupItems.forEach(function(it, i) { it.item_order = i; });
+    saveCatalogLocal();
+    renderBudget();
   }
 
   function moveGroup(groupKey, direction) {
