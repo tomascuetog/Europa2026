@@ -735,6 +735,9 @@
     linksWrap.className = 'bi-links-wrap';
 
     itemLinks.forEach(function(link, li) {
+      var entry = document.createElement('div');
+      entry.style.cssText = 'display:inline-flex;flex-direction:column;gap:.2rem;max-width:100%;';
+
       var chip = document.createElement('span');
       chip.className = 'bi-link-chip';
       var a = document.createElement('a');
@@ -744,11 +747,30 @@
       a.textContent = link.label || link.url.replace(/^https?:\/\//, '').split('/')[0];
       a.title = link.url;
       chip.appendChild(a);
+
+      var editLinkBtn = document.createElement('button');
+      editLinkBtn.className = 'bi-link-chip-del';
+      editLinkBtn.textContent = '✎';
+      editLinkBtn.title = 'Editar link';
+      editLinkBtn.style.fontSize = '.72rem';
+      chip.appendChild(editLinkBtn);
+
       var delLinkBtn = document.createElement('button');
       delLinkBtn.className = 'bi-link-chip-del';
       delLinkBtn.textContent = '×';
       delLinkBtn.title = 'Quitar link';
-      (function(id, idx) {
+      chip.appendChild(delLinkBtn);
+
+      entry.appendChild(chip);
+
+      var editChipForm = document.createElement('div');
+      editChipForm.className = 'bi-link-form';
+      editChipForm.style.display = 'none';
+      entry.appendChild(editChipForm);
+
+      linksWrap.appendChild(entry);
+
+      (function(id, idx, chipEl, formEl, linkObj) {
         delLinkBtn.addEventListener('click', function(e) {
           e.stopPropagation();
           if (!trackerState[id]) return;
@@ -756,9 +778,44 @@
           saveTrackerLocal();
           renderBudget();
         });
-      })(item.id, li);
-      chip.appendChild(delLinkBtn);
-      linksWrap.appendChild(chip);
+
+        editLinkBtn.addEventListener('click', function(e) {
+          e.stopPropagation();
+          chipEl.style.display = 'none';
+          formEl.style.display = 'flex';
+          formEl.innerHTML = '';
+
+          var urlInp = document.createElement('input');
+          urlInp.type = 'url'; urlInp.value = linkObj.url; urlInp.placeholder = 'https://…';
+          urlInp.style.cssText = 'flex:2;min-width:140px;';
+          var lblInp = document.createElement('input');
+          lblInp.type = 'text'; lblInp.value = linkObj.label || ''; lblInp.placeholder = 'Etiqueta (opcional)';
+          lblInp.style.cssText = 'flex:1;min-width:80px;';
+          var okBtn = document.createElement('button');
+          okBtn.className = 'bi-link-form-ok'; okBtn.textContent = '✓';
+          var cancelBtn = document.createElement('button');
+          cancelBtn.className = 'bi-link-form-cancel'; cancelBtn.textContent = '✕';
+
+          function doSave() {
+            var url = urlInp.value.trim();
+            if (!url) { urlInp.focus(); return; }
+            if (!/^https?:\/\//i.test(url)) url = 'https://' + url;
+            if (!trackerState[id] || !trackerState[id].links) return;
+            trackerState[id].links[idx] = { url: url, label: lblInp.value.trim() };
+            saveTrackerLocal();
+            renderBudget();
+          }
+          function doCancel() { formEl.style.display = 'none'; chipEl.style.display = ''; }
+
+          okBtn.addEventListener('click', function(e) { e.stopPropagation(); doSave(); });
+          cancelBtn.addEventListener('click', function(e) { e.stopPropagation(); doCancel(); });
+          urlInp.addEventListener('keydown', function(e) { if(e.key==='Enter'){e.preventDefault();lblInp.focus();} if(e.key==='Escape') doCancel(); });
+          lblInp.addEventListener('keydown', function(e) { if(e.key==='Enter'){e.preventDefault();doSave();} if(e.key==='Escape') doCancel(); });
+
+          formEl.appendChild(urlInp); formEl.appendChild(lblInp); formEl.appendChild(okBtn); formEl.appendChild(cancelBtn);
+          setTimeout(function() { urlInp.select(); urlInp.focus(); }, 50);
+        });
+      })(item.id, li, chip, editChipForm, link);
     });
 
     var addLinkBtn = document.createElement('button');
