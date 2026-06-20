@@ -73,9 +73,12 @@
 .bi-file-lbl:hover{border-color:var(--gold);color:var(--gold);}
 .bi-file-link{font-family:Outfit,sans-serif;font-size:.7rem;color:#15803d;text-decoration:underline;word-break:break-all;}
 @media(max-width:480px){
-  .bi-label{font-size:.77rem;}
   .res-val{font-size:1.65rem;}
   .bi-split-lbl{min-width:100px;}
+  /* En mobile el label pasa a su propia fila para no quedar aplastado */
+  .bi-main{flex-wrap:wrap;row-gap:.2rem;align-items:center;}
+  .bi-label{order:10;flex:0 0 100%;font-size:.78rem;margin-top:.05rem;}
+  .bi-price-wrap{margin-left:auto;}
 }
 
 /* ── EDIT ITEM BUTTONS ─────────────────── */
@@ -1600,5 +1603,6 @@
 
 })();
 </script>
+<script src="shared.js"></script>
 </body>
 </html>
