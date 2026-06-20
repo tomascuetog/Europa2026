@@ -775,7 +775,7 @@
           e.stopPropagation();
           if (!trackerState[id]) return;
           trackerState[id].links.splice(idx, 1);
-          saveTrackerLocal();
+          trkUpsert(id);
           renderBudget();
         });
 
@@ -802,7 +802,7 @@
             if (!/^https?:\/\//i.test(url)) url = 'https://' + url;
             if (!trackerState[id] || !trackerState[id].links) return;
             trackerState[id].links[idx] = { url: url, label: lblInp.value.trim() };
-            saveTrackerLocal();
+            trkUpsert(id);
             renderBudget();
           }
           function doCancel() { formEl.style.display = 'none'; chipEl.style.display = ''; }
@@ -847,7 +847,7 @@
           if (!trackerState[id]) trackerState[id] = {status:'proyectado',precio:0,adelanto:0,note:'',file_url:'',file_name:'',fecha_adelanto:'',fecha_destino:'',links:[]};
           if (!trackerState[id].links) trackerState[id].links = [];
           trackerState[id].links.push({ url: url, label: lblInp.value.trim() });
-          saveTrackerLocal();
+          trkUpsert(id);
           renderBudget();
         }
         function doCancel() { form.style.display = 'none'; btn.style.display = ''; }
@@ -959,6 +959,7 @@
       file_name:      s.file_name      || '',
       fecha_adelanto: s.fecha_adelanto || '',
       fecha_destino:  s.fecha_destino  || '',
+      links:          s.links          || [],
       date:           '',
       updated_at:     new Date().toISOString()
     }).then(function(res) {
@@ -1442,6 +1443,7 @@
         var focused = document.activeElement;
         if (focused && focused.dataset && (focused.dataset.field === 'precio' || focused.dataset.field === 'adelanto' || focused.dataset.field === 'note')) return;
         var prevT = trackerState[r.id];
+        var rtLinks = Array.isArray(r.links) ? r.links : [];
         trackerState[r.id] = {
           status:         normalizeStatus(r.status),
           precio:         r.precio         != null ? r.precio         : (prevT ? prevT.precio         || 0  : 0),
@@ -1451,7 +1453,7 @@
           file_name:      r.file_name      || '',
           fecha_adelanto: r.fecha_adelanto != null ? r.fecha_adelanto : (prevT ? prevT.fecha_adelanto || '' : ''),
           fecha_destino:  r.fecha_destino  != null ? r.fecha_destino  : (prevT ? prevT.fecha_destino  || '' : ''),
-          links:          (prevT && prevT.links) || []
+          links:          rtLinks.length > 0 ? rtLinks : ((prevT && prevT.links) || [])
         };
         renderBudget(); renderResumen(); renderChart();
       }
@@ -1519,6 +1521,7 @@
     (r.data || []).forEach(function(row) {
       var prev = trackerState[row.id];
       // Usar != null para detectar columnas inexistentes (undefined) vs valor real 0/''
+      var sbLinks = Array.isArray(row.links) ? row.links : [];
       trackerState[row.id] = {
         status:         normalizeStatus(row.status),
         precio:         row.precio         != null ? row.precio         : (prev ? prev.precio         || 0  : 0),
@@ -1528,7 +1531,7 @@
         file_name:      row.file_name      || '',
         fecha_adelanto: row.fecha_adelanto != null ? row.fecha_adelanto : (prev ? prev.fecha_adelanto || '' : ''),
         fecha_destino:  row.fecha_destino  != null ? row.fecha_destino  : (prev ? prev.fecha_destino  || '' : ''),
-        links:          (prev && prev.links) || []
+        links:          sbLinks.length > 0 ? sbLinks : ((prev && prev.links) || [])
       };
     });
     saveTrackerLocal();
