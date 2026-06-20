@@ -79,6 +79,11 @@
   .editor-sep{color:var(--text-mid);font-size:.8rem;margin-top:.9rem;}
   .editor-nights{font-family:Outfit,sans-serif;font-size:.72rem;font-weight:600;color:var(--gold);margin-top:.9rem;white-space:nowrap;}
 
+  /* MOVE DEST BUTTONS */
+  .dest-move-btn{font-family:Outfit,sans-serif;font-size:.72rem;font-weight:700;color:var(--navy);background:rgba(13,27,42,.06);border:1px solid rgba(13,27,42,.14);border-radius:8px;padding:.28rem .6rem;cursor:pointer;-webkit-tap-highlight-color:transparent;transition:background .12s;}
+  .dest-move-btn:not(:disabled):active{background:rgba(13,27,42,.14);}
+  .dest-move-btn:disabled{opacity:.25;cursor:default;}
+
   /* FLIGHTS BOX */
   .flights-box{background:#fff;border-radius:14px;padding:1.1rem 1.25rem;box-shadow:0 2px 8px rgba(13,27,42,.06);border:1px solid rgba(13,27,42,.05);}
   .flight-row{display:flex;justify-content:space-between;align-items:center;font-family:Outfit,sans-serif;font-size:.8rem;}
@@ -144,7 +149,12 @@ function fmtDate(s){
   return d.getUTCDate()+' '+MONTHS[d.getUTCMonth()];
 }
 
-function sorted(){ return [...DESTS].sort((a,b)=>a.start.localeCompare(b.start)); }
+function sorted(){
+  const hasOrder = DESTS.some(d => d.order !== undefined);
+  return [...DESTS].sort((a,b)=> hasOrder
+    ? (a.order ?? 999) - (b.order ?? 999)
+    : a.start.localeCompare(b.start));
+}
 
 // ── PERSISTENCIA ──────────────────────────────────────────────────────────────
 (function load(){
@@ -162,13 +172,18 @@ function sorted(){ return [...DESTS].sort((a,b)=>a.start.localeCompare(b.start))
       }
     }
   } catch(e){}
+  // Inicializar order si no existe (primera vez o datos previos)
+  if(!DESTS.some(d => d.order !== undefined)){
+    [...DESTS].sort((a,b)=>a.start.localeCompare(b.start)).forEach((d,i)=>{ d.order = i; });
+  }
 })();
 
 function save(){
   try {
     localStorage.setItem('itin-dates-v2', JSON.stringify(DESTS.map(d=>({
       id:d.id, name:d.name, start:d.start, end:d.end,
-      color:d.color||'#374151', temp:d.temp||'', rain:d.rain||'', desc:d.desc||'', url:d.url||'#'
+      color:d.color||'#374151', temp:d.temp||'', rain:d.rain||'', desc:d.desc||'', url:d.url||'#',
+      order: d.order !== undefined ? d.order : 999
     }))));
   } catch(e){}
 }
@@ -176,12 +191,27 @@ function save(){
 // ── AGREGAR / ELIMINAR DESTINOS ───────────────────────────────────────────────
 const PALETTE=['#059669','#e11d48','#0891b2','#b45309','#6d28d9','#be185d','#0f766e','#c2410c'];
 
+function moveDest(id, direction){
+  const dests = sorted();
+  const idx = dests.findIndex(d => d.id === id);
+  if(idx === -1) return;
+  const swapIdx = direction === 'up' ? idx - 1 : idx + 1;
+  if(swapIdx < 0 || swapIdx >= dests.length) return;
+  const tmp = dests[idx]; dests[idx] = dests[swapIdx]; dests[swapIdx] = tmp;
+  dests.forEach((d,i) => { d.order = i; });
+  save();
+  renderCities();
+  renderCalendar();
+  renderStats();
+}
+
 function addDest(){
   const color = PALETTE[DESTS.length % PALETTE.length];
   const s = sorted();
   const lastEnd = s.length ? s[s.length-1].end : '2026-09-01';
+  const maxOrder = DESTS.reduce((m,d) => Math.max(m, d.order !== undefined ? d.order : -1), -1);
   const newId = 'd' + Date.now();
-  DESTS.push({id:newId, name:'Nuevo destino', start:lastEnd, end:lastEnd, color, temp:'', rain:'', desc:'', url:'#'});
+  DESTS.push({id:newId, name:'Nuevo destino', start:lastEnd, end:lastEnd, color, temp:'', rain:'', desc:'', url:'#', order: maxOrder + 1});
   save();
   renderCities();
   renderCalendar();
@@ -274,9 +304,11 @@ function renderCities(){
   if(!list) return;
   list.innerHTML = '<div class="route-line"></div>';
 
-  sorted().forEach((d, i)=>{
+  const dests = sorted();
+  dests.forEach((d, i)=>{
     const n = nights(d);
     const nTxt = n===1?'noche':'noches';
+    const isFirst = i === 0, isLast = i === dests.length - 1;
     const row = document.createElement('div');
     row.className = 'city-row';
     row.innerHTML = `
@@ -290,7 +322,7 @@ function renderCities(){
           <div class="city-temp">${d.temp}</div>
           <div class="city-rain">${d.rain}</div>
         </div>
-        <button class="city-edit-btn" id="ebtn-${d.id}" title="Editar fechas">✎</button>
+        <button class="city-edit-btn" id="ebtn-${d.id}" title="Editar">✎</button>
       </a>
       <div class="city-editor" id="editor-${d.id}" style="display:none">
         <div class="editor-name-row">
@@ -302,8 +334,12 @@ function renderCities(){
           <div class="date-field"><label>Fin</label><input type="date" id="end-${d.id}" value="${d.end}"></div>
           <span class="editor-nights" id="en-${d.id}">${n}N</span>
         </div>
-        <div style="margin-top:.65rem;padding-top:.55rem;border-top:1px solid rgba(13,27,42,.07);text-align:right">
-          <button onclick="deleteDest('${d.id}')" style="font-family:Outfit,sans-serif;font-size:.65rem;font-weight:600;color:#b91c1c;background:rgba(239,68,68,.07);border:1px solid rgba(239,68,68,.2);border-radius:8px;padding:.3rem .7rem;cursor:pointer;-webkit-tap-highlight-color:transparent">✕ Eliminar destino</button>
+        <div style="margin-top:.65rem;padding-top:.55rem;border-top:1px solid rgba(13,27,42,.07);display:flex;justify-content:space-between;align-items:center;">
+          <div style="display:flex;gap:.4rem;">
+            <button class="dest-move-btn" onclick="moveDest('${d.id}','up')" ${isFirst?'disabled':''}>↑</button>
+            <button class="dest-move-btn" onclick="moveDest('${d.id}','down')" ${isLast?'disabled':''}>↓</button>
+          </div>
+          <button onclick="deleteDest('${d.id}')" style="font-family:Outfit,sans-serif;font-size:.65rem;font-weight:600;color:#b91c1c;background:rgba(239,68,68,.07);border:1px solid rgba(239,68,68,.2);border-radius:8px;padding:.3rem .7rem;cursor:pointer;-webkit-tap-highlight-color:transparent">✕ Eliminar</button>
         </div>
       </div>
     `;
@@ -359,8 +395,7 @@ function renderCities(){
       save();
       renderCalendar();
       renderStats();
-      const newSorted = sorted();
-      const idxNow = newSorted.findIndex(x=>x.id===d.id);
+      const idxNow = sorted().findIndex(x=>x.id===d.id);
       if(idxNow !== i) renderCities();
     }
     sIn.addEventListener('change', updateFromInputs);
