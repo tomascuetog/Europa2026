@@ -316,6 +316,17 @@ function renderCities(){
       e.preventDefault();
       e.stopPropagation();
       const open = editor.style.display !== 'none';
+      if (open) {
+        // Guardar nombre pendiente antes de cerrar (iOS no dispara change en blur implícito)
+        const v = nameIn.value.trim();
+        if (v && v !== d.name) {
+          d.name = v;
+          const nameEl = row.querySelector('.city-name');
+          if (nameEl) nameEl.textContent = v;
+          save();
+          renderCalendar();
+        }
+      }
       editor.style.display = open ? 'none' : 'block';
       editBtn.classList.toggle('active', !open);
     });

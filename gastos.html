@@ -1442,7 +1442,17 @@
         var focused = document.activeElement;
         if (focused && focused.dataset && (focused.dataset.field === 'precio' || focused.dataset.field === 'adelanto' || focused.dataset.field === 'note')) return;
         var prevT = trackerState[r.id];
-        trackerState[r.id] = {status:r.status||'proyectado', precio:r.precio||0, adelanto:r.adelanto||0, note:r.note||'', file_url:r.file_url||'', file_name:r.file_name||'', fecha_adelanto:r.fecha_adelanto||'', fecha_destino:r.fecha_destino||'', links:(prevT&&prevT.links)||[]};
+        trackerState[r.id] = {
+          status:         normalizeStatus(r.status),
+          precio:         r.precio         != null ? r.precio         : (prevT ? prevT.precio         || 0  : 0),
+          adelanto:       r.adelanto       != null ? r.adelanto       : (prevT ? prevT.adelanto       || 0  : 0),
+          note:           r.note           != null ? r.note           : (prevT ? prevT.note           || '' : ''),
+          file_url:       r.file_url       || '',
+          file_name:      r.file_name      || '',
+          fecha_adelanto: r.fecha_adelanto != null ? r.fecha_adelanto : (prevT ? prevT.fecha_adelanto || '' : ''),
+          fecha_destino:  r.fecha_destino  != null ? r.fecha_destino  : (prevT ? prevT.fecha_destino  || '' : ''),
+          links:          (prevT && prevT.links) || []
+        };
         renderBudget(); renderResumen(); renderChart();
       }
     })
@@ -1508,16 +1518,17 @@
     }
     (r.data || []).forEach(function(row) {
       var prev = trackerState[row.id];
+      // Usar != null para detectar columnas inexistentes (undefined) vs valor real 0/''
       trackerState[row.id] = {
         status:         normalizeStatus(row.status),
-        precio:         row.precio         || 0,
-        adelanto:       row.adelanto       || 0,
-        note:           row.note           || '',
+        precio:         row.precio         != null ? row.precio         : (prev ? prev.precio         || 0  : 0),
+        adelanto:       row.adelanto       != null ? row.adelanto       : (prev ? prev.adelanto       || 0  : 0),
+        note:           row.note           != null ? row.note           : (prev ? prev.note           || '' : ''),
         file_url:       row.file_url       || '',
         file_name:      row.file_name      || '',
-        fecha_adelanto: row.fecha_adelanto || '',
-        fecha_destino:  row.fecha_destino  || '',
-        links:          (prev && prev.links) || []  // preservar links locales
+        fecha_adelanto: row.fecha_adelanto != null ? row.fecha_adelanto : (prev ? prev.fecha_adelanto || '' : ''),
+        fecha_destino:  row.fecha_destino  != null ? row.fecha_destino  : (prev ? prev.fecha_destino  || '' : ''),
+        links:          (prev && prev.links) || []
       };
     });
     saveTrackerLocal();
