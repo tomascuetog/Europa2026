@@ -122,7 +122,15 @@
   </div>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
+// ── SUPABASE ──────────────────────────────────────────────────────────────────
+var SB_URL = 'https://adzmnnmubbharcprjkhs.supabase.co';
+var SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFkem1ubm11YmJoYXJjcHJqa2hzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg5MzI3MjcsImV4cCI6MjA5NDUwODcyN30.K_TdCUgIo23aqc0wCQBJI7BMWDTT6PND89n7x_MU6-A';
+var sb = supabase.createClient(SB_URL, SB_KEY);
+var destinationsSyncEnabled = true;
+var knownRemoteIds = []; // ids que sabemos que ya existen en Supabase (para poder borrar los que falten)
+
 // ── DATOS ────────────────────────────────────────────────────────────────────
 const DESTS = [
   { id:'mad',  name:'Madrid',          start:'2026-09-01', end:'2026-09-04', color:'#0d1b2a', temp:'22°C', rain:'5d lluvia',  desc:'Punto de entrada',              url:'madrid.html'                  },
@@ -186,7 +194,91 @@ function save(){
       order: d.order !== undefined ? d.order : 999
     }))));
   } catch(e){}
+  syncDestinationsToSupabase();
 }
+
+// ── SYNC SUPABASE ─────────────────────────────────────────────────────────────
+function destRowFromLocal(d){
+  return {
+    id: d.id, name: d.name, start_date: d.start, end_date: d.end,
+    color: d.color||'#374151', temp: d.temp||'', rain: d.rain||'',
+    description: d.desc||'', url: d.url||'#',
+    sort_order: d.order !== undefined ? d.order : 999,
+    updated_at: new Date().toISOString()
+  };
+}
+
+function localFromDestRow(row){
+  return {
+    id: row.id, name: row.name, start: row.start_date, end: row.end_date,
+    color: row.color||'#374151', temp: row.temp||'', rain: row.rain||'',
+    desc: row.description||'', url: row.url||'#',
+    order: row.sort_order !== undefined ? row.sort_order : 999
+  };
+}
+
+function syncDestinationsToSupabase(){
+  if(!destinationsSyncEnabled) return;
+  var rows = DESTS.map(destRowFromLocal);
+  var currentIds = rows.map(function(r){ return r.id; });
+  var toDelete = knownRemoteIds.filter(function(id){ return currentIds.indexOf(id) === -1; });
+  var p = toDelete.length ? sb.from('destinations').delete().in('id', toDelete) : Promise.resolve({error:null});
+  p.then(function(){ return sb.from('destinations').upsert(rows); })
+   .then(function(res){
+     if(res && res.error){ console.warn('Supabase destinations error:', res.error.message); return; }
+     knownRemoteIds = currentIds;
+   })
+   .catch(function(err){ console.warn('Red error al guardar destinations:', err); });
+}
+
+function applyRemoteDestinations(rows){
+  DESTS.length = 0;
+  rows.forEach(function(row){ DESTS.push(localFromDestRow(row)); });
+  knownRemoteIds = DESTS.map(function(d){ return d.id; });
+  try { localStorage.setItem('itin-dates-v2', JSON.stringify(rows.map(function(row){ return localFromDestRow(row); }))); } catch(e){}
+}
+
+function isEditingDestInput(){
+  var el = document.activeElement;
+  if(!el || el.tagName !== 'INPUT') return false;
+  return /^(name|start|end)-/.test(el.id);
+}
+
+// Carga inicial desde Supabase (localStorage ya se usó para el primer render, esto trae la versión compartida)
+sb.from('destinations').select('*').then(function(r){
+  if(r.error){
+    console.warn('Tabla destinations no disponible, usando solo localStorage:', r.error.message);
+    destinationsSyncEnabled = false;
+    return;
+  }
+  if(!r.data || !r.data.length){
+    // Primera vez: sembrar Supabase con los datos actuales
+    knownRemoteIds = [];
+    syncDestinationsToSupabase();
+    return;
+  }
+  applyRemoteDestinations(r.data);
+  renderCalendar();
+  renderStats();
+  renderCities();
+}).catch(function(err){
+  console.warn('Red error al cargar destinations:', err);
+  destinationsSyncEnabled = false;
+});
+
+// Realtime: refleja cambios hechos desde otro dispositivo
+sb.channel('itin_sync')
+  .on('postgres_changes', {event:'*', schema:'public', table:'destinations'}, function(){
+    if(isEditingDestInput()) return; // no pisar mientras alguien está tipeando
+    sb.from('destinations').select('*').then(function(r){
+      if(r.error || !r.data) return;
+      applyRemoteDestinations(r.data);
+      renderCalendar();
+      renderStats();
+      renderCities();
+    });
+  })
+  .subscribe();
 
 // ── AGREGAR / ELIMINAR DESTINOS ───────────────────────────────────────────────
 const PALETTE=['#059669','#e11d48','#0891b2','#b45309','#6d28d9','#be185d','#0f766e','#c2410c'];

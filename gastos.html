@@ -263,6 +263,7 @@
   var catalogItems = []; // flat array of items with group info
   var editMode = false;
   var catalogEditable = true; // becomes false if budget_items table missing
+  var groupMetaSyncEnabled = true; // becomes false if group_meta table missing
 
   var LS_TRACKER        = 'europa2026_tracker_v1';
   var LS_CATALOG        = 'europa2026_budget_catalog_v2'; // v2: dest_id schema
@@ -371,6 +372,45 @@
   }
   function loadGroupMeta() {
     try { var r = localStorage.getItem(LS_GROUP_META); if (r) groupMeta = JSON.parse(r); } catch(e) {}
+  }
+
+  // ── GROUP META SYNC (Supabase) ──────────────────────────────
+  // Nombre/orden/eliminación de tramos, para que persistan entre dispositivos
+  function groupMetaRowFromLocal(key) {
+    var meta = groupMeta[key] || {};
+    return {
+      group_key:  key,
+      name:       meta.name !== undefined ? meta.name : null,
+      sort_key:   meta.sort_key !== undefined ? meta.sort_key : null,
+      deleted:    !!deletedGroupKeys[key],
+      updated_at: new Date().toISOString()
+    };
+  }
+  function syncGroupMeta(keys) {
+    if (!groupMetaSyncEnabled) return;
+    var arr = Array.isArray(keys) ? keys : [keys];
+    var rows = arr.filter(Boolean).map(groupMetaRowFromLocal);
+    if (!rows.length) return;
+    sb.from('group_meta').upsert(rows).then(function(res) {
+      if (res.error) console.warn('group_meta sync error:', res.error.message);
+    }).catch(function(err) { console.warn('Red error group_meta:', err); });
+  }
+  function applyRemoteGroupMeta(rows) {
+    (rows || []).forEach(function(row) {
+      if (row.deleted) {
+        deletedGroupKeys[row.group_key] = true;
+        delete groupMeta[row.group_key];
+      } else {
+        delete deletedGroupKeys[row.group_key];
+        var m = {};
+        if (row.name !== null && row.name !== undefined) m.name = row.name;
+        if (row.sort_key !== null && row.sort_key !== undefined) m.sort_key = row.sort_key;
+        if (Object.keys(m).length) groupMeta[row.group_key] = m;
+        else delete groupMeta[row.group_key];
+      }
+    });
+    saveGroupMeta();
+    saveDeletedGroups();
   }
 
   // Asigna dest_id/sort_key a items según su group_name
@@ -1043,6 +1083,7 @@
     saveCatalogLocal();
     saveDeletedGroups();
     saveGroupMeta();
+    syncGroupMeta(groupKey);
     renderBudget();
     renderResumen();
     showToast('Tramo eliminado', false);
@@ -1055,16 +1096,22 @@
     if (!groupMeta[groupKey]) groupMeta[groupKey] = {};
     groupMeta[groupKey].name = newName;
     saveGroupMeta();
-    // También actualizar catalogItems para consistencia
+    // También actualizar catalogItems para consistencia, y subir el nuevo nombre a Supabase
+    var itemRows = [];
     catalogItems.forEach(function(it) {
       var key = it.dest_id || it.group_name;
-      if (key === groupKey && !it.deleted) it.group_name = newName;
+      if (key === groupKey && !it.deleted) {
+        it.group_name = newName;
+        itemRows.push({ id: it.id, group_name: newName, group_order: it.group_order, updated_at: new Date().toISOString() });
+      }
     });
+    if (itemRows.length) sb.from('budget_items').upsert(itemRows).catch(function(){});
     if (deletedGroupKeys[groupKey]) {
       deletedGroupKeys[newName] = true;
       delete deletedGroupKeys[groupKey];
       saveDeletedGroups();
     }
+    syncGroupMeta([groupKey, newName]);
     saveCatalogLocal();
     renderBudget();
     renderResumen();
@@ -1087,6 +1134,8 @@
     groupItems.forEach(function(it, i) { it.item_order = i; });
     saveCatalogLocal();
     renderBudget();
+    var rows = groupItems.map(function(it) { return { id: it.id, item_order: it.item_order, updated_at: new Date().toISOString() }; });
+    sb.from('budget_items').upsert(rows).catch(function(){});
   }
 
   function moveGroup(groupKey, direction) {
@@ -1099,12 +1148,17 @@
     var tmp = groups[idx];
     groups[idx] = groups[swapIdx];
     groups[swapIdx] = tmp;
-    groups.forEach(function(g, i) {
+    var allKeys = groups.map(function(g) {
       var gk = g.dest_id || g.group_name;
       if (!groupMeta[gk]) groupMeta[gk] = {};
+      return gk;
+    });
+    groups.forEach(function(g, i) {
+      var gk = g.dest_id || g.group_name;
       groupMeta[gk].sort_key = i;
     });
     saveGroupMeta();
+    syncGroupMeta(allKeys);
     renderBudget();
   }
 
@@ -1466,12 +1520,14 @@
       var r = p.new;
       var idx = catalogItems.findIndex(function(it) { return it.id === r.id; });
       if (idx >= 0) {
-        // Merge: preservar dest_id/sort_key/group_order locales
+        // Merge: preservar dest_id/sort_key locales (vinculación con itinerario)
         catalogItems[idx].label      = r.label;
         catalogItems[idx].est        = r.est;
         catalogItems[idx].tag        = r.tag;
         catalogItems[idx].item_order = r.item_order;
         catalogItems[idx].deleted    = r.deleted;
+        if (r.group_name) catalogItems[idx].group_name = r.group_name;
+        if (r.group_order != null) catalogItems[idx].group_order = r.group_order;
       } else {
         catalogItems.push({
           id: r.id, group_name: r.group_name, group_order: r.group_order,
@@ -1481,6 +1537,12 @@
         migrateLegacyItems();
       }
       saveCatalogLocal();
+      renderBudget();
+      renderResumen();
+    })
+    .on('postgres_changes', {event:'*', schema:'public', table:'group_meta'}, function(p) {
+      if (!p.new) return;
+      applyRemoteGroupMeta([p.new]);
       renderBudget();
       renderResumen();
     })
@@ -1560,8 +1622,8 @@
       saveCatalogLocal();
       seedBudgetItems();
     } else {
-      // MERGE: preservar metadata local (dest_id, sort_key, group_order)
-      // Solo actualizar contenido (label, est, tag, deleted, item_order)
+      // MERGE: preservar dest_id/sort_key locales (vinculación con itinerario)
+      // Actualizar contenido, incluyendo nombre/orden de grupo (para reflejar renombres de tramos)
       var sbMap = {};
       (r.data || []).forEach(function(row) { sbMap[row.id] = row; });
 
@@ -1574,6 +1636,8 @@
         it.tag        = row.tag;
         it.deleted    = row.deleted;
         it.item_order = row.item_order;
+        if (row.group_name) it.group_name = row.group_name;
+        if (row.group_order != null) it.group_order = row.group_order;
       });
 
       // Agregar items nuevos (de otro dispositivo) que no están en localStorage
@@ -1599,6 +1663,23 @@
     catalogEditable = false;
     var editBtn = document.getElementById('editToggleBtn');
     if (editBtn) editBtn.style.display = 'none';
+  });
+
+  // 4) Sync group_meta (nombre/orden/eliminación de tramos) from Supabase
+  sb.from('group_meta').select('*').then(function(r) {
+    if (r.error) {
+      console.warn('group_meta table error:', r.error.message);
+      groupMetaSyncEnabled = false;
+      return;
+    }
+    if (r.data && r.data.length) {
+      applyRemoteGroupMeta(r.data);
+      renderBudget();
+      renderResumen();
+    }
+  }).catch(function(err) {
+    console.warn('Red error group_meta:', err);
+    groupMetaSyncEnabled = false;
   });
 
 })();
