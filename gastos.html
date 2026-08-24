@@ -72,6 +72,8 @@
 .bi-file-lbl{cursor:pointer;font-family:Outfit,sans-serif;font-size:.68rem;color:var(--text-mid);border:1px dashed rgba(13,27,42,.2);border-radius:8px;padding:.22rem .55rem;white-space:nowrap;transition:all .15s;-webkit-tap-highlight-color:transparent;}
 .bi-file-lbl:hover{border-color:var(--gold);color:var(--gold);}
 .bi-file-link{font-family:Outfit,sans-serif;font-size:.7rem;color:#15803d;text-decoration:underline;word-break:break-all;}
+.bi-files-wrap{display:flex;flex-wrap:wrap;gap:.4rem;align-items:center;}
+.bi-file-chip{display:inline-flex;align-items:center;gap:.15rem;}
 @media(max-width:480px){
   .res-val{font-size:1.65rem;}
   .bi-split-lbl{min-width:100px;}
@@ -949,39 +951,79 @@
       noteInp.dataset.id = item.id; noteInp.dataset.field = 'note';
       detail.appendChild(noteInp);
 
-      if (s.file_url) {
+      var filesWrap = document.createElement('div');
+      filesWrap.className = 'bi-files-wrap';
+
+      var fileList = [];
+      if (s.file_url) fileList.push({ url: s.file_url, name: s.file_name, legacy: true });
+      (s.files || []).forEach(function(f, fi) { fileList.push({ url: f.url, name: f.name, idx: fi }); });
+
+      fileList.forEach(function(f) {
+        var fchip = document.createElement('span');
+        fchip.className = 'bi-file-chip';
+
         var flink = document.createElement('a');
         flink.className = 'bi-file-link';
-        flink.href = s.file_url; flink.target = '_blank'; flink.rel = 'noopener';
-        flink.textContent = '📎 ' + (s.file_name || 'comprobante');
-        detail.appendChild(flink);
-      } else {
-        var flbl = document.createElement('label');
-        flbl.className = 'bi-file-lbl';
-        flbl.textContent = '📎 Adjuntar';
-        var finp = document.createElement('input');
-        finp.type = 'file'; finp.accept = 'image/*,.pdf'; finp.style.display = 'none';
-        (function(itemId, lbl) {
-          finp.addEventListener('change', function() {
-            var file = this.files[0];
-            if (!file) return;
-            lbl.textContent = '⏳ Subiendo…';
+        flink.href = f.url; flink.target = '_blank'; flink.rel = 'noopener';
+        flink.textContent = '📎 ' + (f.name || 'comprobante');
+        fchip.appendChild(flink);
+
+        var delBtn = document.createElement('button');
+        delBtn.className = 'bi-link-chip-del';
+        delBtn.textContent = '×';
+        delBtn.title = 'Quitar archivo';
+        (function(itemId, fObj) {
+          delBtn.addEventListener('click', function(e) {
+            e.stopPropagation();
+            if (!trackerState[itemId]) return;
+            if (fObj.legacy) {
+              trackerState[itemId].file_url = '';
+              trackerState[itemId].file_name = '';
+            } else if (trackerState[itemId].files) {
+              trackerState[itemId].files.splice(fObj.idx, 1);
+            }
+            trkUpsert(itemId).then(function() { renderBudget(); });
+          });
+        })(item.id, f);
+        fchip.appendChild(delBtn);
+
+        filesWrap.appendChild(fchip);
+      });
+
+      var flbl = document.createElement('label');
+      flbl.className = 'bi-file-lbl';
+      flbl.textContent = '📎 Adjuntar';
+      var finp = document.createElement('input');
+      finp.type = 'file'; finp.accept = 'image/*,.pdf'; finp.multiple = true; finp.style.display = 'none';
+      (function(itemId, lbl) {
+        finp.addEventListener('change', function() {
+          var chosen = Array.prototype.slice.call(this.files || []);
+          if (!chosen.length) return;
+          lbl.textContent = '⏳ Subiendo…';
+          var uploads = chosen.map(function(file) {
             var ext = file.name.split('.').pop();
-            var path = itemId + '_' + Date.now() + '.' + ext;
-            sb.storage.from('comprobantes').upload(path, file, {upsert:true}).then(function(res) {
-              if (res.error) { lbl.textContent = '❌ Error'; return; }
+            var path = itemId + '_' + Date.now() + '_' + Math.random().toString(36).slice(2, 8) + '.' + ext;
+            return sb.storage.from('comprobantes').upload(path, file, {upsert:true}).then(function(res) {
+              if (res.error) return null;
               var url = sb.storage.from('comprobantes').getPublicUrl(path).data.publicUrl;
               var fname = file.name.length > 22 ? file.name.substring(0,20) + '…' : file.name;
-              if (!trackerState[itemId]) trackerState[itemId] = {status:'reservado',precio:0,adelanto:0,note:'',file_url:'',file_name:''};
-              trackerState[itemId].file_url  = url;
-              trackerState[itemId].file_name = fname;
-              trkUpsert(itemId).then(function() { renderBudget(); });
+              return { url: url, name: fname };
             });
           });
-        })(item.id, flbl);
-        flbl.appendChild(finp);
-        detail.appendChild(flbl);
-      }
+          Promise.all(uploads).then(function(results) {
+            var ok = results.filter(Boolean);
+            if (!trackerState[itemId]) trackerState[itemId] = {status:'reservado',precio:0,adelanto:0,note:'',file_url:'',file_name:'',files:[]};
+            if (!trackerState[itemId].files) trackerState[itemId].files = [];
+            trackerState[itemId].files = trackerState[itemId].files.concat(ok);
+            if (ok.length < results.length) lbl.textContent = '❌ Algunos archivos fallaron';
+            trkUpsert(itemId).then(function() { renderBudget(); });
+          });
+        });
+      })(item.id, flbl);
+      flbl.appendChild(finp);
+      filesWrap.appendChild(flbl);
+
+      detail.appendChild(filesWrap);
 
       card.appendChild(detail);
     }
@@ -1003,6 +1045,7 @@
       fecha_adelanto: s.fecha_adelanto || '',
       fecha_destino:  s.fecha_destino  || '',
       links:          s.links          || [],
+      files:          s.files          || [],
       date:           '',
       updated_at:     new Date().toISOString()
     }).then(function(res) {
@@ -1501,6 +1544,7 @@
         if (focused && focused.dataset && (focused.dataset.field === 'precio' || focused.dataset.field === 'adelanto' || focused.dataset.field === 'note')) return;
         var prevT = trackerState[r.id];
         var rtLinks = Array.isArray(r.links) ? r.links : [];
+        var rtFiles = Array.isArray(r.files) ? r.files : [];
         trackerState[r.id] = {
           status:         normalizeStatus(r.status),
           precio:         r.precio         != null ? r.precio         : (prevT ? prevT.precio         || 0  : 0),
@@ -1510,7 +1554,8 @@
           file_name:      r.file_name      || '',
           fecha_adelanto: r.fecha_adelanto != null ? r.fecha_adelanto : (prevT ? prevT.fecha_adelanto || '' : ''),
           fecha_destino:  r.fecha_destino  != null ? r.fecha_destino  : (prevT ? prevT.fecha_destino  || '' : ''),
-          links:          rtLinks.length > 0 ? rtLinks : ((prevT && prevT.links) || [])
+          links:          rtLinks.length > 0 ? rtLinks : ((prevT && prevT.links) || []),
+          files:          rtFiles.length > 0 ? rtFiles : ((prevT && prevT.files) || [])
         };
         renderBudget(); renderResumen(); renderChart();
       }
@@ -1587,6 +1632,7 @@
       var prev = trackerState[row.id];
       // Usar != null para detectar columnas inexistentes (undefined) vs valor real 0/''
       var sbLinks = Array.isArray(row.links) ? row.links : [];
+      var sbFiles = Array.isArray(row.files) ? row.files : [];
       trackerState[row.id] = {
         status:         normalizeStatus(row.status),
         precio:         row.precio         != null ? row.precio         : (prev ? prev.precio         || 0  : 0),
@@ -1596,7 +1642,8 @@
         file_name:      row.file_name      || '',
         fecha_adelanto: row.fecha_adelanto != null ? row.fecha_adelanto : (prev ? prev.fecha_adelanto || '' : ''),
         fecha_destino:  row.fecha_destino  != null ? row.fecha_destino  : (prev ? prev.fecha_destino  || '' : ''),
-        links:          sbLinks.length > 0 ? sbLinks : ((prev && prev.links) || [])
+        links:          sbLinks.length > 0 ? sbLinks : ((prev && prev.links) || []),
+        files:          sbFiles.length > 0 ? sbFiles : ((prev && prev.files) || [])
       };
     });
     saveTrackerLocal();
