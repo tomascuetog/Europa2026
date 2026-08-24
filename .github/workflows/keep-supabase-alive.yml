@@ -1,0 +1,22 @@
+name: Keep Supabase project alive
+
+on:
+  schedule:
+    # Lunes y jueves 09:00 UTC (máximo 4 días entre pings, por debajo del límite de pausa de 7 días de Supabase free tier)
+    - cron: '0 9 * * 1,4'
+  workflow_dispatch: {}
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Query Supabase REST API
+        env:
+          # Clave anon pública, ya expuesta en gastos.html/itinerario.html/tareas.html (client-side)
+          SUPABASE_URL: https://adzmnnmubbharcprjkhs.supabase.co
+          SUPABASE_ANON_KEY: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFkem1ubm11YmJoYXJjcHJqa2hzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg5MzI3MjcsImV4cCI6MjA5NDUwODcyN30.K_TdCUgIo23aqc0wCQBJI7BMWDTT6PND89n7x_MU6-A
+        run: |
+          curl -sS -f \
+            -H "apikey: $SUPABASE_ANON_KEY" \
+            -H "Authorization: Bearer $SUPABASE_ANON_KEY" \
+            "$SUPABASE_URL/rest/v1/budget_items?select=id&limit=1"
