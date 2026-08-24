@@ -751,7 +751,7 @@
       (function(it) {
         editBtn.addEventListener('click', function(e) {
           e.stopPropagation();
-          openSheet(it, it.group_name, it.group_order);
+          openSheet(it, it.group_name, it.group_order, false, it.dest_id);
         });
       })(item);
       editBtns.appendChild(editBtn);
@@ -1258,7 +1258,10 @@
     } else {
       newGroupInp.style.display = 'none';
       newGroupInp.value = '';
-      if (defaultGroup) groupSel.value = defaultGroup;
+      // Si hay dest_id, la selección ya se resolvió por matchById en el loop de arriba;
+      // reasignar acá por nombre puede pisarla si el tramo fue renombrado (group_name
+      // desactualizado en el item vs. display_name actual del grupo).
+      if (!defaultDestId && defaultGroup) groupSel.value = defaultGroup;
     }
 
     // Fill fields if editing
