@@ -43,6 +43,12 @@
 .ti-btn:hover{border-color:var(--gold);color:var(--gold);}
 .ti-btn.del:hover{border-color:#ef4444;color:#ef4444;}
 
+/* ── TASK PRICE / LINK ────────────────── */
+.task-content{flex:1;min-width:0;}
+.task-meta{display:flex;flex-wrap:wrap;align-items:center;gap:.5rem;margin-top:.2rem;}
+.task-price{font-family:Outfit,sans-serif;font-size:.68rem;font-weight:600;color:var(--gold);}
+.task-link{font-family:Outfit,sans-serif;font-size:.68rem;color:#1d4ed8;text-decoration:underline;-webkit-tap-highlight-color:transparent;}
+
 /* ── GROUP ADD BUTTON ─────────────────── */
 .task-group-add-btn{display:none;font-family:Outfit,sans-serif;font-size:.63rem;font-weight:600;color:var(--gold);background:none;border:1px dashed rgba(201,151,58,.5);border-radius:20px;padding:.18rem .55rem;cursor:pointer;-webkit-tap-highlight-color:transparent;transition:all .15s;white-space:nowrap;}
 .task-group-add-btn:hover{background:rgba(201,151,58,.07);}
@@ -122,6 +128,14 @@
     <div class="sheet-field">
       <label class="sheet-label">Tarea</label>
       <input class="sheet-input" id="sheetTaskLabel" placeholder="Descripción de la tarea…" type="text">
+    </div>
+    <div class="sheet-field">
+      <label class="sheet-label">Precio (opcional)</label>
+      <input class="sheet-input" id="sheetTaskPrice" placeholder="0" type="number" min="0" step="any" inputmode="decimal">
+    </div>
+    <div class="sheet-field">
+      <label class="sheet-label">Link (opcional)</label>
+      <input class="sheet-input" id="sheetTaskLink" placeholder="https://…" type="text" inputmode="url">
     </div>
   </div>
 
@@ -357,6 +371,8 @@
           group_name:  g.group,
           group_order: g.order,
           label:       it.label,
+          price:       it.price || 0,
+          link:        it.link  || '',
           item_order:  it.order,
           deleted:     false
         });
@@ -443,12 +459,37 @@
         var cb = document.createElement('div');
         cb.className = 'task-cb' + (d ? ' done' : '');
 
+        var content = document.createElement('div');
+        content.className = 'task-content';
+
         var lbl = document.createElement('span');
         lbl.className = 'task-label' + (d ? ' done' : '');
         lbl.textContent = it.label;
+        content.appendChild(lbl);
+
+        if (it.price || it.link) {
+          var meta = document.createElement('div');
+          meta.className = 'task-meta';
+          if (it.price) {
+            var priceEl = document.createElement('span');
+            priceEl.className = 'task-price';
+            priceEl.textContent = '$' + it.price;
+            meta.appendChild(priceEl);
+          }
+          if (it.link) {
+            var linkEl = document.createElement('a');
+            linkEl.className = 'task-link';
+            linkEl.href = it.link;
+            linkEl.target = '_blank';
+            linkEl.rel = 'noopener';
+            linkEl.textContent = '🔗 ' + it.link.replace(/^https?:\/\//, '').split('/')[0];
+            meta.appendChild(linkEl);
+          }
+          content.appendChild(meta);
+        }
 
         el.appendChild(cb);
-        el.appendChild(lbl);
+        el.appendChild(content);
 
         if (taskCatalogEditable) {
           var editBtns = document.createElement('div');
@@ -483,7 +524,7 @@
         }
 
         el.addEventListener('click', function(e) {
-          if (e.target.closest('.task-edit-btns')) return;
+          if (e.target.closest('.task-edit-btns') || e.target.closest('.task-link')) return;
           tasksState[it.id] = !tasksState[it.id];
           saveTasksLocal();
           renderTasks();
@@ -532,6 +573,8 @@
       group_name:  item.group_name,
       group_order: item.group_order,
       label:       item.label,
+      price:       item.price || 0,
+      link:        item.link  || '',
       item_order:  item.item_order,
       deleted:     false,
       updated_at:  new Date().toISOString()
@@ -1033,6 +1076,8 @@
     }
 
     document.getElementById('sheetTaskLabel').value = item ? item.label : '';
+    document.getElementById('sheetTaskPrice').value = item && item.price ? item.price : '';
+    document.getElementById('sheetTaskLink').value  = item ? (item.link || '') : '';
 
     openSheet();
     setTimeout(function() { document.getElementById('sheetTaskLabel').focus(); }, 350);
@@ -1098,6 +1143,9 @@
     var groupOrder = 0;
     var newGrpInp  = document.getElementById('sheetTaskNewGroup');
     var labelVal   = document.getElementById('sheetTaskLabel').value.trim();
+    var priceVal   = parseFloat(document.getElementById('sheetTaskPrice').value) || 0;
+    var linkVal    = document.getElementById('sheetTaskLink').value.trim();
+    if (linkVal && !/^https?:\/\//i.test(linkVal)) linkVal = 'https://' + linkVal;
 
     if (groupName === '__new__') {
       groupName = newGrpInp.value.trim();
@@ -1119,6 +1167,8 @@
         group_name:  groupName,
         group_order: groupOrder,
         label:       labelVal,
+        price:       priceVal,
+        link:        linkVal,
         item_order:  sheetEditingTask.item_order,
         deleted:     false
       };
@@ -1131,6 +1181,8 @@
         group_name:  groupName,
         group_order: groupOrder,
         label:       labelVal,
+        price:       priceVal,
+        link:        linkVal,
         item_order:  nextOrder,
         deleted:     false
       };
@@ -1175,7 +1227,8 @@
       var idx = taskCatalog.findIndex(function(it) { return it.id === r.id; });
       var item = {
         id: r.id, group_name: r.group_name, group_order: r.group_order,
-        label: r.label, item_order: r.item_order, deleted: r.deleted
+        label: r.label, price: r.price || 0, link: r.link || '',
+        item_order: r.item_order, deleted: r.deleted
       };
       if (idx >= 0) { taskCatalog[idx] = item; } else { taskCatalog.push(item); }
       saveCatalogLocal();
@@ -1267,6 +1320,8 @@
           group_name:  row.group_name,
           group_order: row.group_order,
           label:       row.label,
+          price:       row.price || 0,
+          link:        row.link  || '',
           item_order:  row.item_order,
           deleted:     row.deleted
         };
