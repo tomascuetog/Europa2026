@@ -1135,10 +1135,26 @@
   function renameGroup(groupKey, newName) {
     newName = (newName || '').trim();
     if (!newName) return;
-    // Persistir en groupMeta para que sobreviva aunque el grupo esté vacío
-    if (!groupMeta[groupKey]) groupMeta[groupKey] = {};
-    groupMeta[groupKey].name = newName;
+
+    // Los grupos con dest_id se identifican por ese id (estable ante renombres).
+    // Los grupos manuales (transporte, tramos de traslado) se identifican por su
+    // propio nombre, así que renombrarlos cambia la key: hay que migrar el meta
+    // a la key nueva, si no el nombre se pierde en el próximo reload.
+    var hasDestId = catalogItems.some(function(it) {
+      return !it.deleted && (it.dest_id || it.group_name) === groupKey && it.dest_id;
+    });
+    var newKey = hasDestId ? groupKey : newName;
+
+    var meta = groupMeta[groupKey] || {};
+    meta.name = newName;
+    if (newKey !== groupKey) {
+      delete groupMeta[groupKey];
+      deletedGroupKeys[groupKey] = true;
+      saveDeletedGroups();
+    }
+    groupMeta[newKey] = meta;
     saveGroupMeta();
+
     // También actualizar catalogItems para consistencia, y subir el nuevo nombre a Supabase
     var itemRows = [];
     catalogItems.forEach(function(it) {
@@ -1149,12 +1165,8 @@
       }
     });
     if (itemRows.length) sb.from('budget_items').upsert(itemRows).catch(function(){});
-    if (deletedGroupKeys[groupKey]) {
-      deletedGroupKeys[newName] = true;
-      delete deletedGroupKeys[groupKey];
-      saveDeletedGroups();
-    }
-    syncGroupMeta([groupKey, newName]);
+
+    syncGroupMeta(newKey === groupKey ? [groupKey] : [groupKey, newKey]);
     saveCatalogLocal();
     renderBudget();
     renderResumen();

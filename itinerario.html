@@ -35,20 +35,20 @@
   /* SECTION LABEL */
   .itin-section-label{font-family:Outfit,sans-serif;font-size:.6rem;letter-spacing:.18em;text-transform:uppercase;color:var(--text-mid);margin-bottom:.75rem;padding-left:.15rem;}
 
-  /* CALENDAR */
-  .cal-wrap{margin:0 0 1.25rem;}
-  .cal-month-label{font-family:'Cormorant Garamond',serif;font-size:.9rem;font-weight:600;color:var(--navy);margin-bottom:.45rem;}
-  .cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;}
-  .cal-head{font-family:Outfit,sans-serif;font-size:.52rem;font-weight:700;letter-spacing:.03em;color:var(--text-mid);text-align:center;padding:.2rem 0 .35rem;}
-  .cal-cell{aspect-ratio:1;border-radius:5px;display:flex;align-items:center;justify-content:center;}
-  .cal-cell.empty{background:rgba(13,27,42,.04);}
-  .cal-cell.post{background:rgba(13,27,42,.04);}
-  .cal-cell.trip{box-shadow:0 1px 3px rgba(0,0,0,.15);}
-  .cal-num{font-family:Outfit,sans-serif;font-size:.6rem;font-weight:700;color:white;line-height:1;}
-  .cal-cell.empty .cal-num,.cal-cell.post .cal-num{color:rgba(13,27,42,.2);font-weight:400;}
-  .cal-legend{display:flex;flex-wrap:wrap;gap:.3rem .7rem;margin-top:.6rem;}
-  .cal-leg{display:inline-flex;align-items:center;gap:.28rem;font-family:Outfit,sans-serif;font-size:.6rem;color:var(--text-mid);}
-  .cal-leg-sq{width:8px;height:8px;border-radius:2px;flex-shrink:0;}
+  /* CALENDAR ── namespaced itin-cal-* para no chocar con .cal-cell/.cal-num de style.css (usadas por ruta.html) */
+  .itin-cal-wrap{margin:0 0 1.25rem;}
+  .itin-cal-month-label{font-family:'Cormorant Garamond',serif;font-size:.9rem;font-weight:600;color:var(--navy);margin-bottom:.45rem;}
+  .itin-cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;}
+  .itin-cal-head{font-family:Outfit,sans-serif;font-size:.52rem;font-weight:700;letter-spacing:.03em;color:var(--text-mid);text-align:center;padding:.2rem 0 .35rem;}
+  .itin-cal-cell{width:100%;aspect-ratio:1;min-width:0;border-radius:5px;display:flex;align-items:center;justify-content:center;}
+  .itin-cal-cell.empty{background:rgba(13,27,42,.04);}
+  .itin-cal-cell.post{background:rgba(13,27,42,.04);}
+  .itin-cal-cell.trip{box-shadow:0 1px 3px rgba(0,0,0,.15);}
+  .itin-cal-num{font-family:Outfit,sans-serif;font-size:.6rem;font-weight:700;color:white;line-height:1;margin-bottom:0;}
+  .itin-cal-cell.empty .itin-cal-num,.itin-cal-cell.post .itin-cal-num{color:rgba(13,27,42,.2);font-weight:400;}
+  .itin-cal-legend{display:flex;flex-wrap:wrap;gap:.3rem .7rem;margin-top:.6rem;}
+  .itin-cal-leg{display:inline-flex;align-items:center;gap:.28rem;font-family:Outfit,sans-serif;font-size:.6rem;color:var(--text-mid);}
+  .itin-cal-leg-sq{width:8px;height:8px;border-radius:2px;flex-shrink:0;}
 
   /* CITY LIST */
   .city-list{display:flex;flex-direction:column;gap:.45rem;margin-bottom:1.5rem;position:relative;}
@@ -107,7 +107,7 @@
     <div class="itin-stat"><div class="itin-stat-val">~3k</div><div class="itin-stat-label">USD p/p</div></div>
   </div>
 
-  <div class="cal-wrap" id="calWrap"></div>
+  <div class="itin-cal-wrap" id="calWrap"></div>
 
   <div class="itin-section-label">Ciudades y fechas</div>
   <div class="city-list" id="cityList"><div class="route-line"></div></div>
@@ -342,32 +342,32 @@ function renderCalendar(){
   });
 
   // Cabecera
-  let h = '<div class="cal-month-label">Septiembre 2026</div><div class="cal-grid">';
-  ['L','M','X','J','V','S','D'].forEach(x=>h+=`<div class="cal-head">${x}</div>`);
+  let h = '<div class="itin-cal-month-label">Septiembre 2026</div><div class="itin-cal-grid">';
+  ['L','M','X','J','V','S','D'].forEach(x=>h+=`<div class="itin-cal-head">${x}</div>`);
 
   // Sep 2026 empieza martes → 1 celda vacía (Lunes)
-  h += '<div class="cal-cell empty"><span class="cal-num"></span></div>';
+  h += '<div class="itin-cal-cell empty"><span class="itin-cal-num"></span></div>';
 
   for(let day=1; day<=30; day++){
     const key = `2026-09-${String(day).padStart(2,'0')}`;
     const d = dayMap[key];
     if(d){
-      h += `<div class="cal-cell trip" style="background:${d.color}"><span class="cal-num">${day}</span></div>`;
+      h += `<div class="itin-cal-cell trip" style="background:${d.color}"><span class="itin-cal-num">${day}</span></div>`;
     } else {
-      h += `<div class="cal-cell post"><span class="cal-num">${day}</span></div>`;
+      h += `<div class="itin-cal-cell post"><span class="itin-cal-num">${day}</span></div>`;
     }
   }
 
   // Rellenar última fila (1 offset + 30 días = 31 celdas → 31%7=3 → 4 restantes)
   const total = 1 + 30;
   const rem = total%7===0 ? 0 : 7-total%7;
-  for(let i=0;i<rem;i++) h+='<div class="cal-cell empty"></div>';
+  for(let i=0;i<rem;i++) h+='<div class="itin-cal-cell empty"></div>';
   h += '</div>';
 
   // Leyenda
-  h += '<div class="cal-legend">';
+  h += '<div class="itin-cal-legend">';
   sorted().forEach(d=>{
-    h += `<span class="cal-leg"><span class="cal-leg-sq" style="background:${d.color}"></span>${d.name}</span>`;
+    h += `<span class="itin-cal-leg"><span class="itin-cal-leg-sq" style="background:${d.color}"></span>${d.name}</span>`;
   });
   h += '</div>';
 
