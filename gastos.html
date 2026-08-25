@@ -1164,9 +1164,24 @@
         itemRows.push({ id: it.id, group_name: newName, group_order: it.group_order, updated_at: new Date().toISOString() });
       }
     });
-    if (itemRows.length) sb.from('budget_items').upsert(itemRows).catch(function(){});
 
-    syncGroupMeta(newKey === groupKey ? [groupKey] : [groupKey, newKey]);
+    var itemsPromise = itemRows.length
+      ? sb.from('budget_items').upsert(itemRows)
+      : Promise.resolve({ error: null });
+    var metaKeys = newKey === groupKey ? [groupKey] : [groupKey, newKey];
+    var metaRows = metaKeys.filter(Boolean).map(groupMetaRowFromLocal);
+    var metaPromise = groupMetaSyncEnabled && metaRows.length
+      ? sb.from('group_meta').upsert(metaRows)
+      : Promise.resolve({ error: null });
+
+    Promise.all([itemsPromise, metaPromise]).then(function(results) {
+      var err = results.map(function(r) { return r && r.error; }).filter(Boolean)[0];
+      if (err) showToast('⚠️ Tramo sin sincronizar (' + (err.code || err.message) + ')', true);
+      else showToast('✓ Tramo guardado', false);
+    }).catch(function() {
+      showToast('⚠️ Sin conexión — guardado local', true);
+    });
+
     saveCatalogLocal();
     renderBudget();
     renderResumen();
